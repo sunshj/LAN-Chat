@@ -94,6 +94,13 @@ export const useAppStore = defineStore(
       return msg
     }
 
+    function deleteMessage(mid: string) {
+      const msgs = messages.value[currentChannelId.value]
+      if (msgs?.length > 0) {
+        messages.value[currentChannelId.value] = msgs.filter(msg => msg.mid !== mid)
+      }
+    }
+
     function setMessagesAsRead() {
       messages.value[currentChannelId.value]?.forEach(msg => {
         if (msg.sender === currentChat.value.id && !msg.read) {
@@ -132,6 +139,7 @@ export const useAppStore = defineStore(
       messages,
       currentChatMessages,
       addMessage,
+      deleteMessage,
       setMessagesAsRead,
       unreadMessagesCount
     }

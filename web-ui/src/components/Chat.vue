@@ -1,6 +1,6 @@
 <template>
   <ElDrawer v-model="visible" class="chat-drawer" direction="btt" size="100%" @closed="onClose">
-    <div class="h-full w-full flex flex-col items-center gap-2">
+    <template #header>
       <div class="flex flex-col items-center gap-2">
         <ElBadge
           is-dot
@@ -12,15 +12,20 @@
         </ElBadge>
         <div>{{ appStore.currentChat.username }}</div>
       </div>
-
+    </template>
+    <div class="h-full w-full flex flex-col items-center gap-2">
       <div ref="messageRef" class="relative mb-14 w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
           <div
-            v-for="{ time, content, sender, type } in appStore.currentChatMessages"
+            v-for="{ time, content, sender, type, mid } in appStore.currentChatMessages"
             :key="time"
             :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
-            <div :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']">
+            <div
+              v-click-outside="onClickOutside"
+              :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']"
+              @contextmenu.prevent="e => showPopover(e, mid)"
+            >
               <div v-if="type === 'text'">
                 <Suspense v-if="isMarkdownValue(content)">
                   <Markdown :value="content" @loaded="scrollToBottom" />
@@ -74,6 +79,28 @@
               </p>
             </div>
           </div>
+          <el-popover
+            ref="popoverRef"
+            :visible="popoverVisible"
+            :virtual-ref="buttonRef"
+            trigger="contextmenu"
+            virtual-triggering
+            :popper-style="{
+              padding: '2px'
+            }"
+            @hide="onPopoverHide"
+          >
+            <el-button
+              type="danger"
+              class="w-full"
+              text
+              bg
+              @contextmenu.prevent
+              @click="confirmDeleteMessage()"
+            >
+              删除消息
+            </el-button>
+          </el-popover>
         </div>
         <div
           class="fixed bottom-0 min-h-14 w-full flex items-start justify-around gap-2 bg-white p-2"
@@ -120,9 +147,9 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
+import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
 import { getOriginalFilename, isMarkdownValue, socketKey } from '../utils'
-import type { UploadProgressEvent } from 'element-plus'
 
 const appStore = useAppStore()
 const socket = inject(socketKey)!
@@ -153,6 +180,48 @@ const scrollToBottom = useDebounceFn(() => {
     messageRef.value?.scrollTo(0, scrollHeight - clientHeight)
   }
 })
+
+const popoverVisible = ref(false)
+const buttonRef = ref(null)
+const popoverRef = ref<any>(null)
+const currentSelectMid = ref('')
+
+const showPopover = (e: any, mid: string) => {
+  currentSelectMid.value = mid
+  buttonRef.value = e.target
+  popoverVisible.value = true
+}
+
+const onClickOutside = (e: any) => {
+  if (popoverVisible.value && !popoverRef.value?.popperRef?.contentRef?.contains(e.target)) {
+    popoverVisible.value = false
+  }
+}
+
+function onPopoverHide() {
+  buttonRef.value = null
+  popoverRef.value = null
+  currentSelectMid.value = ''
+}
+
+function confirmDeleteMessage() {
+  ElMessageBox.confirm('确定要删除这条消息吗？', 'Warning', {
+    confirmButtonText: '确定',
+    cancelButtonText: '算了',
+    type: 'warning'
+  }).then(value => {
+    if (value === 'confirm') {
+      deleteMessage()
+    }
+  })
+}
+
+function deleteMessage() {
+  popoverVisible.value = false
+  nextTick(() => {
+    appStore.deleteMessage(currentSelectMid.value)
+  })
+}
 
 function send() {
   if (!message.value.trim()) return
