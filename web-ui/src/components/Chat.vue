@@ -21,7 +21,16 @@
             :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
             <div :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']">
-              <div v-if="type === 'text'">{{ content }}</div>
+              <div v-if="type === 'text'">
+                <Suspense v-if="isMarkdownValue(content)">
+                  <Markdown :value="content" />
+                  <template #fallback>
+                    <div>Loading...</div>
+                  </template>
+                </Suspense>
+                <div v-else>{{ content }}</div>
+              </div>
+
               <div v-else-if="type === 'image'">
                 <el-image
                   fit="cover"
@@ -66,16 +75,38 @@
             </div>
           </div>
         </div>
-        <div class="fixed bottom-0 h-14 w-full flex items-start justify-around gap-2 bg-white p-2">
-          <el-upload :show-file-list="false" action="/api/upload" :on-success="onUploadSuccess">
+        <div
+          class="fixed bottom-0 min-h-14 w-full flex items-start justify-around gap-2 bg-white p-2"
+        >
+          <div
+            :class="[
+              'absolute inset-0 z-10 h-1 w-full',
+              uploadPercentage > 0 ? 'bg-green-500' : ''
+            ]"
+            :style="{
+              translate: `-${100 - uploadPercentage}%`
+            }"
+          />
+
+          <el-upload
+            :show-file-list="false"
+            action="/api/upload"
+            :on-progress="onUploadProgress"
+            :on-success="onUploadSuccess"
+          >
             <el-button plain size="large">
               <IconUpload class="text-xl" />
             </el-button>
           </el-upload>
           <div class="flex-1">
             <ElInput
-              v-model.trim="message"
-              size="large"
+              v-model="message"
+              type="textarea"
+              :autosize="{
+                minRows: 1.5,
+                maxRows: 6
+              }"
+              resize="none"
               placeholder="Ctrl + Enter to send"
               @keydown.ctrl.enter="send()"
             />
@@ -90,7 +121,8 @@
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
 import { type Message, type MessageType, useAppStore } from '../stores'
-import { getOriginalFilename, socketKey } from '../utils'
+import { getOriginalFilename, isMarkdownValue, socketKey } from '../utils'
+import type { UploadProgressEvent } from 'element-plus'
 
 const appStore = useAppStore()
 const socket = inject(socketKey)!
@@ -116,12 +148,14 @@ const fileSupportDownload = (file: string) => fileStatus.value.find(f => f.file 
 const formatFileUrl = (filename: string) => `/api/download/${filename}`
 
 function scrollToBottom() {
-  const { scrollHeight, clientHeight } = messageRef.value!
-  messageRef.value?.scroll(0, scrollHeight - clientHeight)
+  const { scrollHeight, clientHeight, scrollTop } = messageRef.value!
+  if (scrollHeight - clientHeight - scrollTop > 50) {
+    messageRef.value?.scroll(0, scrollHeight - clientHeight)
+  }
 }
 
 function send() {
-  if (!message.value) return
+  if (!message.value.trim()) return
   const msg = appStore.addMessage(message.value)
   socket.emit('new-message', msg)
   message.value = ''
@@ -142,8 +176,17 @@ function getMessageType(mimetype: string): MessageType {
   return 'file'
 }
 
-function onUploadSuccess(data: any) {
-  const { filename, mimetype } = data.data
+const uploadPercentage = ref(0)
+
+function onUploadProgress(evt: UploadProgressEvent) {
+  uploadPercentage.value = Number.parseFloat(evt.percent.toFixed(2))
+  if (evt.percent === 100) {
+    uploadPercentage.value = 0
+  }
+}
+
+function onUploadSuccess(res: any) {
+  const { filename, mimetype } = res.data
   const msg = appStore.addMessage(filename, getMessageType(mimetype))
   socket.emit('new-message', msg)
   nextTick(() => {
@@ -180,6 +223,10 @@ watchEffect(async () => {
       ?.map(v => checkFileStatus(v.content))
 
     fileStatus.value = await Promise.all(promises)
+
+    nextTick(() => {
+      scrollToBottom()
+    })
   }
 })
 
