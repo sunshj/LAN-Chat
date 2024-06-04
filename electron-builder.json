@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "top.sunshj.lan-chat",
+  "productName": "LAN-Chat",
+  "directories": {
+    "buildResources": "build"
+  },
+  "files": [
+    "!**/.vscode/*",
+    "!src/*",
+    "!prisma/*",
+    "!electron.vite.config.{js,ts,mjs,cjs}",
+    "!{eslint.config.js,dev-app-update.yml,CHANGELOG.md,README.md}",
+    "!{.env,.env.*,.npmrc,pnpm-lock.yaml}",
+    "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
+  ],
+  "asarUnpack": ["resources/**"],
+  "afterPack": "./scripts/after-pack.js",
+  "extraResources": [
+    "prisma/**/*",
+    "node_modules/.prisma/**/*",
+    "node_modules/@prisma/client/**/*"
+  ],
+  "win": {
+    "executableName": "LAN-Chat"
+  },
+  "nsis": {
+    "artifactName": "${name}-${version}-setup.${ext}",
+    "shortcutName": "${productName}",
+    "uninstallDisplayName": "${productName}",
+    "createDesktopShortcut": "always"
+  },
+  "appImage": {
+    "artifactName": "${name}-${version}.${ext}"
+  },
+  "npmRebuild": false
+}
