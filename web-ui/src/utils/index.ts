@@ -59,7 +59,7 @@ export function isMarkdownValue(value: string) {
 
 export async function safeMarkdownParse(value: string) {
   const highlighter = await shiki.getHighlighter({
-    langs: ['md', 'js', 'html', 'vue', 'ts', 'vue-html'],
+    langs: ['md', 'js', 'html', 'vue', 'ts', 'css'],
     themes: ['github-light-default']
   })
 

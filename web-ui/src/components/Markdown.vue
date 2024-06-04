@@ -1,5 +1,5 @@
 <template>
-  <div class="md-output" v-html="output" />
+  <div class="relative" v-html="output" />
 </template>
 
 <script setup lang="ts">
@@ -9,15 +9,26 @@ const props = defineProps<{
   value: string
 }>()
 
-const output = await safeMarkdownParse(props.value)
+const emit = defineEmits(['loaded'])
+
+const output = ref('')
+
+watchEffect(async () => {
+  output.value = await safeMarkdownParse(props.value)
+  emit('loaded')
+})
 </script>
 
 <style>
+pre {
+  font-size: 14px;
+}
+
 pre.shiki {
   background-color: #f2f3f4 !important;
   padding: 6px;
-  position: relative;
   border-radius: 4px;
+  overflow-x: auto;
 }
 
 pre.shiki:hover::before {

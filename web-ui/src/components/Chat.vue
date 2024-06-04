@@ -23,7 +23,7 @@
             <div :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']">
               <div v-if="type === 'text'">
                 <Suspense v-if="isMarkdownValue(content)">
-                  <Markdown :value="content" />
+                  <Markdown :value="content" @loaded="scrollToBottom" />
                   <template #fallback>
                     <div>Loading...</div>
                   </template>
@@ -147,12 +147,12 @@ const fileSupportDownload = (file: string) => fileStatus.value.find(f => f.file 
 
 const formatFileUrl = (filename: string) => `/api/download/${filename}`
 
-function scrollToBottom() {
+const scrollToBottom = useDebounceFn(() => {
   const { scrollHeight, clientHeight, scrollTop } = messageRef.value!
-  if (scrollHeight - clientHeight - scrollTop > 50) {
-    messageRef.value?.scroll(0, scrollHeight - clientHeight)
+  if (scrollHeight - clientHeight - scrollTop > 20) {
+    messageRef.value?.scrollTo(0, scrollHeight - clientHeight)
   }
-}
+})
 
 function send() {
   if (!message.value.trim()) return
@@ -254,10 +254,7 @@ onBeforeUnmount(() => {
   background-color: #fff;
   word-break: break-all;
   box-shadow: 0 0 1px #f2f3f4;
-}
-
-.message div {
-  width: fit-content;
+  max-width: 100%;
 }
 
 .message::before {
