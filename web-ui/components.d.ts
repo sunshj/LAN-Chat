@@ -8,8 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Avatar: typeof import('./src/components/Avatar.vue')['default']
-    ChatDrawer: typeof import('./src/components/ChatDrawer.vue')['default']
-    DownloadIcon: typeof import('./src/components/DownloadIcon.vue')['default']
+    Chat: typeof import('./src/components/Chat.vue')['default']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -18,7 +17,8 @@ declare module 'vue' {
     ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    ProfileDrawer: typeof import('./src/components/ProfileDrawer.vue')['default']
-    UploadBoxIcon: typeof import('./src/components/UploadBoxIcon.vue')['default']
+    IconDownload: typeof import('./src/components/Icon/Download.vue')['default']
+    IconUpload: typeof import('./src/components/Icon/Upload.vue')['default']
+    Profile: typeof import('./src/components/Profile.vue')['default']
   }
 }

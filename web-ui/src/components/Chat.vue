@@ -56,7 +56,7 @@
                     type="success"
                     :disabled="!fileSupportDownload(content)"
                   >
-                    <DownloadIcon />
+                    <IconDownload />
                   </el-button>
                 </a>
               </div>
@@ -69,7 +69,7 @@
         <div class="fixed bottom-0 h-14 w-full flex items-start justify-around gap-2 bg-white p-2">
           <el-upload :show-file-list="false" action="/api/upload" :on-success="onUploadSuccess">
             <el-button plain size="large">
-              <UploadBoxIcon class="text-xl" />
+              <IconUpload class="text-xl" />
             </el-button>
           </el-upload>
           <div class="flex-1">
@@ -174,7 +174,6 @@ async function checkFileStatus(file: string): Promise<FileStatus> {
 
 watchEffect(async () => {
   if (visible.value) {
-    socket.emit('join-channel', appStore.currentChannelId)
     appStore.setMessagesAsRead()
     const promises = appStore.currentChatMessages
       ?.filter(m => m.type !== 'text')
@@ -195,7 +194,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  socket.off('join-channel')
   socket.off('new-message')
 })
 </script>

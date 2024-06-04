@@ -12,6 +12,6 @@
 
 <script lang="ts">
 export default {
-  name: 'DownloadIcon'
+  name: 'IconDownload'
 }
 </script>

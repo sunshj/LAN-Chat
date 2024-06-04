@@ -20,11 +20,6 @@ export const channelEventHandler = (io: Server, socket: Socket) => {
     io.emit('get-users', await getConnectionUsersId())
   })
 
-  socket.on('join-channel', channelId => {
-    console.log('channelId:', channelId)
-    socket.join(channelId)
-  })
-
   socket.on('new-message', msg => {
     const receiverId = msg.receiver
     io.sockets.sockets.forEach(sk => {

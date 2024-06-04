@@ -21,8 +21,8 @@
     </main>
   </ElContainer>
 
-  <ChatDrawer v-model="chatDrawerVisible" />
-  <ProfileDrawer v-model="profileDrawerVisible" />
+  <Chat v-model="chatDrawerVisible" />
+  <Profile v-model="profileDrawerVisible" />
 </template>
 
 <script setup lang="ts">
