@@ -79,3 +79,10 @@ export async function safeMarkdownParse(value: string) {
   const html = await md.parse(value)
   return DOMPurify.sanitize(html)
 }
+
+export function downloadFile(url: string, filename: string) {
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+}

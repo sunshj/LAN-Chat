@@ -86,10 +86,24 @@
             trigger="contextmenu"
             virtual-triggering
             :popper-style="{
-              padding: '2px'
+              padding: '2px',
+              display: 'flex',
+              'flex-direction': 'column',
+              'justify-content': 'center'
             }"
             @hide="onPopoverHide"
           >
+            <el-button
+              v-if="currentSelectMessage?.type === 'image'"
+              type="primary"
+              class="w-full"
+              text
+              bg
+              @contextmenu.prevent
+              @click="downloadImage(currentSelectMessage)"
+            >
+              下载图片
+            </el-button>
             <el-button
               type="danger"
               class="w-full"
@@ -149,7 +163,7 @@
 import { formatTimeAgo } from '@vueuse/core'
 import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
-import { getOriginalFilename, isMarkdownValue, socketKey } from '../utils'
+import { downloadFile, getOriginalFilename, isMarkdownValue, socketKey } from '../utils'
 
 const appStore = useAppStore()
 const socket = inject(socketKey)!
@@ -186,6 +200,8 @@ const buttonRef = ref(null)
 const popoverRef = ref<any>(null)
 const currentSelectMid = ref('')
 
+const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid.value))
+
 const showPopover = (e: any, mid: string) => {
   currentSelectMid.value = mid
   buttonRef.value = e.target
@@ -202,6 +218,13 @@ function onPopoverHide() {
   buttonRef.value = null
   popoverRef.value = null
   currentSelectMid.value = ''
+}
+
+function downloadImage(imageMsg: Message) {
+  const url = formatFileUrl(imageMsg.content)
+  const filename = getOriginalFilename(imageMsg.content)
+  popoverVisible.value = false
+  downloadFile(url, filename)
 }
 
 function confirmDeleteMessage() {
@@ -257,6 +280,7 @@ function onUploadProgress(evt: UploadProgressEvent) {
 function onUploadSuccess(res: any) {
   const { filename, mimetype } = res.data
   const msg = appStore.addMessage(filename, getMessageType(mimetype))
+  fileStatus.value.push({ file: msg.content, download: true })
   socket.emit('new-message', msg)
   nextTick(() => {
     scrollToBottom()
@@ -306,6 +330,11 @@ onMounted(() => {
     }
     if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
     appStore.messages[msg.cid].push(msg)
+
+    if (msg.type !== 'text') {
+      fileStatus.value.push({ file: msg.content, download: true })
+    }
+
     nextTick(() => {
       scrollToBottom()
     })
@@ -351,6 +380,10 @@ onBeforeUnmount(() => {
 
 .message.receiver::before {
   left: -10px;
+}
+
+.el-button + .el-button {
+  margin-left: 0;
 }
 </style>
 

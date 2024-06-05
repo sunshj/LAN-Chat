@@ -101,6 +101,10 @@ export const useAppStore = defineStore(
       }
     }
 
+    function getMessage(mid: string) {
+      return messages.value[currentChannelId.value]?.find(msg => msg.mid === mid)
+    }
+
     function setMessagesAsRead() {
       messages.value[currentChannelId.value]?.forEach(msg => {
         if (msg.sender === currentChat.value.id && !msg.read) {
@@ -138,6 +142,7 @@ export const useAppStore = defineStore(
       generateChannelId,
       messages,
       currentChatMessages,
+      getMessage,
       addMessage,
       deleteMessage,
       setMessagesAsRead,
