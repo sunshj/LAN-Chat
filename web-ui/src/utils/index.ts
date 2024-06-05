@@ -1,7 +1,7 @@
 import parser from 'ua-parser-js'
 import { Marked, marked } from 'marked'
 import DOMPurify from 'dompurify'
-import * as shiki from 'shiki'
+import { bundledLanguages, getHighlighter } from 'shiki'
 import markedShiki from 'marked-shiki'
 import type { Socket } from 'socket.io-client'
 
@@ -58,8 +58,8 @@ export function isMarkdownValue(value: string) {
 }
 
 export async function safeMarkdownParse(value: string) {
-  const highlighter = await shiki.getHighlighter({
-    langs: ['md', 'js', 'html', 'vue', 'ts', 'css'],
+  const highlighter = await getHighlighter({
+    langs: Object.keys(bundledLanguages),
     themes: ['github-light-default']
   })
 

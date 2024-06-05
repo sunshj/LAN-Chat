@@ -301,6 +301,9 @@ watch(visible, async value => {
 
 onMounted(() => {
   socket.on('new-message', (msg: Message) => {
+    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChat.id) {
+      msg.read = true
+    }
     if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
     appStore.messages[msg.cid].push(msg)
     nextTick(() => {
