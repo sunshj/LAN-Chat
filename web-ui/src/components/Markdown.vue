@@ -3,7 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { safeMarkdownParse } from '../utils'
+import MyWorker from '../utils/worker.js?worker'
+
+const worker: Worker = new MyWorker()
 
 const props = defineProps<{
   value: string
@@ -11,11 +13,28 @@ const props = defineProps<{
 
 const emit = defineEmits(['loaded'])
 
-const output = ref('')
+const output = ref('Loading...')
 
-watchEffect(async () => {
-  output.value = await safeMarkdownParse(props.value)
-  emit('loaded')
+watchEffect(() => {
+  if (!props.value) return
+  worker.postMessage({
+    type: 'markdown-parse',
+    payload: props.value
+  })
+})
+
+onMounted(() => {
+  worker.addEventListener('message', event => {
+    const { type, payload } = event.data
+    if (type === 'markdown-parse-reply') {
+      output.value = payload
+      emit('loaded')
+    }
+  })
+})
+
+onBeforeUnmount(() => {
+  worker.terminate()
 })
 </script>
 

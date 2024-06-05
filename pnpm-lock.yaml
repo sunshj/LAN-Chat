@@ -139,9 +139,6 @@ importers:
 
   web-ui:
     dependencies:
-      dompurify:
-        specifier: ^3.1.5
-        version: 3.1.5
       marked:
         specifier: ^12.0.2
         version: 12.0.2
@@ -150,7 +147,7 @@ importers:
         version: 1.1.0(marked@12.0.2)(shiki@1.6.2)
       pinia:
         specifier: ^2.1.7
-        version: 2.1.7(typescript@5.3.3)(vue@3.4.27)
+        version: 2.1.7(vue@3.4.27)
       pinia-plugin-persistedstate:
         specifier: ^3.2.1
         version: 3.2.1(pinia@2.1.7)
@@ -170,9 +167,6 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
-      '@types/dompurify':
-        specifier: ^3.0.5
-        version: 3.0.5
       '@types/seedrandom':
         specifier: ^3.0.8
         version: 3.0.8
@@ -1879,12 +1873,6 @@ packages:
       '@types/ms': 0.7.34
     dev: true
 
-  /@types/dompurify@3.0.5:
-    resolution: {integrity: sha512-1Wg0g3BtQF7sSb27fJQAKck1HECM6zV1EB66j8JH9i3LCjYabJa0FSdiSgsD5K/RbrsR0SiraKacLB+T8ZVYAg==}
-    dependencies:
-      '@types/trusted-types': 2.0.7
-    dev: true
-
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
@@ -2011,10 +1999,6 @@ packages:
       '@types/http-errors': 2.0.4
       '@types/node': 18.19.33
       '@types/send': 0.17.4
-    dev: true
-
-  /@types/trusted-types@2.0.7:
-    resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
     dev: true
 
   /@types/ua-parser-js@0.7.39:
@@ -2594,7 +2578,7 @@ packages:
     dependencies:
       '@vue/compiler-ssr': 3.4.27
       '@vue/shared': 3.4.27
-      vue: 3.4.27(typescript@5.3.3)
+      vue: 3.4.27
 
   /@vue/shared@3.4.27:
     resolution: {integrity: sha512-DL3NmY2OFlqmYYrzp39yi3LDkKxa5vZVwxWdQ3rG0ekuWscHraeIbnI8t+aZK7qhYqEqWKTUdijadunb9pnrgA==}
@@ -3656,10 +3640,6 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
-
-  /dompurify@3.1.5:
-    resolution: {integrity: sha512-lwG+n5h8QNpxtyrJW/gJWckL+1/DQiYMX8f7t8Z2AZTPw1esVrqjI63i7Zc2Gz0aKzLVMYC1V1PL/ky+aY/NgA==}
-    dev: false
 
   /dotenv-expand@5.1.0:
     resolution: {integrity: sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==}
@@ -6120,10 +6100,10 @@ packages:
     peerDependencies:
       pinia: ^2.0.0
     dependencies:
-      pinia: 2.1.7(typescript@5.3.3)(vue@3.4.27)
+      pinia: 2.1.7(vue@3.4.27)
     dev: false
 
-  /pinia@2.1.7(typescript@5.3.3)(vue@3.4.27):
+  /pinia@2.1.7(vue@3.4.27):
     resolution: {integrity: sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==}
     peerDependencies:
       '@vue/composition-api': ^1.4.0
@@ -6136,8 +6116,7 @@ packages:
         optional: true
     dependencies:
       '@vue/devtools-api': 6.6.2
-      typescript: 5.3.3
-      vue: 3.4.27(typescript@5.3.3)
+      vue: 3.4.27
       vue-demi: 0.14.8(vue@3.4.27)
     dev: false
 
@@ -7341,7 +7320,7 @@ packages:
       '@vue/composition-api':
         optional: true
     dependencies:
-      vue: 3.4.27(typescript@5.3.3)
+      vue: 3.4.27
 
   /vue-eslint-parser@9.4.2(eslint@8.57.0):
     resolution: {integrity: sha512-Ry9oiGmCAK91HrKMtCrKFWmSFWvYkpGglCeFAIqDdr9zdXmMMpJOmUJS7WWsW7fX81h6mwHmUZCQQ1E0PkSwYQ==}
@@ -7379,6 +7358,20 @@ packages:
       semver: 7.6.2
       typescript: 5.3.3
     dev: true
+
+  /vue@3.4.27:
+    resolution: {integrity: sha512-8s/56uK6r01r1icG/aEOHqyMVxd1bkYcSe9j8HcKtr/xTOFWvnzIVTehNW+5Yt89f+DLBe4A569pnZLS5HzAMA==}
+    peerDependencies:
+      typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@vue/compiler-dom': 3.4.27
+      '@vue/compiler-sfc': 3.4.27
+      '@vue/runtime-dom': 3.4.27
+      '@vue/server-renderer': 3.4.27(vue@3.4.27)
+      '@vue/shared': 3.4.27
 
   /vue@3.4.27(typescript@5.3.3):
     resolution: {integrity: sha512-8s/56uK6r01r1icG/aEOHqyMVxd1bkYcSe9j8HcKtr/xTOFWvnzIVTehNW+5Yt89f+DLBe4A569pnZLS5HzAMA==}

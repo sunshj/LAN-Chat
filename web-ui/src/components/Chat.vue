@@ -27,12 +27,12 @@
               @contextmenu.prevent="e => showPopover(e, mid)"
             >
               <div v-if="type === 'text'">
-                <Suspense v-if="isMarkdownValue(content)">
-                  <Markdown :value="content" @loaded="scrollToBottom" />
-                  <template #fallback>
-                    <div>Loading...</div>
-                  </template>
-                </Suspense>
+                <Markdown
+                  v-if="isMarkdownValue(content)"
+                  :value="content"
+                  @loaded="scrollToBottom"
+                />
+
                 <div v-else>{{ content }}</div>
               </div>
 
@@ -164,6 +164,9 @@ import { formatTimeAgo } from '@vueuse/core'
 import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
 import { downloadFile, getOriginalFilename, isMarkdownValue, socketKey } from '../utils'
+import MyWorker from '../utils/worker.js?worker'
+
+const worker: Worker = new MyWorker()
 
 const appStore = useAppStore()
 const socket = inject(socketKey)!
@@ -291,31 +294,14 @@ function onClose() {
   appStore.clearCurrentChat()
 }
 
-async function checkFileStatus(file: string): Promise<FileStatus> {
-  try {
-    const response = await fetch(formatFileUrl(file), {
-      method: 'HEAD'
-    })
-    return {
-      file,
-      download: response.ok
-    }
-  } catch {
-    return {
-      file,
-      download: false
-    }
-  }
-}
-
-watch(visible, async value => {
+watch(visible, value => {
   if (value) {
     appStore.setMessagesAsRead()
-    const promises = appStore.currentChatMessages
-      ?.filter(m => m.type !== 'text')
-      ?.map(v => checkFileStatus(v.content))
 
-    fileStatus.value = await Promise.all(promises)
+    worker.postMessage({
+      type: 'check-file',
+      payload: appStore.currentChatMessages?.filter(m => m.type !== 'text').map(v => v.content)
+    })
 
     nextTick(() => {
       scrollToBottom()
@@ -339,10 +325,18 @@ onMounted(() => {
       scrollToBottom()
     })
   })
+
+  worker.addEventListener('message', event => {
+    const { type, payload } = event.data
+    if (type === 'check-file-reply') {
+      fileStatus.value = payload
+    }
+  })
 })
 
 onBeforeUnmount(() => {
   socket.off('new-message')
+  worker.terminate()
 })
 </script>
 

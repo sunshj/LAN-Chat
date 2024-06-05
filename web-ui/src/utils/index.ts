@@ -1,8 +1,5 @@
 import parser from 'ua-parser-js'
-import { Marked, marked } from 'marked'
-import DOMPurify from 'dompurify'
-import { bundledLanguages, getHighlighter } from 'shiki'
-import markedShiki from 'marked-shiki'
+import { marked } from 'marked'
 import type { Socket } from 'socket.io-client'
 
 export const socketKey = Symbol('socket') as InjectionKey<Socket>
@@ -55,29 +52,6 @@ export function isMarkdownValue(value: string) {
   ].some(tokenType => tokenTypes.includes(tokenType))
 
   return isMarkdown
-}
-
-export async function safeMarkdownParse(value: string) {
-  const highlighter = await getHighlighter({
-    langs: Object.keys(bundledLanguages),
-    themes: ['github-light-default']
-  })
-
-  const md = new Marked()
-
-  md.use(
-    markedShiki({
-      highlight(code, lang, props) {
-        return highlighter.codeToHtml(code, {
-          lang,
-          theme: 'github-light-default',
-          meta: { __raw: props.join(' '), 'data-lang': lang }
-        })
-      }
-    })
-  )
-  const html = await md.parse(value)
-  return DOMPurify.sanitize(html)
 }
 
 export function downloadFile(url: string, filename: string) {

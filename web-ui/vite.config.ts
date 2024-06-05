@@ -37,5 +37,8 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     outDir: '../resources/ui'
+  },
+  worker: {
+    format: 'es'
   }
 })
