@@ -15,7 +15,8 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "format": "prettier --write .",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "commit": "git-cz"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
+    "@sunshj/commitlint-config": "^1.0.0",
     "@sunshj/eslint-config": "^1.0.6",
     "@sunshj/prettier-config": "^1.0.0",
     "@types/better-sqlite3": "^7.6.10",
@@ -42,13 +44,18 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^18.19.9",
     "@vitejs/plugin-vue": "^5.0.3",
+    "commitizen": "^4.3.0",
+    "commitlint": "18",
+    "cz-git": "^1.9.2",
     "drizzle-kit": "^0.20.17",
     "electron": "^28.2.0",
     "electron-builder": "^24.9.1",
     "electron-vite": "^2.0.0",
     "eslint": "^8.57.0",
+    "lint-staged": "15",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.7",
+    "simple-git-hooks": "^2.11.1",
     "typescript": "^5.3.3",
     "unocss": "^0.60.3",
     "unplugin-auto-import": "^0.17.6",
@@ -56,6 +63,11 @@
     "vite": "^5.0.12",
     "vue": "^3.4.15",
     "vue-tsc": "^1.8.27"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   },
   "pnpm": {
     "overrides": {
@@ -78,5 +90,15 @@
       "typedarray": "npm:@nolyfill/typedarray@latest"
     }
   },
-  "prettier": "@sunshj/prettier-config"
+  "lint-staged": {
+    "*.{vue,js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "prettier": "@sunshj/prettier-config",
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged",
+    "commit-msg": "npx --no-install commitlint --config commitlint.config.js --edit $1"
+  }
 }
