@@ -1,7 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { type BrowserWindow, Menu, dialog } from 'electron'
-import { getResPath, prisma } from './utils'
+import { getResPath } from './utils'
+import { db, users } from './database'
 
 export function createMenu(mainWindow: BrowserWindow) {
   return Menu.buildFromTemplate([
@@ -22,11 +23,11 @@ export function createMenu(mainWindow: BrowserWindow) {
           })
           .then(async ({ response }) => {
             if (response === 1) {
-              const res = await prisma.user.deleteMany()
+              const res = await db.delete(users)
               dialog.showMessageBox({
                 title: 'LAN Chat',
                 type: 'info',
-                message: `清空了${res.count}条数据`
+                message: `清空了${res.changes}条数据`
               })
             }
           })

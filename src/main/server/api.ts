@@ -1,7 +1,10 @@
 import path from 'node:path'
 import { Router } from 'express'
 import multer from 'multer'
-import { getResPath, prisma, randomId } from '../utils'
+import { eq } from 'drizzle-orm'
+import { getResPath, randomId } from '../utils'
+import { db, users } from '../database'
+import { createUserDto, updateUserDto } from './dto'
 
 const router = Router()
 const upload = multer({
@@ -24,43 +27,34 @@ router.get('/', (req, res) => {
 })
 
 router.get('/users', async (_req, res) => {
-  const users = await prisma.user.findMany()
+  const data = await db.select().from(users)
   res.send({
-    data: users
+    data
   })
 })
 
 router.get('/user/:id', async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: req.params.id
-    }
-  })
+  const [user] = await db.select().from(users).where(eq(users.id, req.params.id))
   res.send({
     data: user
   })
 })
 
-router.put('/user/:id', async (req, res) => {
-  const user = await prisma.user.update({
-    where: {
-      id: req.params.id
-    },
-    data: {
-      username: req.body.username
-    }
-  })
+router.put('/user/:id', updateUserDto, async (req, res) => {
+  const [user] = await db
+    .update(users)
+    .set({ username: req.body.username })
+    .where(eq(users.id, req.params.id))
+    .returning()
+
   res.send({
     data: user
   })
 })
 
-router.post('/user', async (req, res) => {
-  const user = await prisma.user.create({
-    data: {
-      username: req.body.username
-    }
-  })
+router.post('/user', createUserDto, async (req, res) => {
+  const [user] = await db.insert(users).values({ username: req.body.username }).returning()
+
   res.send({
     data: user
   })

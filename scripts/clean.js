@@ -1,12 +1,9 @@
 const path = require('node:path')
 const fs = require('node:fs')
-const { PrismaClient } = require('@prisma/client')
-
-const prisma = new PrismaClient()
 
 // 清空数据库
 async function cleanDatabase() {
-  await prisma.user.deleteMany({})
+  //
 }
 
 // 执行清理操作

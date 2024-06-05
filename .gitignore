@@ -3,7 +3,7 @@ dist
 out
 .DS_Store
 *.log*
-prisma/*.db
 resources/ui/**
 resources/uploads/**
+resources/database/**
 !resources/**/.gitkeep

@@ -3,8 +3,8 @@ import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, shell } from 'electron
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
-import { prisma } from './utils'
 import { getNetworksAddr, startServer, stopServer } from './server'
+import { runMigrate } from './database/migrate'
 
 function createWindow(): void {
   // Create the browser window.
@@ -75,7 +75,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('LAN Chat')
 
@@ -92,6 +92,7 @@ app.whenReady().then(() => {
   ipcMain.handle('get-networks', getNetworksAddr)
   ipcMain.handle('open-url', (_event, url) => shell.openExternal(url))
 
+  await runMigrate()
   createWindow()
 
   app.on('activate', function () {
@@ -105,7 +106,6 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  prisma.$disconnect()
   if (process.platform !== 'darwin') {
     app.quit()
   }

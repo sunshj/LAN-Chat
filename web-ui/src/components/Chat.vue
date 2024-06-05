@@ -284,8 +284,8 @@ async function checkFileStatus(file: string): Promise<FileStatus> {
   }
 }
 
-watchEffect(async () => {
-  if (visible.value) {
+watch(visible, async value => {
+  if (value) {
     appStore.setMessagesAsRead()
     const promises = appStore.currentChatMessages
       ?.filter(m => m.type !== 'text')

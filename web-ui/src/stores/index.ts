@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { randomId } from '../utils'
-import type { User } from '@prisma/client'
+import type { User } from '../../../src/main/database'
 
 export type MessageType = 'text' | 'image' | 'video' | 'audio' | 'file'
 export interface Message {

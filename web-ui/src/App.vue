@@ -29,8 +29,7 @@
 import { io } from 'socket.io-client'
 import { useAppStore } from './stores'
 import { getDeviceName, socketKey } from './utils'
-import type { User } from '@prisma/client'
-
+import type { User } from '../../src/main/database'
 const socket = io('/', {
   transports: ['websocket']
 })

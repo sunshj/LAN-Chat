@@ -1,9 +1,6 @@
 import crypto from 'node:crypto'
 import path from 'node:path'
 import { Notification, type NotificationConstructorOptions, app } from 'electron'
-import { PrismaClient } from '@prisma/client'
-
-export const prisma = new PrismaClient()
 
 export function $notify(
   title: string,
