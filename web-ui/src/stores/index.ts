@@ -36,8 +36,22 @@ export const useAppStore = defineStore(
       return res.data
     }
 
-    /** online users(ignore self) */
     const users = ref<User[]>([])
+    /** online users(ignore self) */
+    const onlineUsers = ref<User[]>([])
+
+    /** has chat history or online users(ignore self)  */
+    const hasChatHistoryOrOnlineUsers = computed(() => {
+      const offlineUsers = users.value.filter(
+        user => !onlineUsers.value.some(u => u.id === user.id)
+      )
+
+      const hasChatHistoryOfflineUsers = offlineUsers
+        .filter(user => user.id !== userInfo.value.id)
+        .filter(user => Object.keys(messages.value).some(cid => cid.includes(user.id)))
+
+      return [...onlineUsers.value, ...hasChatHistoryOfflineUsers]
+    })
 
     async function fetchUsers() {
       const { data: res } = await axios.get<{ data: User[] }>('/api/users')
@@ -46,6 +60,10 @@ export const useAppStore = defineStore(
 
     function setUsers(newUsers: User[]) {
       users.value = newUsers
+    }
+
+    function setOnlineUsers(newUsers: User[]) {
+      onlineUsers.value = newUsers
     }
 
     async function createUser(username: string) {
@@ -132,7 +150,10 @@ export const useAppStore = defineStore(
       fetchUser,
       updateUser,
       users,
+      onlineUsers,
+      hasChatHistoryOrOnlineUsers,
       setUsers,
+      setOnlineUsers,
       fetchUsers,
       createUser,
       currentChat,

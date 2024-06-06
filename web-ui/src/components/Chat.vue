@@ -261,7 +261,7 @@ function send() {
 }
 
 const currentChatIsOnline = computed(() => {
-  return appStore.users.map(u => u.id).includes(appStore.currentChat.id)
+  return appStore.onlineUsers.map(u => u.id).includes(appStore.currentChat.id)
 })
 
 function getMessageType(mimetype: string): MessageType {
