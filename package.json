@@ -1,6 +1,6 @@
 {
   "name": "lan-chat",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "局域网聊天与传输工具",
   "author": "sunshj",
   "main": "./out/main/index.js",
