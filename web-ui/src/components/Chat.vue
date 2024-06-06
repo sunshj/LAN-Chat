@@ -293,13 +293,16 @@ function onClose() {
 }
 
 watch(visible, value => {
-  if (value) {
+  if (value && appStore.currentChatMessages.length > 0) {
     appStore.setMessagesAsRead()
 
-    worker.postMessage({
-      type: 'check-file',
-      payload: appStore.currentChatMessages?.filter(m => m.type !== 'text').map(v => v.content)
-    })
+    const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
+    if (fileMessages.length > 0) {
+      worker.postMessage({
+        type: 'check-file',
+        payload: fileMessages.map(v => v.content)
+      })
+    }
 
     nextTick(() => {
       scrollToBottom()
