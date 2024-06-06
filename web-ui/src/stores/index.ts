@@ -42,13 +42,13 @@ export const useAppStore = defineStore(
 
     /** has chat history or online users(ignore self)  */
     const hasChatHistoryOrOnlineUsers = computed(() => {
-      const offlineUsers = users.value.filter(
-        user => !onlineUsers.value.some(u => u.id === user.id)
-      )
-
-      const hasChatHistoryOfflineUsers = offlineUsers
+      const offlineUsers = users.value
         .filter(user => user.id !== userInfo.value.id)
-        .filter(user => Object.keys(messages.value).some(cid => cid.includes(user.id)))
+        .filter(user => !onlineUsers.value.some(u => u.id === user.id))
+
+      const hasChatHistoryOfflineUsers = offlineUsers.filter(user =>
+        Object.keys(messages.value).includes(generateChatId(user.id))
+      )
 
       return [...onlineUsers.value, ...hasChatHistoryOfflineUsers]
     })
@@ -122,7 +122,7 @@ export const useAppStore = defineStore(
     function cleanUselessChat() {
       const userIds = users.value.map(user => user.id)
       Object.keys(messages.value).forEach(cid => {
-        if (!userIds.some(userId => cid.includes(userId))) {
+        if (!userIds.some(userId => generateChatId(userId) === cid)) {
           Reflect.deleteProperty(messages.value, cid)
         }
       })
