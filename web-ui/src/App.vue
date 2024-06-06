@@ -10,9 +10,15 @@
       <div
         v-for="user in appStore.hasChatHistoryOrOnlineUsers"
         :key="user.id"
-        class="w-36 flex-center flex-col cursor-pointer gap-2 border border-1px rounded-xl p-2 text-sm font-bold uppercase transition hover:scale-105 hover:bg-gray-1"
+        class="group relative w-36 flex-center flex-col cursor-pointer gap-2 border border-1px border-gray-1 rounded-xl border-solid p-2 text-sm font-bold uppercase transition hover:scale-105 hover:bg-gray-1"
         @click="showChatDrawer(user)"
       >
+        <div
+          class="absolute right-0 top-0 scale-125 px-2 opacity-0 transition hover:text-blue-500 group-hover:opacity-100"
+          @click.stop="confirmDeleteChat(user.id)"
+        >
+          ×
+        </div>
         <ElBadge v-bind="badgeProps(user.id)" :offset="[-10, 10]">
           <Avatar :id="user.id" />
         </ElBadge>
@@ -44,7 +50,7 @@ const profileDrawerVisible = ref(false)
 
 function showChatDrawer(user: User) {
   chatDrawerVisible.value = true
-  appStore.setCurrentChat(user)
+  appStore.setCurrentChatUser(user)
 }
 
 function isOnlineUser(userId: string) {
@@ -52,7 +58,7 @@ function isOnlineUser(userId: string) {
 }
 
 function getUnreadCount(userId: string) {
-  const channelId = appStore.generateChannelId(userId)
+  const channelId = appStore.generateChatId(userId)
   return appStore.unreadMessagesCount[channelId] || 0
 }
 
@@ -77,7 +83,18 @@ function badgeProps(userId: string): Partial<BadgeProps> {
   }
 }
 
+function confirmDeleteChat(userId: string) {
+  ElMessageBox.confirm('确定要删除此聊天记录吗？', 'Warning', {
+    confirmButtonText: '确定',
+    cancelButtonText: '算了',
+    type: 'warning'
+  }).then(() => {
+    appStore.deleteChatByUserId(userId)
+  })
+}
+
 onMounted(async () => {
+  appStore.cleanUselessChat()
   const storageUid = appStore.userInfo.id || 'invalid_uid'
   const userExist = await appStore.fetchUser(storageUid)
 
@@ -95,10 +112,10 @@ onMounted(async () => {
     appStore.setUsers(allUsers)
     const onlineUsers = allUsers.filter(user => remainIds.includes(user.id))
     appStore.setOnlineUsers(onlineUsers)
-    // currentChat rename
-    const currentChatUser = onlineUsers.find(user => user.id === appStore.currentChat.id)
+    // currentChatUser rename
+    const currentChatUser = onlineUsers.find(user => user.id === appStore.currentChatUser.id)
     if (currentChatUser) {
-      appStore.setCurrentChat(currentChatUser)
+      appStore.setCurrentChatUser(currentChatUser)
     }
   })
 })

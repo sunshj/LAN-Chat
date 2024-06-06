@@ -8,9 +8,9 @@
           :offset="[-10, 10]"
           :badge-style="{ width: '14px', height: '14px' }"
         >
-          <Avatar :id="appStore.currentChat.id" />
+          <Avatar :id="appStore.currentChatUser.id" />
         </ElBadge>
-        <div>{{ appStore.currentChat.username }}</div>
+        <div>{{ appStore.currentChatUser.username }}</div>
       </div>
     </template>
     <div class="h-full w-full flex flex-col items-center gap-2">
@@ -235,10 +235,8 @@ function confirmDeleteMessage() {
     confirmButtonText: '确定',
     cancelButtonText: '算了',
     type: 'warning'
-  }).then(value => {
-    if (value === 'confirm') {
-      deleteMessage()
-    }
+  }).then(() => {
+    deleteMessage()
   })
 }
 
@@ -261,7 +259,7 @@ function send() {
 }
 
 const currentChatIsOnline = computed(() => {
-  return appStore.onlineUsers.map(u => u.id).includes(appStore.currentChat.id)
+  return appStore.onlineUsers.map(u => u.id).includes(appStore.currentChatUser.id)
 })
 
 function getMessageType(mimetype: string): MessageType {
@@ -291,7 +289,7 @@ function onUploadSuccess(res: any) {
 }
 
 function onClose() {
-  appStore.clearCurrentChat()
+  appStore.clearCurrentChatUser()
 }
 
 watch(visible, value => {
@@ -311,7 +309,7 @@ watch(visible, value => {
 
 onMounted(() => {
   socket.on('new-message', (msg: Message) => {
-    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChat.id) {
+    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
       msg.read = true
     }
     if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []

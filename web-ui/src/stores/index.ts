@@ -71,61 +71,77 @@ export const useAppStore = defineStore(
       return res.data
     }
 
-    const currentChat = ref<User>({
+    const currentChatUser = ref<User>({
       id: '',
       username: ''
     })
 
-    function setCurrentChat(user: User) {
-      currentChat.value = user
+    function setCurrentChatUser(user: User) {
+      currentChatUser.value = user
     }
 
-    function clearCurrentChat() {
-      setCurrentChat({
+    function clearCurrentChatUser() {
+      setCurrentChatUser({
         id: '',
         username: ''
       })
     }
 
-    function generateChannelId(userId: string) {
+    function generateChatId(userId: string) {
       return [userId, userInfo.value.id].sort().join('-')
     }
 
-    const currentChannelId = computed(() => generateChannelId(currentChat.value.id))
+    const currentChatId = computed(() => generateChatId(currentChatUser.value.id))
 
     const messages = ref<Record<string, Message[]>>({})
 
-    const currentChatMessages = computed(() => messages.value[currentChannelId.value] ?? [])
+    const currentChatMessages = computed(() => messages.value[currentChatId.value] ?? [])
 
     function addMessage(content: string, type: MessageType = 'text') {
       const msg = {
         mid: `${Date.now()}-${randomId()}`,
-        cid: currentChannelId.value,
+        cid: currentChatId.value,
         sender: userInfo.value.id,
-        receiver: currentChat.value.id,
+        receiver: currentChatUser.value.id,
         time: Date.now(),
         content,
         type
       }
-      if (!messages.value[currentChannelId.value]) messages.value[currentChannelId.value] = []
-      messages.value[currentChannelId.value].push(msg)
+      if (!messages.value[currentChatId.value]) messages.value[currentChatId.value] = []
+      messages.value[currentChatId.value].push(msg)
       return msg
     }
 
     function deleteMessage(mid: string) {
-      const msgs = messages.value[currentChannelId.value]
+      const msgs = messages.value[currentChatId.value]
       if (msgs?.length > 0) {
-        messages.value[currentChannelId.value] = msgs.filter(msg => msg.mid !== mid)
+        messages.value[currentChatId.value] = msgs.filter(msg => msg.mid !== mid)
+      }
+    }
+
+    function cleanUselessChat() {
+      const userIds = users.value.map(user => user.id)
+      Object.keys(messages.value).forEach(cid => {
+        if (!userIds.some(userId => cid.includes(userId))) {
+          Reflect.deleteProperty(messages.value, cid)
+        }
+      })
+    }
+
+    function deleteChatByUserId(userId: string) {
+      const cid = generateChatId(userId)
+      if (messages.value[cid]) {
+        Reflect.deleteProperty(messages.value, cid)
       }
     }
 
     function getMessage(mid: string) {
-      return messages.value[currentChannelId.value]?.find(msg => msg.mid === mid)
+      return messages.value[currentChatId.value]?.find(msg => msg.mid === mid)
     }
 
     function setMessagesAsRead() {
-      messages.value[currentChannelId.value]?.forEach(msg => {
-        if (msg.sender === currentChat.value.id && !msg.read) {
+      messages.value[currentChatId.value]?.forEach(msg => {
+        if (msg.sender === currentChatUser.value.id && !msg.read) {
           msg.read = true
         }
       })
@@ -156,17 +172,19 @@ export const useAppStore = defineStore(
       setOnlineUsers,
       fetchUsers,
       createUser,
-      currentChat,
-      setCurrentChat,
-      clearCurrentChat,
-      currentChannelId,
-      generateChannelId,
+      currentChatUser,
+      setCurrentChatUser,
+      clearCurrentChatUser,
+      currentChatId,
+      generateChatId,
       messages,
       currentChatMessages,
+      deleteChatByUserId,
       getMessage,
       addMessage,
       deleteMessage,
       setMessagesAsRead,
+      cleanUselessChat,
       unreadMessagesCount
     }
   },
