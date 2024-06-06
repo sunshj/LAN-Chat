@@ -192,7 +192,8 @@ const fileSupportDownload = (file: string) => fileStatus.value.find(f => f.file 
 const formatFileUrl = (filename: string) => `/api/download/${filename}`
 
 const scrollToBottom = useDebounceFn(() => {
-  const { scrollHeight, clientHeight, scrollTop } = messageRef.value!
+  if (!messageRef.value) return
+  const { scrollHeight, clientHeight, scrollTop } = messageRef.value
   if (scrollHeight - clientHeight - scrollTop > 20) {
     messageRef.value?.scrollTo(0, scrollHeight - clientHeight)
   }

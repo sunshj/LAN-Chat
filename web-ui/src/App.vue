@@ -93,18 +93,20 @@ function confirmDeleteChat(userId: string) {
   })
 }
 
-onMounted(async () => {
+onMounted(() => {
   appStore.cleanUselessChat()
-  const storageUid = appStore.userInfo.id || 'invalid_uid'
-  const userExist = await appStore.fetchUser(storageUid)
 
-  if (userExist) {
-    socket.emit('online', appStore.userInfo.id)
-  } else {
-    const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
-    appStore.setUserInfo(user)
-    socket.emit('online', user.id)
-  }
+  socket.on('connect', async () => {
+    const storageUid = appStore.userInfo.id || 'invalid_uid'
+    const userExist = await appStore.fetchUser(storageUid)
+    if (userExist) {
+      socket.emit('online', appStore.userInfo.id)
+    } else {
+      const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
+      appStore.setUserInfo(user)
+      socket.emit('online', user.id)
+    }
+  })
 
   socket.on('get-users', async (userIds: string[]) => {
     const remainIds = userIds.filter(id => id !== appStore.userInfo.id)
@@ -117,6 +119,10 @@ onMounted(async () => {
     if (currentChatUser) {
       appStore.setCurrentChatUser(currentChatUser)
     }
+  })
+
+  socket.on('disconnect', () => {
+    appStore.setOnlineUsers([])
   })
 })
 
