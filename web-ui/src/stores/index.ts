@@ -12,6 +12,8 @@ export interface Message {
   content: string
   time: number
   read?: boolean
+  /** video cover  */
+  cover?: string
 }
 
 export const useAppStore = defineStore(
@@ -97,15 +99,18 @@ export const useAppStore = defineStore(
 
     const currentChatMessages = computed(() => messages.value[currentChatId.value] ?? [])
 
-    function addMessage(content: string, type: MessageType = 'text') {
-      const msg = {
+    function addMessage(
+      content: string,
+      options: Pick<Message, 'type' | 'cover'> = { type: 'text' }
+    ) {
+      const msg: Message = {
         mid: `${Date.now()}-${randomId()}`,
         cid: currentChatId.value,
         sender: userInfo.value.id,
         receiver: currentChatUser.value.id,
         time: Date.now(),
         content,
-        type
+        ...options
       }
       if (!messages.value[currentChatId.value]) messages.value[currentChatId.value] = []
       messages.value[currentChatId.value].push(msg)

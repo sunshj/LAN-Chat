@@ -13,6 +13,8 @@ export function getDeviceName(ua: string) {
   return `${osName} ${version} ${browserName}`
 }
 
+export const formatFileUrl = (filename: string) => `/api/download/${filename}`
+
 export function randomId(n = 6) {
   return Math.random().toString(32).slice(n)
 }
@@ -59,4 +61,31 @@ export function downloadFile(url: string, filename: string) {
   a.href = url
   a.download = filename
   a.click()
+}
+
+export function getVideoCover(url: string, sec = 1) {
+  return new Promise<string>((resolve, reject) => {
+    const video = document.createElement('video')
+    video.src = url
+    video.addEventListener('loadedmetadata', () => {
+      video.currentTime = Math.min(
+        Math.max(0, (sec < 0 ? video.duration : 0) + sec),
+        video.duration
+      )
+    })
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas')
+      canvas.height = video.videoHeight
+      canvas.width = video.videoWidth
+      const ctx = canvas.getContext('2d')
+      // 压缩
+      canvas.height = Math.floor(canvas.height / 2)
+      canvas.width = Math.floor(canvas.width / 2)
+      ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
+      resolve(canvas.toDataURL())
+    })
+    video.addEventListener('error', error => {
+      reject(error)
+    })
+  })
 }

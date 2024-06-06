@@ -20,6 +20,7 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     IconDownload: typeof import('./src/components/Icon/Download.vue')['default']
     IconUpload: typeof import('./src/components/Icon/Upload.vue')['default']
+    IconVideoPlay: typeof import('./src/components/Icon/VideoPlay.vue')['default']
     Markdown: typeof import('./src/components/Markdown.vue')['default']
     Profile: typeof import('./src/components/Profile.vue')['default']
   }

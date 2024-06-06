@@ -17,7 +17,7 @@
       <div ref="messageRef" class="relative mb-14 w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
           <div
-            v-for="{ time, content, sender, type, mid } in appStore.currentChatMessages"
+            v-for="{ time, content, sender, type, mid, cover } in appStore.currentChatMessages"
             :key="time"
             :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
@@ -48,13 +48,13 @@
               <div v-else class="flex flex-col gap-2">
                 <div>{{ getOriginalFilename(content) }}</div>
 
-                <video
-                  v-if="type === 'video'"
-                  :src="formatFileUrl(content)"
-                  controls
-                  :autoplay="false"
-                  class="h-40"
-                />
+                <div v-if="type === 'video'" class="relative h-40 w-full">
+                  <img :src="cover" class="h-full w-full" />
+                  <IconVideoPlay
+                    class="absolute left-1/2 top-1/2 cursor-pointer rounded-full text-5xl text-amber transition-all -translate-1/2 hover:scale-110"
+                    @click="showVideo(formatFileUrl(content))"
+                  />
+                </div>
 
                 <audio
                   v-else-if="type === 'audio'"
@@ -132,6 +132,7 @@
           <el-upload
             :show-file-list="false"
             action="/api/upload"
+            :before-upload="onBeforeUpload"
             :on-progress="onUploadProgress"
             :on-success="onUploadSuccess"
           >
@@ -163,7 +164,14 @@
 import { formatTimeAgo } from '@vueuse/core'
 import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
-import { downloadFile, getOriginalFilename, isMarkdownValue, socketKey } from '../utils'
+import {
+  downloadFile,
+  formatFileUrl,
+  getOriginalFilename,
+  getVideoCover,
+  isMarkdownValue,
+  socketKey
+} from '../utils'
 import MyWorker from '../utils/worker.js?worker'
 
 const worker: Worker = new MyWorker()
@@ -188,8 +196,6 @@ interface FileStatus {
 const fileStatus = ref<FileStatus[]>([])
 
 const fileSupportDownload = (file: string) => fileStatus.value.find(f => f.file === file)?.download
-
-const formatFileUrl = (filename: string) => `/api/download/${filename}`
 
 const scrollToBottom = useDebounceFn(() => {
   if (!messageRef.value) return
@@ -237,25 +243,10 @@ function confirmDeleteMessage() {
     cancelButtonText: '算了',
     type: 'warning'
   }).then(() => {
-    deleteMessage()
-  })
-}
-
-function deleteMessage() {
-  popoverVisible.value = false
-  nextTick(() => {
-    appStore.deleteMessage(currentSelectMid.value)
-  })
-}
-
-function send() {
-  if (!message.value.trim()) return
-  const msg = appStore.addMessage(message.value)
-  socket.emit('new-message', msg)
-  message.value = ''
-
-  nextTick(() => {
-    scrollToBottom()
+    popoverVisible.value = false
+    nextTick(() => {
+      appStore.deleteMessage(currentSelectMid.value)
+    })
   })
 }
 
@@ -263,11 +254,30 @@ const currentChatIsOnline = computed(() => {
   return appStore.onlineUsers.map(u => u.id).includes(appStore.currentChatUser.id)
 })
 
+const send = useThrottleFn(() => {
+  if (!message.value.trim()) return
+  if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
+  const msg = appStore.addMessage(message.value)
+  socket.emit('new-message', msg)
+  message.value = ''
+
+  nextTick(() => {
+    scrollToBottom()
+  })
+}, 2000)
+
 function getMessageType(mimetype: string): MessageType {
   if (mimetype.includes('image')) return 'image'
   if (mimetype.includes('video')) return 'video'
   if (mimetype.includes('audio')) return 'audio'
   return 'file'
+}
+
+function onBeforeUpload() {
+  if (!currentChatIsOnline.value) {
+    ElMessage.error('当前用户不在线，无法发送文件')
+    return false
+  }
 }
 
 const uploadPercentage = ref(0)
@@ -279,9 +289,11 @@ function onUploadProgress(evt: UploadProgressEvent) {
   }
 }
 
-function onUploadSuccess(res: any) {
+async function onUploadSuccess(res: any) {
   const { filename, mimetype } = res.data
-  const msg = appStore.addMessage(filename, getMessageType(mimetype))
+  const type = getMessageType(mimetype)
+  const cover = type === 'video' ? await getVideoCover(formatFileUrl(filename)) : undefined
+  const msg = appStore.addMessage(filename, { type, cover })
   fileStatus.value.push({ file: msg.content, download: true })
   socket.emit('new-message', msg)
   nextTick(() => {
@@ -289,7 +301,26 @@ function onUploadSuccess(res: any) {
   })
 }
 
+function showVideo(url: string) {
+  ElMessageBox({
+    title: getOriginalFilename(url),
+    message() {
+      return h('video', {
+        class: 'w-full',
+        src: url,
+        controls: true,
+        muted: true
+      })
+    },
+    showConfirmButton: false,
+    closeOnClickModal: true,
+    closeOnPressEscape: true,
+    draggable: true
+  })
+}
+
 function onClose() {
+  message.value = ''
   appStore.clearCurrentChatUser()
 }
 
@@ -387,5 +418,9 @@ onBeforeUnmount(() => {
 .chat-drawer .el-drawer__body {
   overflow: hidden;
   padding: 0;
+}
+
+.el-message-box__message {
+  width: 100%;
 }
 </style>

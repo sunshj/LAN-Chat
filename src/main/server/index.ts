@@ -19,7 +19,8 @@ export async function startServer(
   const app = express()
   server = http.createServer(app)
   io = new Server(server, {
-    transports: ['websocket']
+    transports: ['websocket'],
+    maxHttpBufferSize: 1e8
   })
 
   app.use(express.json())
