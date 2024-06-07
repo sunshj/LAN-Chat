@@ -243,7 +243,9 @@ function onPopoverHide() {
   currentSelectMid.value = ''
 }
 
-const { copy, copied } = useClipboard()
+const { copy, copied } = useClipboard({
+  legacy: true
+})
 
 async function copyText(content: string) {
   popoverVisible.value = false
