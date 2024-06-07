@@ -1,5 +1,7 @@
 import parser from 'ua-parser-js'
 import { marked } from 'marked'
+import id3Parser from 'id3-parser'
+import { convertFileToBuffer } from 'id3-parser/lib/util'
 import type { Socket } from 'socket.io-client'
 
 export const socketKey = Symbol('socket') as InjectionKey<Socket>
@@ -56,6 +58,23 @@ export function isMarkdownValue(value: string) {
   return isMarkdown
 }
 
+export async function getMarkdownPlainText(value: string) {
+  const htmlString = await marked(value)
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(htmlString, 'text/html')
+  const walker = document.createTreeWalker(doc, NodeFilter.SHOW_TEXT)
+
+  const textList = []
+  let currentNode = walker.currentNode
+
+  while (currentNode) {
+    textList.push(currentNode.textContent)
+    currentNode = walker.nextNode()!
+  }
+
+  return textList.filter(Boolean).join('')
+}
+
 export function downloadFile(url: string, filename: string) {
   const a = document.createElement('a')
   a.href = url
@@ -88,4 +107,45 @@ export function getVideoCover(url: string, sec = 1) {
       reject(error)
     })
   })
+}
+
+function arrayBufferToBase64(arrayBuffer?: ArrayLike<number>) {
+  if (!arrayBuffer) return ''
+  let data = ''
+  const bytes = new Uint8Array(arrayBuffer)
+  const len = bytes.byteLength
+  for (let i = 0; i < len; i++) {
+    data += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(data)
+}
+
+export function base64ToBinary(base64?: string) {
+  const binary = atob(base64 ?? '')
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return new Blob([bytes])
+}
+
+export async function getAudioFileInfo(file: File) {
+  const tags = await convertFileToBuffer(file).then(id3Parser)
+
+  if (tags && tags.title) {
+    const title = tags.title ?? ''
+    const artist = tags.artist ?? ''
+    return {
+      pic: arrayBufferToBase64(tags?.image?.data),
+      title,
+      artist
+    }
+  }
+
+  const filename = file.name.slice(0, file.name.lastIndexOf('.'))
+  return {
+    pic: '',
+    title: filename.includes('-') ? filename.split('-')[1] : filename,
+    artist: filename.includes('-') ? filename.split('-')[0] : ''
+  }
 }

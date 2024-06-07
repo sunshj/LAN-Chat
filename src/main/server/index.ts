@@ -6,7 +6,7 @@ import { type IpcMainInvokeEvent, shell } from 'electron'
 import { Server } from 'socket.io'
 import { $notify } from '../utils'
 import apiRouter from './api'
-import { channelEventHandler } from './events'
+import { chatEventHandler } from './events'
 
 let server: http.Server
 let io: Server
@@ -30,8 +30,8 @@ export async function startServer(
   app.use('/api', apiRouter)
 
   io.on('connection', socket => {
-    /** channel socket handle  */
-    channelEventHandler(io, socket)
+    /** chat socket handle  */
+    chatEventHandler(io, socket)
   })
 
   return await new Promise<boolean>(resolve => {

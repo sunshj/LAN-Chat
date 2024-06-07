@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io'
 
-export const channelEventHandler = (io: Server, socket: Socket) => {
+export const chatEventHandler = (io: Server, socket: Socket) => {
   const getConnectionUsersId = async () => {
     const connections = await io.fetchSockets()
     return connections.map(v => v.data.userId)

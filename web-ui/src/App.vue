@@ -58,8 +58,8 @@ function isOnlineUser(userId: string) {
 }
 
 function getUnreadCount(userId: string) {
-  const channelId = appStore.generateChatId(userId)
-  return appStore.unreadMessagesCount[channelId] || 0
+  const chatId = appStore.generateChatId(userId)
+  return appStore.unreadMessagesCount[chatId] || 0
 }
 
 function badgeProps(userId: string): Partial<BadgeProps> {

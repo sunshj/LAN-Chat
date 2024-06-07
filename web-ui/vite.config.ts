@@ -36,7 +36,14 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: false,
-    outDir: '../resources/ui'
+    outDir: '../resources/ui',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/element-plus')) return 'element-plus'
+        }
+      }
+    }
   },
   worker: {
     format: 'es'

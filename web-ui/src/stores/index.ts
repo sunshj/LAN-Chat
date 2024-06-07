@@ -3,6 +3,7 @@ import { randomId } from '../utils'
 import type { User } from '../../../src/main/database'
 
 export type MessageType = 'text' | 'image' | 'video' | 'audio' | 'file'
+
 export interface Message {
   mid: string
   cid: string
@@ -14,6 +15,12 @@ export interface Message {
   read?: boolean
   /** video cover  */
   cover?: string
+  /** audio */
+  audio?: {
+    pic: string
+    title: string
+    artist: string
+  }
 }
 
 export const useAppStore = defineStore(
@@ -101,7 +108,7 @@ export const useAppStore = defineStore(
 
     function addMessage(
       content: string,
-      options: Pick<Message, 'type' | 'cover'> = { type: 'text' }
+      options: Pick<Message, 'type' | 'cover' | 'audio'> = { type: 'text' }
     ) {
       const msg: Message = {
         mid: `${Date.now()}-${randomId()}`,
@@ -165,6 +172,12 @@ export const useAppStore = defineStore(
       )
     })
 
+    const isSupportTouch = ref(false)
+
+    onMounted(() => {
+      isSupportTouch.value = Reflect.has(window, 'ontouchstart')
+    })
+
     return {
       userInfo,
       setUserInfo,
@@ -190,7 +203,8 @@ export const useAppStore = defineStore(
       deleteMessage,
       setMessagesAsRead,
       cleanUselessChat,
-      unreadMessagesCount
+      unreadMessagesCount,
+      isSupportTouch
     }
   },
   {

@@ -14,17 +14,30 @@
       </div>
     </template>
     <div class="h-full w-full flex flex-col items-center gap-2">
-      <div ref="messageRef" class="relative mb-14 w-full flex-1 overflow-y-auto bg-gray-2">
+      <div ref="containerRef" class="relative mb-14 w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
           <div
-            v-for="{ time, content, sender, type, mid, cover } in appStore.currentChatMessages"
+            v-for="{
+              time,
+              content,
+              sender,
+              type,
+              mid,
+              cover,
+              audio
+            } in appStore.currentChatMessages"
             :key="time"
             :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
             <div
               v-click-outside="onClickOutside"
               :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']"
-              @contextmenu.prevent="e => showPopover(e, mid)"
+              @contextmenu.prevent="
+                !(type === 'text' && appStore.isSupportTouch) && showPopover($event, mid)
+              "
+              @click.prevent="
+                type === 'text' && appStore.isSupportTouch && showPopover($event, mid)
+              "
             >
               <div v-if="type === 'text'">
                 <Markdown
@@ -45,34 +58,16 @@
                 />
               </div>
 
-              <div v-else class="flex flex-col gap-2">
-                <div>{{ getOriginalFilename(content) }}</div>
+              <div v-else>
+                <Video v-if="type === 'video'" :cover="cover!" :url="formatFileUrl(content)" />
 
-                <div v-if="type === 'video'" class="relative h-40 w-full">
-                  <img :src="cover" class="h-full w-full" />
-                  <IconVideoPlay
-                    class="absolute left-1/2 top-1/2 cursor-pointer rounded-full text-5xl text-amber transition-all -translate-1/2 hover:scale-110"
-                    @click="showVideo(formatFileUrl(content))"
-                  />
-                </div>
+                <Audio v-else-if="type === 'audio'" :url="formatFileUrl(content)" :audio="audio" />
 
-                <audio
-                  v-else-if="type === 'audio'"
-                  :src="formatFileUrl(content)"
-                  controls
-                  :autoplay="false"
-                  class="h-10"
+                <File
+                  v-else
+                  :url="formatFileUrl(content)"
+                  :support-download="fileSupportDownload(content)"
                 />
-
-                <a v-else :href="formatFileUrl(content)" :download="getOriginalFilename(content)">
-                  <el-button
-                    class="w-full"
-                    type="success"
-                    :disabled="!fileSupportDownload(content)"
-                  >
-                    <IconDownload />
-                  </el-button>
-                </a>
               </div>
               <p class="relative block w-full text-end text-xs text-[#777]">
                 {{ formatTimeAgo(new Date(time)) }}
@@ -82,7 +77,7 @@
           <el-popover
             ref="popoverRef"
             :visible="popoverVisible"
-            :virtual-ref="buttonRef"
+            :virtual-ref="messageRef"
             trigger="contextmenu"
             virtual-triggering
             :popper-style="{
@@ -103,6 +98,17 @@
               @click="downloadImage(currentSelectMessage)"
             >
               下载图片
+            </el-button>
+            <el-button
+              v-if="currentSelectMessage?.type === 'text'"
+              type="primary"
+              class="w-full"
+              text
+              bg
+              @contextmenu.prevent
+              @click="copyText(currentSelectMessage.content)"
+            >
+              复制文本
             </el-button>
             <el-button
               type="danger"
@@ -162,11 +168,17 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
-import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
+import {
+  type UploadFile,
+  type UploadProgressEvent,
+  ClickOutside as vClickOutside
+} from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
 import {
   downloadFile,
   formatFileUrl,
+  getAudioFileInfo,
+  getMarkdownPlainText,
   getOriginalFilename,
   getVideoCover,
   isMarkdownValue,
@@ -186,7 +198,7 @@ const visible = defineModel<boolean>({
 
 const message = ref('')
 
-const messageRef = ref<HTMLDivElement>()
+const containerRef = ref<HTMLDivElement>()
 
 interface FileStatus {
   file: string
@@ -195,18 +207,19 @@ interface FileStatus {
 
 const fileStatus = ref<FileStatus[]>([])
 
-const fileSupportDownload = (file: string) => fileStatus.value.find(f => f.file === file)?.download
+const fileSupportDownload = (file: string) =>
+  fileStatus.value.find(f => f.file === file)?.download ?? false
 
 const scrollToBottom = useDebounceFn(() => {
-  if (!messageRef.value) return
-  const { scrollHeight, clientHeight, scrollTop } = messageRef.value
+  if (!containerRef.value) return
+  const { scrollHeight, clientHeight, scrollTop } = containerRef.value
   if (scrollHeight - clientHeight - scrollTop > 20) {
-    messageRef.value?.scrollTo(0, scrollHeight - clientHeight)
+    containerRef.value?.scrollTo(0, scrollHeight - clientHeight)
   }
 })
 
 const popoverVisible = ref(false)
-const buttonRef = ref(null)
+const messageRef = ref(null)
 const popoverRef = ref<any>(null)
 const currentSelectMid = ref('')
 
@@ -214,7 +227,7 @@ const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid
 
 const showPopover = (e: any, mid: string) => {
   currentSelectMid.value = mid
-  buttonRef.value = e.target
+  messageRef.value = e.target.closest('.message')
   popoverVisible.value = true
 }
 
@@ -225,9 +238,26 @@ const onClickOutside = (e: any) => {
 }
 
 function onPopoverHide() {
-  buttonRef.value = null
+  messageRef.value = null
   popoverRef.value = null
   currentSelectMid.value = ''
+}
+
+const { copy, copied } = useClipboard()
+
+async function copyText(content: string) {
+  popoverVisible.value = false
+  if (isMarkdownValue(content)) {
+    const text = await getMarkdownPlainText(content)
+    await copy(text)
+  } else {
+    await copy(content)
+  }
+  if (copied.value) {
+    ElMessage.success('Copied')
+  } else {
+    ElMessage.error('Copy failed')
+  }
 }
 
 function downloadImage(imageMsg: Message) {
@@ -289,33 +319,16 @@ function onUploadProgress(evt: UploadProgressEvent) {
   }
 }
 
-async function onUploadSuccess(res: any) {
+async function onUploadSuccess(res: any, file: UploadFile) {
   const { filename, mimetype } = res.data
   const type = getMessageType(mimetype)
   const cover = type === 'video' ? await getVideoCover(formatFileUrl(filename)) : undefined
-  const msg = appStore.addMessage(filename, { type, cover })
+  const audio = type === 'audio' ? await getAudioFileInfo(file.raw!) : undefined
+  const msg = appStore.addMessage(filename, { type, cover, audio })
   fileStatus.value.push({ file: msg.content, download: true })
   socket.emit('new-message', msg)
   nextTick(() => {
     scrollToBottom()
-  })
-}
-
-function showVideo(url: string) {
-  ElMessageBox({
-    title: getOriginalFilename(url),
-    message() {
-      return h('video', {
-        class: 'w-full',
-        src: url,
-        controls: true,
-        muted: true
-      })
-    },
-    showConfirmButton: false,
-    closeOnClickModal: true,
-    closeOnPressEscape: true,
-    draggable: true
   })
 }
 
@@ -418,9 +431,5 @@ onBeforeUnmount(() => {
 .chat-drawer .el-drawer__body {
   overflow: hidden;
   padding: 0;
-}
-
-.el-message-box__message {
-  width: 100%;
 }
 </style>
