@@ -149,3 +149,29 @@ export async function getAudioFileInfo(file: File) {
     artist: filename.includes('-') ? filename.split('-')[0] : ''
   }
 }
+
+export function compressImageFile(file: File, quality = 0.25) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.addEventListener('load', event => {
+      const image = new Image()
+
+      image.addEventListener('load', () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.floor(image.width * quality)
+        canvas.height = Math.floor(image.height * quality)
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(image, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL())
+      })
+
+      image.addEventListener('error', error => {
+        reject(error)
+      })
+      image.src = event?.target?.result as string
+    })
+
+    reader.readAsDataURL(file)
+  })
+}

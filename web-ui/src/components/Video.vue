@@ -17,7 +17,7 @@ import { getOriginalFilename } from '../utils'
 
 const props = defineProps<{
   url: string
-  cover: string
+  cover?: string
 }>()
 
 function showVideo(url: string) {

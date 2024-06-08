@@ -23,6 +23,7 @@ declare module 'vue' {
     IconDownload: typeof import('./src/components/Icon/Download.vue')['default']
     IconUpload: typeof import('./src/components/Icon/Upload.vue')['default']
     IconVideoPlay: typeof import('./src/components/Icon/VideoPlay.vue')['default']
+    Image: typeof import('./src/components/Image.vue')['default']
     Markdown: typeof import('./src/components/Markdown.vue')['default']
     Profile: typeof import('./src/components/Profile.vue')['default']
     Video: typeof import('./src/components/Video.vue')['default']

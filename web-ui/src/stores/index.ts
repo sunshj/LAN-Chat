@@ -4,6 +4,23 @@ import type { User } from '../../../src/main/database'
 
 export type MessageType = 'text' | 'image' | 'video' | 'audio' | 'file'
 
+export interface MessagePayload {
+  /** video payload */
+  video?: {
+    cover?: string
+  }
+  /** audio payload */
+  audio?: {
+    pic?: string
+    title?: string
+    artist?: string
+  }
+  /** image payload */
+  image?: {
+    thumbnail?: string
+  }
+}
+
 export interface Message {
   mid: string
   cid: string
@@ -13,14 +30,7 @@ export interface Message {
   content: string
   time: number
   read?: boolean
-  /** video cover  */
-  cover?: string
-  /** audio */
-  audio?: {
-    pic: string
-    title: string
-    artist: string
-  }
+  payload?: MessagePayload
 }
 
 export const useAppStore = defineStore(
@@ -108,7 +118,7 @@ export const useAppStore = defineStore(
 
     function addMessage(
       content: string,
-      options: Pick<Message, 'type' | 'cover' | 'audio'> = { type: 'text' }
+      options: Pick<Message, 'type' | 'payload'> = { type: 'text' }
     ) {
       const msg: Message = {
         mid: `${Date.now()}-${randomId()}`,

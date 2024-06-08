@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-2">
     <div>{{ getOriginalFilename(props.url) }}</div>
-    <Aplayer :music="music" :volume="0.4" />
+    <Aplayer :volume="0.4" :music="music" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@ import type { Message } from '../stores'
 
 const props = defineProps<{
   url: string
-  audio?: Message['audio']
+  audio: NonNullable<Message['payload']>['audio']
 }>()
 
 const music = {

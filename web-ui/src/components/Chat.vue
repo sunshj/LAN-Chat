@@ -17,15 +17,7 @@
       <div ref="containerRef" class="relative mb-14 w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
           <div
-            v-for="{
-              time,
-              content,
-              sender,
-              type,
-              mid,
-              cover,
-              audio
-            } in appStore.currentChatMessages"
+            v-for="{ time, content, sender, type, mid, payload } in appStore.currentChatMessages"
             :key="time"
             :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
@@ -49,19 +41,24 @@
                 <div v-else>{{ content }}</div>
               </div>
 
-              <div v-else-if="type === 'image'">
-                <el-image
-                  fit="cover"
-                  :src="formatFileUrl(content)"
-                  class="h-40 w-40"
-                  :preview-src-list="[formatFileUrl(content)]"
-                />
-              </div>
+              <Image
+                v-else-if="type === 'image'"
+                :url="formatFileUrl(content)"
+                :thumbnail="payload?.image?.thumbnail"
+              />
 
               <div v-else>
-                <Video v-if="type === 'video'" :cover="cover!" :url="formatFileUrl(content)" />
+                <Video
+                  v-if="type === 'video'"
+                  :cover="payload?.video?.cover"
+                  :url="formatFileUrl(content)"
+                />
 
-                <Audio v-else-if="type === 'audio'" :url="formatFileUrl(content)" :audio="audio" />
+                <Audio
+                  v-else-if="type === 'audio'"
+                  :url="formatFileUrl(content)"
+                  :audio="payload?.audio"
+                />
 
                 <File
                   v-else
@@ -89,16 +86,17 @@
             @hide="onPopoverHide"
           >
             <el-button
-              v-if="currentSelectMessage?.type === 'image'"
+              v-if="currentSelectMessage && ['image', 'audio'].includes(currentSelectMessage?.type)"
               type="primary"
               class="w-full"
               text
               bg
               @contextmenu.prevent
-              @click="downloadImage(currentSelectMessage)"
+              @click="download(currentSelectMessage)"
             >
-              下载图片
+              下载{{ currentSelectMessage?.type === 'audio' ? '音频' : '图片' }}
             </el-button>
+
             <el-button
               v-if="currentSelectMessage?.type === 'text'"
               type="primary"
@@ -175,6 +173,7 @@ import {
 } from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
 import {
+  compressImageFile,
   downloadFile,
   formatFileUrl,
   getAudioFileInfo,
@@ -262,9 +261,9 @@ async function copyText(content: string) {
   }
 }
 
-function downloadImage(imageMsg: Message) {
-  const url = formatFileUrl(imageMsg.content)
-  const filename = getOriginalFilename(imageMsg.content)
+function download(msg: Message) {
+  const url = formatFileUrl(msg.content)
+  const filename = getOriginalFilename(msg.content)
   popoverVisible.value = false
   downloadFile(url, filename)
 }
@@ -324,9 +323,11 @@ function onUploadProgress(evt: UploadProgressEvent) {
 async function onUploadSuccess(res: any, file: UploadFile) {
   const { filename, mimetype } = res.data
   const type = getMessageType(mimetype)
-  const cover = type === 'video' ? await getVideoCover(formatFileUrl(filename)) : undefined
+  const image = type === 'image' ? { thumbnail: await compressImageFile(file.raw!) } : undefined
+  const video =
+    type === 'video' ? { cover: await getVideoCover(formatFileUrl(filename)) } : undefined
   const audio = type === 'audio' ? await getAudioFileInfo(file.raw!) : undefined
-  const msg = appStore.addMessage(filename, { type, cover, audio })
+  const msg = appStore.addMessage(filename, { type, payload: { video, audio, image } })
   fileStatus.value.push({ file: msg.content, download: true })
   socket.emit('new-message', msg)
   nextTick(() => {
