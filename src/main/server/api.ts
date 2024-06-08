@@ -13,8 +13,8 @@ const upload = multer({
       cb(null, path.join(getResPath(), 'uploads'))
     },
     filename(_req, file, cb) {
-      const originalname = Buffer.from(file.originalname, 'latin1').toString('utf8')
-      cb(null, `${randomId()}-${originalname}`)
+      file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8')
+      cb(null, `${randomId()}-${file.originalname}`)
     }
   })
 })
@@ -61,9 +61,9 @@ router.post('/user', createUserDto, async (req, res) => {
 })
 
 router.post('/upload', upload.single('file'), async (req, res) => {
-  const file = req.file
-  const type = getMessageType(file?.mimetype)
-  const payload = {
+  const file = req.file!
+  const type = getMessageType(file.mimetype)
+  const payload: any = {
     audio: undefined,
     video: undefined,
     image: undefined

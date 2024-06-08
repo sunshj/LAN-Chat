@@ -11,7 +11,7 @@ import {
   dialog
 } from 'electron'
 import axios from 'axios'
-import { parseV2Tag } from 'id3-parser'
+import id3Parser from 'id3-parser'
 import sharp from 'sharp'
 
 export function $notify(
@@ -126,18 +126,20 @@ export function getMessageType(mimetype: string) {
   return 'file'
 }
 
-export async function getAudioFileInfo(file: File) {
+export async function getAudioFileInfo(file: Express.Multer.File) {
   const buffer = await fs.readFile(file.path)
-  const tags = await parseV2Tag(buffer)
+  // @ts-expect-error (support for CommonJS)
+  const tags = id3Parser.default(buffer)
 
   if (tags && tags.title) {
     const title = tags.title ?? ''
     const artist = tags.artist ?? ''
 
-    const coverName = `${file.filename}-cover.jpg`
+    const coverName = `${file?.filename}-cover.jpg`
     if (tags?.image?.data) {
       const coverFilePath = path.join(file.destination, coverName)
-      await fs.writeFile(coverFilePath, [tags?.image?.data])
+
+      await fs.writeFile(coverFilePath, new Uint8Array(tags?.image?.data))
     }
 
     return {
@@ -155,7 +157,7 @@ export async function getAudioFileInfo(file: File) {
   }
 }
 
-export async function getImageThumbnail(file: File) {
+export async function getImageThumbnail(file: Express.Multer.File) {
   if (file.size < 1024 * 1024 * 3) return
   const thumbnail = `${file.filename}-thumbnail.jpg`
   const thumbnailFilePath = path.join(file.destination, thumbnail)

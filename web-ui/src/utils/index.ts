@@ -101,8 +101,8 @@ export function getVideoCover(filename: string, sec = 1) {
       canvas.width = Math.floor(canvas.width / 2)
       ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
       canvas.toBlob(async blob => {
-        const file = new File([blob], `${getOriginalFilename(filename)}-cover.jpg`, {
-          type: blob.type
+        const file = new File([blob!], `${getOriginalFilename(filename)}-cover.jpg`, {
+          type: blob?.type
         })
         const formData = new FormData()
         formData.append('file', file)
