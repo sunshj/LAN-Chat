@@ -39,13 +39,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |
             dist/*.exe
-            dist/*.zip
-            dist/*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

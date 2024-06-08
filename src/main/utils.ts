@@ -2,7 +2,7 @@ import crypto from 'node:crypto'
 import path from 'node:path'
 import os from 'node:os'
 import fs from 'node:fs/promises'
-import { execSync } from 'node:child_process'
+import { exec } from 'node:child_process'
 import {
   type BrowserWindow,
   Notification,
@@ -110,7 +110,9 @@ export async function upgradeApp(url: string, onProgress?: (val: number) => void
 
   const tempPath = path.join(app.getPath('temp'), 'LAN-Chat-latest.exe')
   await fs.writeFile(tempPath, buffer)
-  execSync(`start "" "${tempPath}"`)
-  await fs.unlink(tempPath)
-  app.exit()
+  setTimeout(() => {
+    fs.unlink(tempPath)
+    app.exit()
+  }, 100)
+  exec(`start "" "${tempPath}"`)
 }
