@@ -82,7 +82,7 @@ export async function checkUpgrade(win: BrowserWindow) {
     .then(async ({ response }) => {
       if (response !== 0) return
 
-      const downloadUrl = latestRelease.assets.find(a =>
+      const downloadUrl = latestRelease.assets.find((a: { name: string }) =>
         a.name.endsWith('.exe')
       ).browser_download_url
 
