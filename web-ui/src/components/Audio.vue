@@ -8,7 +8,7 @@
 <script setup lang="ts">
 // @ts-expect-error
 import Aplayer from 'vue-aplayer-next'
-import { base64ToBinary, getOriginalFilename } from '../utils'
+import { formatFileUrl, getOriginalFilename } from '../utils'
 import type { Message } from '../stores'
 
 const props = defineProps<{
@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const music = {
   src: props.url,
-  pic: URL.createObjectURL(base64ToBinary(props.audio?.pic)),
+  pic: formatFileUrl(props.audio?.pic),
   title: props.audio?.artist ? `${props.audio?.title} -` : props.audio?.title,
   artist: ` ${props.audio?.artist}`
 }

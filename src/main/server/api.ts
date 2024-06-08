@@ -2,7 +2,7 @@ import path from 'node:path'
 import { Router } from 'express'
 import multer from 'multer'
 import { eq } from 'drizzle-orm'
-import { getResPath, randomId } from '../utils'
+import { getAudioFileInfo, getImageThumbnail, getMessageType, getResPath, randomId } from '../utils'
 import { db, users } from '../database'
 import { createUserDto, updateUserDto } from './dto'
 
@@ -60,10 +60,20 @@ router.post('/user', createUserDto, async (req, res) => {
   })
 })
 
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   const file = req.file
+  const type = getMessageType(file?.mimetype)
+  const payload = {
+    audio: undefined,
+    video: undefined,
+    image: undefined
+  }
+
+  if (type === 'audio') payload.audio = await getAudioFileInfo(file)
+  if (type === 'image') payload.image = await getImageThumbnail(file)
+
   res.send({
-    data: file
+    data: { ...file, payload }
   })
 })
 

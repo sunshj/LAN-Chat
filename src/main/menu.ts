@@ -12,13 +12,22 @@ export function createMenu(mainWindow: BrowserWindow) {
     },
     {
       label: '清空数据库',
-      click: () => {
+      click: async () => {
+        const total = (await db.select().from(users)).length
+        if (total === 0) {
+          dialog.showMessageBox({
+            title: 'LAN Chat',
+            type: 'info',
+            message: '数据库空空如也'
+          })
+          return
+        }
         dialog
           .showMessageBox(mainWindow, {
             title: 'LAN Chat',
             type: 'warning',
             message: '确定要清空数据库吗？',
-            detail: '清空数据库后，所有数据将无法恢复。',
+            detail: `共计${total}条数据，清空后所有数据将无法恢复。`,
             buttons: ['取消', '确定']
           })
           .then(async ({ response }) => {
@@ -56,7 +65,7 @@ export function createMenu(mainWindow: BrowserWindow) {
             type: 'question',
             buttons: ['取消', '确定'],
             title: 'LAN Chat',
-            detail: `确定要清空这些文件吗？\n${safeFiles.join('\n')}`
+            detail: `共计${safeFiles.length}个文件，确定要清理吗？`
           })
           .then(({ response }) => {
             if (response === 1) {

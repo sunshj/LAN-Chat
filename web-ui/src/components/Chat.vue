@@ -44,13 +44,13 @@
               <Image
                 v-else-if="type === 'image'"
                 :url="formatFileUrl(content)"
-                :thumbnail="payload?.image?.thumbnail"
+                :thumbnail="formatFileUrl(payload?.image?.thumbnail || content)"
               />
 
               <div v-else>
                 <Video
                   v-if="type === 'video'"
-                  :cover="payload?.video?.cover"
+                  :cover="formatFileUrl(payload?.video?.cover)"
                   :url="formatFileUrl(content)"
                 />
 
@@ -166,17 +166,11 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
-import {
-  type UploadFile,
-  type UploadProgressEvent,
-  ClickOutside as vClickOutside
-} from 'element-plus'
+import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
 import { type Message, type MessageType, useAppStore } from '../stores'
 import {
-  compressImageFile,
   downloadFile,
   formatFileUrl,
-  getAudioFileInfo,
   getMarkdownPlainText,
   getOriginalFilename,
   getVideoCover,
@@ -320,14 +314,11 @@ function onUploadProgress(evt: UploadProgressEvent) {
   }
 }
 
-async function onUploadSuccess(res: any, file: UploadFile) {
-  const { filename, mimetype } = res.data
+async function onUploadSuccess(res: any) {
+  const { filename, mimetype, payload } = res.data
   const type = getMessageType(mimetype)
-  const image = type === 'image' ? { thumbnail: await compressImageFile(file.raw!) } : undefined
-  const video =
-    type === 'video' ? { cover: await getVideoCover(formatFileUrl(filename)) } : undefined
-  const audio = type === 'audio' ? await getAudioFileInfo(file.raw!) : undefined
-  const msg = appStore.addMessage(filename, { type, payload: { video, audio, image } })
+  payload.video = type === 'video' ? await getVideoCover(filename) : undefined
+  const msg = appStore.addMessage(filename, { type, payload })
   fileStatus.value.push({ file: msg.content, download: true })
   socket.emit('new-message', msg)
   nextTick(() => {

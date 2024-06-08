@@ -7,6 +7,6 @@ module.exports = defineConfig([
     }
   },
   {
-    ignores: ['**/out', '**/resources']
+    ignores: ['**/out', '**/resources', '**/drizzle']
   }
 ])

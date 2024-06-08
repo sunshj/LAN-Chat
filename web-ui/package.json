@@ -7,7 +7,6 @@
     "build": "vue-tsc && vite build"
   },
   "dependencies": {
-    "id3-parser": "^3.0.0",
     "marked": "^12.0.2",
     "marked-shiki": "^1.1.0",
     "pinia": "^2.1.7",

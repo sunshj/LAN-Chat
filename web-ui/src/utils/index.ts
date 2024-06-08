@@ -1,7 +1,6 @@
 import parser from 'ua-parser-js'
 import { marked } from 'marked'
-import id3Parser from 'id3-parser'
-import { convertFileToBuffer } from 'id3-parser/lib/util'
+import axios from 'axios'
 import type { Socket } from 'socket.io-client'
 
 export const socketKey = Symbol('socket') as InjectionKey<Socket>
@@ -15,7 +14,7 @@ export function getDeviceName(ua: string) {
   return `${osName} ${version} ${browserName}`
 }
 
-export const formatFileUrl = (filename: string) => `/api/download/${filename}`
+export const formatFileUrl = (filename?: string) => `/api/download/${filename}`
 
 export function randomId(n = 6) {
   return Math.random().toString(32).slice(n)
@@ -82,10 +81,10 @@ export function downloadFile(url: string, filename: string) {
   a.click()
 }
 
-export function getVideoCover(url: string, sec = 1) {
-  return new Promise<string>((resolve, reject) => {
+export function getVideoCover(filename: string, sec = 1) {
+  return new Promise<{ cover: string }>(resolve => {
     const video = document.createElement('video')
-    video.src = url
+    video.src = formatFileUrl(filename)
     video.addEventListener('loadedmetadata', () => {
       video.currentTime = Math.min(
         Math.max(0, (sec < 0 ? video.duration : 0) + sec),
@@ -101,77 +100,19 @@ export function getVideoCover(url: string, sec = 1) {
       canvas.height = Math.floor(canvas.height / 2)
       canvas.width = Math.floor(canvas.width / 2)
       ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
-      resolve(canvas.toDataURL())
-    })
-    video.addEventListener('error', error => {
-      reject(error)
-    })
-  })
-}
-
-function arrayBufferToBase64(arrayBuffer?: ArrayLike<number>) {
-  if (!arrayBuffer) return ''
-  let data = ''
-  const bytes = new Uint8Array(arrayBuffer)
-  const len = bytes.byteLength
-  for (let i = 0; i < len; i++) {
-    data += String.fromCharCode(bytes[i])
-  }
-  return window.btoa(data)
-}
-
-export function base64ToBinary(base64?: string) {
-  const binary = atob(base64 ?? '')
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i)
-  }
-  return new Blob([bytes])
-}
-
-export async function getAudioFileInfo(file: File) {
-  const tags = await convertFileToBuffer(file).then(id3Parser)
-
-  if (tags && tags.title) {
-    const title = tags.title ?? ''
-    const artist = tags.artist ?? ''
-    return {
-      pic: arrayBufferToBase64(tags?.image?.data),
-      title,
-      artist
-    }
-  }
-
-  const filename = file.name.slice(0, file.name.lastIndexOf('.'))
-  return {
-    pic: '',
-    title: filename.includes('-') ? filename.split('-')[1] : filename,
-    artist: filename.includes('-') ? filename.split('-')[0] : ''
-  }
-}
-
-export function compressImageFile(file: File, quality = 0.25) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.addEventListener('load', event => {
-      const image = new Image()
-
-      image.addEventListener('load', () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = Math.floor(image.width * quality)
-        canvas.height = Math.floor(image.height * quality)
-        const ctx = canvas.getContext('2d')
-        ctx?.drawImage(image, 0, 0, canvas.width, canvas.height)
-        resolve(canvas.toDataURL())
+      canvas.toBlob(async blob => {
+        const file = new File([blob], `${getOriginalFilename(filename)}-cover.jpg`, {
+          type: blob.type
+        })
+        const formData = new FormData()
+        formData.append('file', file)
+        const { data: res } = await axios.post('/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        resolve({ cover: res.data.filename })
       })
-
-      image.addEventListener('error', error => {
-        reject(error)
-      })
-      image.src = event?.target?.result as string
     })
-
-    reader.readAsDataURL(file)
   })
 }
