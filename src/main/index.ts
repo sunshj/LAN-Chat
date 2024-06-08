@@ -3,8 +3,9 @@ import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, shell } from 'electron
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
-import { getNetworksAddr, startServer, stopServer } from './server'
+import { startServer, stopServer } from './server'
 import { runMigrate } from './database/migrate'
+import { fetchReleases, getNetworksAddr, upgradeApp } from './utils'
 
 function createWindow(): void {
   // Create the browser window.
@@ -75,7 +76,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('LAN Chat')
 
@@ -90,9 +91,12 @@ app.whenReady().then(async () => {
   ipcMain.handle('start-server', startServer)
   ipcMain.handle('stop-server', stopServer)
   ipcMain.handle('get-networks', getNetworksAddr)
-  ipcMain.handle('open-url', (_event, url) => shell.openExternal(url))
+  ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
+  ipcMain.handle('fetch-releases', fetchReleases)
+  ipcMain.handle('get-version', () => app.getVersion())
+  ipcMain.handle('upgrade', (_, url) => upgradeApp(url))
 
-  await runMigrate()
+  runMigrate()
   createWindow()
 
   app.on('activate', function () {

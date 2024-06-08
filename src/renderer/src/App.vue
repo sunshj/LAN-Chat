@@ -1,6 +1,5 @@
 <template>
   <div class="h-full w-full flex flex-col gap-2 border border-1px p-4">
-    <div class="text-sm">Start Server</div>
     <ElCard shadow="never">
       <ElForm :model="form" label-width="auto" class="max-w-full w-full">
         <div class="w-full flex justify-between">
@@ -108,7 +107,11 @@ async function stopServer() {
   isRunning.value = await window.api.stopServer()
 }
 
+const title = useTitle(`LAN Chat`)
+
 onMounted(async () => {
+  const version = await window.api.getVersion()
+  title.value = `LAN Chat v${version}`
   await remoteQueryNetworks()
   form.value.host = networks.value[0]
 })

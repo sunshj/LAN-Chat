@@ -6,7 +6,10 @@ export const api = {
   startServer: (data: { host: string; port: number }) => ipcRenderer.invoke('start-server', data),
   stopServer: () => ipcRenderer.invoke('stop-server'),
   getNetworks: () => ipcRenderer.invoke('get-networks'),
-  open: (url: string) => ipcRenderer.invoke('open-url', url)
+  open: (url: string) => ipcRenderer.invoke('open-url', url),
+  fetchReleases: () => ipcRenderer.invoke('fetch-releases'),
+  getVersion: () => ipcRenderer.invoke('get-version'),
+  upgrade: (url: string) => ipcRenderer.invoke('upgrade', url)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { type BrowserWindow, Menu, dialog } from 'electron'
-import { getResPath } from './utils'
+import { checkUpgrade, getResPath } from './utils'
 import { db, users } from './database'
 
 export function createMenu(mainWindow: BrowserWindow) {
@@ -71,6 +71,10 @@ export function createMenu(mainWindow: BrowserWindow) {
             }
           })
       }
+    },
+    {
+      label: '检查更新',
+      click: () => checkUpgrade(mainWindow)
     }
   ])
 }

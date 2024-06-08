@@ -1,5 +1,4 @@
 import path from 'node:path'
-import os from 'node:os'
 import http from 'node:http'
 import express from 'express'
 import { type IpcMainInvokeEvent, shell } from 'electron'
@@ -53,19 +52,4 @@ export function stopServer() {
   }
 
   return server.listening
-}
-
-export function getNetworksAddr() {
-  return Object.values(os.networkInterfaces())
-    .flatMap(nInterface => nInterface ?? [])
-    .filter(
-      detail =>
-        detail &&
-        detail.address &&
-        (detail.family === 'IPv4' ||
-          // @ts-expect-error Node 18.0 - 18.3 returns number
-          detail.family === 4)
-    )
-    .map(v => v.address)
-    .reverse()
 }
