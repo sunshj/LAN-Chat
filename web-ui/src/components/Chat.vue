@@ -63,6 +63,7 @@
                   v-else
                   :url="formatFileUrl(content)"
                   :support-download="fileSupportDownload(content)"
+                  @click.stop
                 />
               </div>
               <p class="relative block w-full text-end text-xs text-[#777]">
