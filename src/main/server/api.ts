@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { Router } from 'express'
 import multer from 'multer'
-import { eq } from 'drizzle-orm'
+import { createId } from '@paralleldrive/cuid2'
 import { getAudioFileInfo, getImageThumbnail, getMessageType, getResPath, randomId } from '../utils'
-import { db, users } from '../database'
+import { users } from '../store'
 import { createUserDto, updateUserDto } from './dto'
 
 const router = Router()
@@ -26,37 +26,28 @@ router.get('/', (req, res) => {
   })
 })
 
-router.get('/users', async (_req, res) => {
-  const data = await db.select().from(users)
+router.get('/users', (_req, res) => {
   res.send({
-    data
+    data: users.findMany()
   })
 })
 
-router.get('/user/:id', async (req, res) => {
-  const [user] = await db.select().from(users).where(eq(users.id, req.params.id))
+router.get('/user/:id', (req, res) => {
   res.send({
-    data: user
+    data: users.findOne(req.params.id)
   })
 })
 
-router.put('/user/:id', updateUserDto, async (req, res) => {
-  const [user] = await db
-    .update(users)
-    .set({ username: req.body.username })
-    .where(eq(users.id, req.params.id))
-    .returning()
-
+router.put('/user/:id', updateUserDto, (req, res) => {
   res.send({
-    data: user
+    data: users.mutation(req.params.id, { username: req.body.username })
   })
 })
 
-router.post('/user', createUserDto, async (req, res) => {
-  const [user] = await db.insert(users).values({ username: req.body.username }).returning()
-
+router.post('/user', createUserDto, (req, res) => {
+  const id = createId()
   res.send({
-    data: user
+    data: users.mutation(id, { username: req.body.username })
   })
 })
 

@@ -1,9 +1,9 @@
 // @ts-check
-const path = require('node:path')
-const fs = require('node:fs')
+import path from 'node:path'
+import fs from 'node:fs'
 
 /** @type {import("electron-builder").Configuration['afterPack']} */
-module.exports = context => {
+export default context => {
   if (process.platform === 'darwin') return
   const unpackedDir = path.join(context.appOutDir, 'locales')
 

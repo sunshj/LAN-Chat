@@ -1,11 +1,14 @@
 import path from 'node:path'
 import http from 'node:http'
+import { fileURLToPath } from 'node:url'
 import express from 'express'
 import { type IpcMainInvokeEvent, shell } from 'electron'
 import { Server } from 'socket.io'
 import { $notify } from '../utils'
 import apiRouter from './api'
 import { chatEventHandler } from './events'
+
+const __dirname = fileURLToPath(path.dirname(import.meta.url))
 
 let server: http.Server
 let io: Server

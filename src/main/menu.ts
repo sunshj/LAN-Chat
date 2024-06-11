@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { type BrowserWindow, Menu, dialog } from 'electron'
 import { checkUpgrade, getResPath } from './utils'
-import { db, users } from './database'
+import { users } from './store'
 
 export function createMenu(mainWindow: BrowserWindow) {
   return Menu.buildFromTemplate([
@@ -12,8 +12,8 @@ export function createMenu(mainWindow: BrowserWindow) {
     },
     {
       label: '清空数据库',
-      click: async () => {
-        const total = (await db.select().from(users)).length
+      click: () => {
+        const total = users.findMany().length
         if (total === 0) {
           dialog.showMessageBox({
             title: 'LAN Chat',
@@ -30,13 +30,13 @@ export function createMenu(mainWindow: BrowserWindow) {
             detail: `共计${total}条数据，清空后所有数据将无法恢复。`,
             buttons: ['取消', '确定']
           })
-          .then(async ({ response }) => {
+          .then(({ response }) => {
             if (response === 1) {
-              const res = await db.delete(users)
+              const { count } = users.deleteMany()
               dialog.showMessageBox({
                 title: 'LAN Chat',
                 type: 'info',
-                message: `清空了${res.changes}条数据`
+                message: `清空了${count}条数据`
               })
             }
           })

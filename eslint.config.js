@@ -1,12 +1,12 @@
-const { defineConfig } = require('@sunshj/eslint-config')
+import { defineConfig } from '@sunshj/eslint-config'
 
-module.exports = defineConfig([
+export default defineConfig([
   {
     rules: {
       'no-alert': 'off'
     }
   },
   {
-    ignores: ['**/out', '**/resources', '**/drizzle']
+    ignores: ['**/out', '**/resources']
   }
 ])

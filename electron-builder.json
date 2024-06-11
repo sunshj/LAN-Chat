@@ -16,13 +16,17 @@
   "asarUnpack": ["resources/**"],
   "afterPack": "./scripts/after-pack.js",
   "win": {
-    "executableName": "LAN-Chat"
+    "executableName": "LAN-Chat",
+    "target": ["nsis", "portable"]
   },
   "nsis": {
     "artifactName": "${name}-${version}-setup.${ext}",
     "shortcutName": "${productName}",
     "uninstallDisplayName": "${productName}",
     "createDesktopShortcut": "always"
+  },
+  "portable": {
+    "artifactName": "${name}-${version}-portable.${ext}"
   },
   "appImage": {
     "artifactName": "${name}-${version}.${ext}"

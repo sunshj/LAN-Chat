@@ -1,4 +1,4 @@
 /** @type {import('cz-git').UserConfig} */
-module.exports = {
+export default {
   extends: ['@sunshj/commitlint-config']
 }

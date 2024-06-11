@@ -1,11 +1,13 @@
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
-import { runMigrate } from './database/migrate'
 import { fetchReleases, getNetworksAddr, upgradeApp } from './utils'
+
+const __dirname = fileURLToPath(dirname(import.meta.url))
 
 function createWindow(): void {
   // Create the browser window.
@@ -17,7 +19,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       devTools: true,
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false
     }
   })
@@ -96,7 +98,6 @@ app.whenReady().then(() => {
   ipcMain.handle('get-version', () => app.getVersion())
   ipcMain.handle('upgrade', (_, url) => upgradeApp(url))
 
-  runMigrate()
   createWindow()
 
   app.on('activate', function () {
