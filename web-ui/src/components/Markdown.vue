@@ -52,7 +52,7 @@ onBeforeUnmount(() => {
   line-height: 24px;
 }
 
-.md-output ul {
+.md-output li {
   list-style-position: inside;
 }
 
