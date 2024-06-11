@@ -5,7 +5,7 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
-import { fetchReleases, getNetworksAddr, upgradeApp } from './utils'
+import { fetchReleases, getNetworksAddr } from './utils'
 
 const __dirname = fileURLToPath(dirname(import.meta.url))
 
@@ -96,7 +96,6 @@ app.whenReady().then(() => {
   ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
   ipcMain.handle('fetch-releases', fetchReleases)
   ipcMain.handle('get-version', () => app.getVersion())
-  ipcMain.handle('upgrade', (_, url) => upgradeApp(url))
 
   createWindow()
 
