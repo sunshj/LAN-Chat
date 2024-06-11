@@ -16,20 +16,13 @@ const store = new Store<{
 
 export const users = {
   findMany() {
-    return store.store.users
+    return store.get('users', [])
   },
   findOne(id: string) {
-    return store.store.users?.find(user => user.id === id) ?? null
+    return store.get('users', [])?.find(user => user.id === id) ?? null
   },
   mutation(id: string, values: Omit<User, 'id'>) {
-    store.set('users', [
-      ...store.get('users', []),
-      {
-        id,
-        ...values
-      }
-    ])
-
+    store.set('users', [...store.get('users', []).filter(u => u.id !== id), { id, ...values }])
     return { id, ...values }
   },
   deleteMany() {

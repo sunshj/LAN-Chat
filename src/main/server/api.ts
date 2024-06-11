@@ -39,6 +39,11 @@ router.get('/user/:id', (req, res) => {
 })
 
 router.put('/user/:id', updateUserDto, (req, res) => {
+  const user = users.findOne(req.params.id)
+  if (!user) {
+    res.status(404).send('user not found')
+    return
+  }
   res.send({
     data: users.mutation(req.params.id, { username: req.body.username })
   })
