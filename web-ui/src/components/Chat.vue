@@ -308,7 +308,11 @@ watch(visible, value => {
     nextTick(() => {
       scrollToBottom()
       nextTick(() => {
+        inputRef.value?.textarea?.setAttribute('readonly', 'readonly')
         inputRef.value?.focus()
+        setTimeout(() => {
+          inputRef.value?.textarea?.removeAttribute('readonly')
+        }, 200)
       })
     })
   } else {
