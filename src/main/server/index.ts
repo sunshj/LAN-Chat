@@ -1,14 +1,11 @@
 import path from 'node:path'
 import http from 'node:http'
-import { fileURLToPath } from 'node:url'
 import express from 'express'
 import { type IpcMainInvokeEvent, shell } from 'electron'
 import { Server } from 'socket.io'
-import { $notify } from '../utils'
+import { $notify, getResPath } from '../utils'
 import apiRouter from './api'
 import { chatEventHandler } from './events'
-
-const __dirname = fileURLToPath(path.dirname(import.meta.url))
 
 let server: http.Server
 let io: Server
@@ -27,7 +24,7 @@ export async function startServer(
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use(express.static(path.join(__dirname, '../../resources/ui')))
+  app.use(express.static(path.join(getResPath(), 'ui')))
 
   app.use('/api', apiRouter)
 
