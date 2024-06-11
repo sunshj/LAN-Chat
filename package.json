@@ -12,10 +12,11 @@
     "build:webui": "pnpm -F web-ui build",
     "build": "pnpm prebuild && pnpm build:webui && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
-    "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && electron-builder --win",
+    "build:unpack": "pnpm build && electron-builder --dir",
+    "build:win": "pnpm build && electron-builder --win",
     "format": "prettier --write .",
-    "lint": "eslint . --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "commit": "git-cz"
   },
   "dependencies": {

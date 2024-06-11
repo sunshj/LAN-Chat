@@ -1,0 +1,43 @@
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+name: CI Typecheck and Lint
+
+jobs:
+  build:
+    name: Lint and Typecheck
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: 18
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Checkout LFS objects
+        run: git lfs checkout
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint and Typecheck
+        run: |
+          pnpm run lint
