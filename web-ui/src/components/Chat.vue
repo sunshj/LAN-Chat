@@ -22,13 +22,12 @@
             :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
             <div
-              v-click-outside="onClickOutside"
               :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']"
               @contextmenu.prevent="
-                !(type === 'text' && appStore.isSupportTouch) && showPopover($event, mid)
+                !(type === 'text' && appStore.isSupportTouch) && handleContextMenu($event, mid)
               "
               @click.prevent="
-                type === 'text' && appStore.isSupportTouch && showPopover($event, mid)
+                type === 'text' && appStore.isSupportTouch && handleContextMenu($event, mid)
               "
             >
               <div v-if="type === 'text'">
@@ -71,66 +70,13 @@
               </p>
             </div>
           </div>
-          <el-popover
-            ref="popoverRef"
-            :visible="popoverVisible"
-            :virtual-ref="messageRef"
-            trigger="contextmenu"
-            virtual-triggering
-            :popper-style="{
-              padding: '2px',
-              display: 'flex',
-              'flex-direction': 'column',
-              'justify-content': 'center'
-            }"
-            @hide="onPopoverHide"
-          >
-            <el-button
-              v-if="currentSelectMessage && ['image', 'audio'].includes(currentSelectMessage?.type)"
-              type="primary"
-              class="w-full"
-              text
-              bg
-              @contextmenu.prevent
-              @click="download(currentSelectMessage)"
-            >
-              下载{{ currentSelectMessage?.type === 'audio' ? '音频' : '图片' }}
-            </el-button>
-
-            <el-button
-              v-if="currentSelectMessage?.type === 'text'"
-              type="primary"
-              class="w-full"
-              text
-              bg
-              @contextmenu.prevent
-              @click="copyText(currentSelectMessage.content)"
-            >
-              复制文本
-            </el-button>
-            <el-button
-              type="danger"
-              class="w-full"
-              text
-              bg
-              @contextmenu.prevent
-              @click="confirmDeleteMessage()"
-            >
-              删除消息
-            </el-button>
-          </el-popover>
         </div>
         <div
           class="fixed bottom-0 min-h-14 w-full flex items-start justify-around gap-2 bg-white p-2"
         >
           <div
-            :class="[
-              'absolute inset-0 z-10 h-1 w-full',
-              uploadPercentage > 0 ? 'bg-green-500' : ''
-            ]"
-            :style="{
-              translate: `-${100 - uploadPercentage}%`
-            }"
+            :class="['absolute inset-0 z-10 h-1 w-full', uploadPercentage > 0 && 'bg-green-500']"
+            :style="{ translate: `-${100 - uploadPercentage}%` }"
           />
 
           <el-upload
@@ -146,6 +92,7 @@
           </el-upload>
           <div class="flex-1">
             <ElInput
+              ref="inputRef"
               v-model="message"
               type="textarea"
               :autosize="{
@@ -166,7 +113,8 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
-import { type UploadProgressEvent, ClickOutside as vClickOutside } from 'element-plus'
+import { type InputInstance, type UploadProgressEvent, useZIndex } from 'element-plus'
+import ContextMenu from '@imengyu/vue3-context-menu'
 import { type Message, type MessageType, useAppStore } from '../stores'
 import {
   downloadFile,
@@ -191,7 +139,8 @@ const visible = defineModel<boolean>({
 
 const message = ref('')
 
-const containerRef = ref<HTMLDivElement>()
+const containerRef = ref<HTMLDivElement | null>(null)
+const inputRef = ref<InputInstance | null>(null)
 
 interface FileStatus {
   file: string
@@ -211,37 +160,51 @@ const scrollToBottom = useDebounceFn(() => {
   }
 })
 
-const popoverVisible = ref(false)
-const messageRef = ref(null)
-const popoverRef = ref<any>(null)
 const currentSelectMid = ref('')
-
 const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid.value))
 
-const showPopover = (e: any, mid: string) => {
+const { nextZIndex } = useZIndex()
+
+function handleContextMenu(e: MouseEvent, mid: string) {
   currentSelectMid.value = mid
-  messageRef.value = e.target.closest('.message')
-  popoverVisible.value = true
-}
-
-const onClickOutside = (e: any) => {
-  if (popoverVisible.value && !popoverRef.value?.popperRef?.contentRef?.contains(e.target)) {
-    popoverVisible.value = false
-  }
-}
-
-function onPopoverHide() {
-  messageRef.value = null
-  popoverRef.value = null
-  currentSelectMid.value = ''
+  ContextMenu.showContextMenu({
+    x: e.x,
+    y: e.y,
+    zIndex: nextZIndex(),
+    items: [
+      {
+        label: '复制',
+        hidden: currentSelectMessage.value?.type !== 'text',
+        async onClick() {
+          const text = window.getSelection()?.toString() || currentSelectMessage.value?.content
+          await copyText(text)
+          window.getSelection()?.removeAllRanges()
+        }
+      },
+      {
+        label: '下载',
+        hidden: !['image', 'audio', 'video'].includes(currentSelectMessage.value!.type),
+        onClick() {
+          download(currentSelectMessage.value!)
+        }
+      },
+      {
+        label: '删除',
+        onClick() {
+          confirmDeleteMessage()
+        }
+      }
+    ]
+  })
 }
 
 const { copy, copied } = useClipboard({
   legacy: true
 })
 
-async function copyText(content: string) {
-  popoverVisible.value = false
+async function copyText(content?: string) {
+  if (!content) return
+
   if (isMarkdownValue(content)) {
     const text = await getMarkdownPlainText(content)
     await copy(text)
@@ -258,17 +221,15 @@ async function copyText(content: string) {
 function download(msg: Message) {
   const url = formatFileUrl(msg.content)
   const filename = getOriginalFilename(msg.content)
-  popoverVisible.value = false
   downloadFile(url, filename)
 }
 
 function confirmDeleteMessage() {
-  ElMessageBox.confirm('确定要删除这条消息吗？', 'Warning', {
+  ElMessageBox.confirm('确定要删除这条消息吗？', '提示', {
+    type: 'warning',
     confirmButtonText: '确定',
-    cancelButtonText: '算了',
-    type: 'warning'
+    cancelButtonText: '算了'
   }).then(() => {
-    popoverVisible.value = false
     nextTick(() => {
       appStore.deleteMessage(currentSelectMid.value)
     })
@@ -345,6 +306,13 @@ watch(visible, value => {
 
     nextTick(() => {
       scrollToBottom()
+      nextTick(() => {
+        inputRef.value?.focus()
+      })
+    })
+  } else {
+    nextTick(() => {
+      inputRef.value?.focus()
     })
   }
 })
@@ -414,10 +382,6 @@ onBeforeUnmount(() => {
 
 .message.receiver::before {
   left: -10px;
-}
-
-.el-button + .el-button {
-  margin-left: 0;
 }
 </style>
 

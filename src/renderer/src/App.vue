@@ -39,7 +39,11 @@
       </ElButton>
     </div>
 
-    <ElCard v-overlay="!isRunning" shadow="never" class="w-full flex justify-center">
+    <ElCard
+      v-overlay="{ visible: !isRunning, text: 'Server is NOT running', color: 'deepskyblue' }"
+      shadow="never"
+      class="w-full flex justify-center"
+    >
       <img draggable="false" width="200" height="200" :src="qrcode" alt="qrcode" />
     </ElCard>
 
@@ -57,25 +61,7 @@
 
 <script setup lang="ts">
 import { useQRCode } from '@vueuse/integrations/useQRCode'
-import type { Directive } from 'vue'
-
-type OverlayDirective = Directive<HTMLElement, boolean | { visible: boolean; text: string }>
-const vOverlay: OverlayDirective = (el, binding) => {
-  const visible = typeof binding.value === 'boolean' ? binding.value : binding.value.visible
-  const text = typeof binding.value === 'boolean' ? 'Server is NOT running' : binding.value.text
-
-  const overlay = el.querySelector<HTMLDivElement>('.v-overlay')
-  if (overlay) {
-    overlay.textContent = text
-    overlay.style.display = visible ? 'flex' : 'none'
-  } else {
-    const ol = document.createElement('div')
-    ol.className = 'v-overlay'
-    ol.textContent = text
-    el.style.position = 'relative'
-    el.append(ol)
-  }
-}
+import { vOverlay } from '../../shared'
 
 const isRunning = ref(false)
 
@@ -131,18 +117,5 @@ body,
   height: 100%;
   width: 100%;
   background-color: #f3f4f5;
-}
-
-.v-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  color: deepskyblue;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
-  justify-content: center;
-  align-items: center;
 }
 </style>

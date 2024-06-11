@@ -1,6 +1,7 @@
 // @ts-check
 import { Marked } from 'marked'
 import { bundledLanguages } from 'shiki/bundle/web'
+import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'
 import { getHighlighterCore } from 'shiki/core'
 import loadWasm from 'shiki/wasm'
 import markedShiki from 'marked-shiki'
@@ -24,13 +25,12 @@ async function checkFileStatus(file) {
   }
 }
 
-async function safeMarkdownParse(value) {
+async function markdownParser(value) {
   const highlighter = await getHighlighterCore({
     langs: Object.values(bundledLanguages),
+    themes: [githubLightDefaultTheme],
     loadWasm
   })
-
-  await highlighter.loadTheme(import('shiki/themes/github-light-default.mjs'))
 
   const marked = new Marked()
 
@@ -60,7 +60,7 @@ onmessage = async event => {
   }
 
   if (type === 'markdown-parse') {
-    const result = await safeMarkdownParse(payload)
+    const result = await markdownParser(payload)
     postMessage({ type: 'markdown-parse-reply', payload: result })
   }
 }

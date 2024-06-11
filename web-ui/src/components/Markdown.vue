@@ -1,9 +1,14 @@
 <template>
-  <div class="relative" v-html="output" />
+  <div
+    v-overlay="{ visible: isLoading, text: 'Markdown 渲染中...' }"
+    class="md-output relative"
+    v-html="output"
+  />
 </template>
 
 <script setup lang="ts">
 import MyWorker from '../utils/worker.js?worker'
+import { vOverlay } from '../../../src/shared'
 
 const worker: Worker = new MyWorker()
 
@@ -13,10 +18,13 @@ const props = defineProps<{
 
 const emit = defineEmits(['loaded'])
 
-const output = ref('Loading...')
+const output = ref(props.value)
+const isLoading = ref(false)
 
 watchEffect(() => {
   if (!props.value) return
+
+  isLoading.value = true
   worker.postMessage({
     type: 'markdown-parse',
     payload: props.value
@@ -29,6 +37,7 @@ onMounted(() => {
     if (type === 'markdown-parse-reply') {
       output.value = payload
       emit('loaded')
+      isLoading.value = false
     }
   })
 })
@@ -39,7 +48,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-pre {
+.md-output {
+  line-height: 24px;
+}
+
+.md-output ul {
+  list-style-position: inside;
+}
+
+.md-output pre {
   font-size: 14px;
 }
 
