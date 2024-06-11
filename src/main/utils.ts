@@ -85,7 +85,7 @@ export async function checkUpgrade(win: BrowserWindow) {
       if (response !== 0) return
 
       const downloadUrl = latestRelease.assets.find((a: { name: string }) =>
-        a.name.endsWith('.exe')
+        a.name.endsWith('setup.exe')
       ).browser_download_url
 
       await upgradeApp(downloadUrl, val => {
