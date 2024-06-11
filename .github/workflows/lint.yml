@@ -3,16 +3,16 @@ on:
   push:
     branches: [main]
 
-name: CI Typecheck and Lint
+name: CI Lint
 
 jobs:
   build:
-    name: Lint and Typecheck
+    name: Lint
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: 18
+        node-version: [18.x]
 
     steps:
       - name: Checkout code
@@ -38,6 +38,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Lint and Typecheck
-        run: |
-          pnpm run lint
+      - name: Lint
+        run: pnpm run lint
