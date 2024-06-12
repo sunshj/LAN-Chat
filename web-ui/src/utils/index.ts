@@ -1,6 +1,7 @@
 import parser from 'ua-parser-js'
 import { marked } from 'marked'
 import axios from 'axios'
+import type { UploadFileResult } from './types'
 import type { Socket } from 'socket.io-client'
 
 export const socketKey = Symbol('socket') as InjectionKey<Socket>
@@ -81,6 +82,20 @@ export function downloadFile(url: string, filename: string) {
   a.click()
 }
 
+export async function uploadFile(file: File, onProgress?: (e: any) => void) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data: res } = await axios.post<UploadFileResult>('/api/upload', formData, {
+    onUploadProgress(e) {
+      onProgress?.({ ...e, percent: (e.progress ?? 0) * 100 })
+    },
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  return res
+}
+
 export function getVideoCover(filename: string, sec = 1) {
   return new Promise<{ cover: string }>(resolve => {
     const video = document.createElement('video')
@@ -104,13 +119,7 @@ export function getVideoCover(filename: string, sec = 1) {
         const file = new File([blob!], `${getOriginalFilename(filename)}-cover.jpg`, {
           type: blob?.type
         })
-        const formData = new FormData()
-        formData.append('file', file)
-        const { data: res } = await axios.post('/api/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
+        const res = await uploadFile(file)
         resolve({ cover: res.data.filename })
       })
     })

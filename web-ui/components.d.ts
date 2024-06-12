@@ -25,6 +25,7 @@ declare module 'vue' {
     Image: typeof import('./src/components/Image.vue')['default']
     Markdown: typeof import('./src/components/Markdown.vue')['default']
     Profile: typeof import('./src/components/Profile.vue')['default']
+    TextField: typeof import('./src/components/TextField.vue')['default']
     Video: typeof import('./src/components/Video.vue')['default']
   }
 }

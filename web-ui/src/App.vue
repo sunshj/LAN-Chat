@@ -33,8 +33,9 @@
 
 <script setup lang="ts">
 import { io } from 'socket.io-client'
-import { type User, useAppStore } from './stores'
+import { useAppStore } from './stores'
 import { getDeviceName, socketKey } from './utils'
+import type { User } from './utils/types'
 import type { BadgeProps } from 'element-plus'
 const socket = io('/', {
   transports: ['websocket']

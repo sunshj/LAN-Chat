@@ -92,17 +92,12 @@
             </el-button>
           </el-upload>
           <div class="flex-1">
-            <ElInput
-              ref="inputRef"
+            <TextField
+              ref="textFieldRef"
               v-model="message"
-              type="textarea"
-              :autosize="{
-                minRows: 1.5,
-                maxRows: 6
-              }"
-              resize="none"
-              placeholder="Ctrl + Enter to send"
-              @keydown.ctrl.enter="send()"
+              :on-upload-progress="onUploadProgress"
+              :on-upload-success="onUploadSuccess"
+              @enter="send()"
             />
           </div>
           <ElButton type="primary" size="large" :disabled="!message" @click="send()">Send</ElButton>
@@ -114,9 +109,9 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
-import { type InputInstance, type UploadProgressEvent, useZIndex } from 'element-plus'
+import { type UploadProgressEvent, useZIndex } from 'element-plus'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import { type Message, type MessageType, useAppStore } from '../stores'
+import { useAppStore } from '../stores'
 import {
   downloadFile,
   formatFileUrl,
@@ -127,6 +122,8 @@ import {
   socketKey
 } from '../utils'
 import MyWorker from '../utils/worker.js?worker'
+import type { Message, MessageType, UploadFileResult } from '../utils/types'
+import type { TextFieldExposed } from './TextField.vue'
 
 const worker: Worker = new MyWorker()
 
@@ -141,7 +138,7 @@ const visible = defineModel<boolean>({
 const message = ref('')
 
 const containerRef = ref<HTMLDivElement | null>(null)
-const inputRef = ref<InputInstance | null>(null)
+const textFieldRef = ref<TextFieldExposed | null>(null)
 
 interface FileStatus {
   file: string
@@ -276,7 +273,7 @@ function onUploadProgress(evt: UploadProgressEvent) {
   }
 }
 
-async function onUploadSuccess(res: any) {
+async function onUploadSuccess(res: UploadFileResult) {
   const { filename, mimetype, payload } = res.data
   const type = getMessageType(mimetype)
   payload.video = type === 'video' ? await getVideoCover(filename) : undefined
@@ -308,16 +305,8 @@ watch(visible, value => {
     nextTick(() => {
       scrollToBottom()
       nextTick(() => {
-        inputRef.value?.textarea?.setAttribute('readonly', 'readonly')
-        inputRef.value?.focus()
-        setTimeout(() => {
-          inputRef.value?.textarea?.removeAttribute('readonly')
-        }, 200)
+        textFieldRef.value?.focus()
       })
-    })
-  } else {
-    nextTick(() => {
-      inputRef.value?.focus()
     })
   }
 })
