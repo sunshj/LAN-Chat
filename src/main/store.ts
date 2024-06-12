@@ -5,12 +5,16 @@ interface User {
   username: string
 }
 
-const store = new Store<{
+export const store = new Store<{
   users: User[]
+  quitApp: 'quit' | 'minimize' | 'none'
+  quitAppTipChecked: boolean
 }>({
   name: 'stores',
   defaults: {
-    users: []
+    users: [],
+    quitApp: 'none',
+    quitAppTipChecked: false
   }
 })
 

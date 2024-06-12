@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
 import { fetchReleases, getNetworksAddr } from './utils'
+import { store } from './store'
 
 const __dirname = fileURLToPath(dirname(import.meta.url))
 
@@ -45,19 +46,35 @@ function createWindow(): void {
 
   mainWindow.on('close', event => {
     event.preventDefault()
+    const { quitApp, quitAppTipChecked } = store.store
+    if (quitAppTipChecked && quitApp === 'quit') {
+      mainWindow.destroy()
+      return
+    }
+
+    if (quitAppTipChecked && quitApp === 'minimize') {
+      mainWindow.hide()
+      mainWindow.setSkipTaskbar(true)
+      return
+    }
 
     dialog
       .showMessageBox(mainWindow, {
         type: 'question',
         buttons: ['退出应用', '最小化到托盘'],
+        checkboxLabel: '不再提示',
+        checkboxChecked: false,
         title: '退出提示',
         message: '是否退出应用？',
         cancelId: -1
       })
-      .then(result => {
-        if (result.response === 0) {
+      .then(({ response, checkboxChecked }) => {
+        store.set('quitAppTipChecked', checkboxChecked)
+        if (response === 0) {
+          store.set('quitApp', 'quit')
           mainWindow.destroy()
-        } else if (result.response === 1) {
+        } else if (response === 1) {
+          store.set('quitApp', 'minimize')
           mainWindow.hide()
           mainWindow.setSkipTaskbar(true)
         } else {
