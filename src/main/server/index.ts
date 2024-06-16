@@ -4,7 +4,7 @@ import express from 'express'
 import { type IpcMainInvokeEvent, shell } from 'electron'
 import { Server } from 'socket.io'
 import { $notify, getResPath } from '../utils'
-import { networks } from '../store'
+import { networkStore } from '../store'
 import apiRouter from './api'
 import { chatEventHandler } from './events'
 
@@ -36,7 +36,7 @@ export async function startServer(
 
   return await new Promise<boolean>(resolve => {
     server.listen(port, host, () => {
-      networks.incr(host)
+      networkStore.incr(host)
       resolve(server.listening)
     })
     const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)

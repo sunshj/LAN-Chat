@@ -5,8 +5,8 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
-import { fetchReleases, getNetworksAddr } from './utils'
-import { networks, store } from './store'
+import { fetchReleases, getNetworksAddr, isEmptyObj } from './utils'
+import { networkStore, store } from './store'
 
 const __dirname = fileURLToPath(dirname(import.meta.url))
 
@@ -110,14 +110,12 @@ app.whenReady().then(() => {
   ipcMain.handle('start-server', startServer)
   ipcMain.handle('stop-server', stopServer)
   ipcMain.handle('get-networks', () => {
-    if (Object.keys(store.get('networks')).length === 0) {
-      store.set(
-        'networks',
-        getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
-      )
+    if (isEmptyObj(store.get('networks'))) {
+      const networks = getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
+      store.set('networks', networks)
     }
 
-    return networks.value
+    return networkStore.value
   })
   ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
   ipcMain.handle('fetch-releases', fetchReleases)

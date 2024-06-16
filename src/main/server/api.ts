@@ -3,7 +3,7 @@ import { Router } from 'express'
 import multer from 'multer'
 import { createId } from '@paralleldrive/cuid2'
 import { getAudioFileInfo, getImageThumbnail, getMessageType, getResPath, randomId } from '../utils'
-import { users } from '../store'
+import { userStore } from '../store'
 import { createUserDto, updateUserDto } from './dto'
 
 const router = Router()
@@ -28,31 +28,31 @@ router.get('/', (req, res) => {
 
 router.get('/users', (_req, res) => {
   res.send({
-    data: users.findMany()
+    data: userStore.findMany()
   })
 })
 
 router.get('/user/:id', (req, res) => {
   res.send({
-    data: users.findOne(req.params.id)
+    data: userStore.findOne(req.params.id)
   })
 })
 
 router.put('/user/:id', updateUserDto, (req, res) => {
-  const user = users.findOne(req.params.id)
+  const user = userStore.findOne(req.params.id)
   if (!user) {
     res.status(404).send('user not found')
     return
   }
   res.send({
-    data: users.mutation(req.params.id, { username: req.body.username })
+    data: userStore.mutation(req.params.id, { username: req.body.username })
   })
 })
 
 router.post('/user', createUserDto, (req, res) => {
   const id = createId()
   res.send({
-    data: users.mutation(id, { username: req.body.username })
+    data: userStore.mutation(id, { username: req.body.username })
   })
 })
 

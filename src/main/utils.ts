@@ -28,6 +28,8 @@ export function $notify(
   return notification
 }
 
+export const isEmptyObj = (obj: object) => Object.keys(obj).length === 0
+
 export const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export const randomId = (n = 16) => crypto.randomBytes(16).toString('hex').slice(0, n)

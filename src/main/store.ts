@@ -20,7 +20,7 @@ export const store = new Store<{
   }
 })
 
-export const users = {
+export const userStore = {
   findMany() {
     return store.get('users', [])
   },
@@ -38,21 +38,15 @@ export const users = {
   }
 }
 
-export const networks = {
+export const networkStore = {
   get value() {
     const networks = store.get('networks', {})
     return Object.entries(networks)
       .sort((a, b) => b[1] - a[1])
-      .map(v => v[0])
+      .map(([ip]) => ip)
   },
   incr(ip: string) {
     const count = store.get('networks', {})[ip] ?? 0
     store.set('networks', { ...store.get('networks', {}), [ip]: count + 1 })
-  },
-  decr(ip: string) {
-    const count = store.get('networks', {})[ip] ?? 0
-    if (count > 0) {
-      store.set('networks', { ...store.get('networks', {}), [ip]: count - 1 })
-    }
   }
 }
