@@ -31,8 +31,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '../stores'
-import type { User } from '../utils/types'
 import type { BadgeProps } from 'element-plus'
 
 const appStore = useAppStore()
@@ -43,7 +41,7 @@ const profileDrawerVisible = ref(false)
 function gotoChat(user: User) {
   appStore.setCurrentChatUser(user)
   router.push({
-    name: '/chat',
+    path: '/chat',
     query: {
       uid: user.id
     }

@@ -8,8 +8,6 @@
 <script setup lang="ts">
 // @ts-expect-error
 import Aplayer from 'vue-aplayer-next'
-import { formatFileUrl, getOriginalFilename } from '../utils'
-import type { Message } from '../utils/types'
 
 const props = defineProps<{
   url: string

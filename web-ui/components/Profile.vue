@@ -22,12 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '../stores'
-import { socketKey } from '../utils'
-
 const appStore = useAppStore()
 
-const socket = inject(socketKey)!
+const socket = useNuxtApp().$socket
 
 const visible = defineModel<boolean>({
   default: false,

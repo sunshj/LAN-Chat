@@ -1,7 +1,3 @@
-import axios from 'axios'
-import { randomId } from '../utils'
-import type { Message, User } from '../utils/types'
-
 export const useAppStore = defineStore(
   'app',
   () => {
@@ -15,13 +11,16 @@ export const useAppStore = defineStore(
     }
 
     async function fetchUser(id: string) {
-      const { data: res } = await axios.get<{ data: User }>(`/api/user/${id}`)
-      return res.data
+      const { data: res } = await $fetch<{ data: User }>(`/api/user/${id}`)
+      return res
     }
 
     async function updateUser({ id, username }: User) {
-      const { data: res } = await axios.put<{ data: User }>(`/api/user/${id}`, { username })
-      return res.data
+      const { data: res } = await $fetch<{ data: User }>(`/api/user/${id}`, {
+        method: 'put',
+        body: { username }
+      })
+      return res
     }
 
     const users = ref<User[]>([])
@@ -42,8 +41,8 @@ export const useAppStore = defineStore(
     })
 
     async function fetchUsers() {
-      const { data: res } = await axios.get<{ data: User[] }>('/api/users')
-      return res.data
+      const { data: res } = await $fetch<{ data: User[] }>('/api/users')
+      return res
     }
 
     function setUsers(newUsers: User[]) {
@@ -55,8 +54,11 @@ export const useAppStore = defineStore(
     }
 
     async function createUser(username: string) {
-      const { data: res } = await axios.post<{ data: User }>('/api/user', { username })
-      return res.data
+      const { data: res } = await $fetch<{ data: User }>('/api/user', {
+        method: 'post',
+        body: { username }
+      })
+      return res
     }
 
     const currentChatUser = ref<User>({

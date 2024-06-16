@@ -10,8 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { getOriginalFilename } from '../utils'
-
 const props = defineProps<{
   url: string
   supportDownload: boolean

@@ -1,20 +1,14 @@
 <template>
-  <RouterView />
+  <NuxtLayout>
+    <NuxtLoadingIndicator />
+    <NuxtPage />
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { io } from 'socket.io-client'
-import { getDeviceName, socketKey } from './utils'
-import { useAppStore } from './stores'
-import type { Message } from './utils/types'
-
 const appStore = useAppStore()
 
-const socket = io('/', {
-  transports: ['websocket']
-})
-
-provide(socketKey, socket)
+const socket = useNuxtApp().$socket
 
 onMounted(() => {
   appStore.cleanUselessChat()
@@ -65,7 +59,7 @@ onMounted(() => {
 
 html,
 body,
-#app {
+#__nuxt {
   height: 100%;
   width: 100%;
   overflow: hidden;

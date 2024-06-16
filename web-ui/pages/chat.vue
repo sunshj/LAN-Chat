@@ -2,7 +2,9 @@
   <div class="h-full flex flex-col">
     <header class="flex-0-0-auto p-6">
       <div class="flex items-center gap-2">
-        <IconArrowLeft class="mr-2 cursor-pointer" @click="$router.push('/')" />
+        <NuxtLink href="/">
+          <IconArrowLeft class="mr-2 cursor-pointer" />
+        </NuxtLink>
         <ElBadge
           is-dot
           :type="currentChatIsOnline ? 'success' : 'danger'"
@@ -115,24 +117,14 @@
 import { formatTimeAgo } from '@vueuse/core'
 import { type UploadProgressEvent, useZIndex } from 'element-plus'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import { useAppStore } from '../stores'
-import {
-  downloadFile,
-  formatFileUrl,
-  getMarkdownPlainText,
-  getOriginalFilename,
-  getVideoCover,
-  isMarkdownValue,
-  socketKey
-} from '../utils'
-import MyWorker from '../utils/worker.js?worker'
-import type { Message, MessageType, UploadFileResult } from '../utils/types'
-import type { TextFieldExposed } from '../components/TextField.vue'
+import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import MyWorker from '@/assets/worker.js?worker'
+import type { TextFieldExposed } from '@/components/TextField.vue'
 
-const worker: Worker = new MyWorker()
+const worker = new MyWorker()
 
 const appStore = useAppStore()
-const socket = inject(socketKey)!
+const socket = useNuxtApp().$socket
 const route = useRoute()
 
 const message = ref('')

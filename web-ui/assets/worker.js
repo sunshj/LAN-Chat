@@ -1,4 +1,3 @@
-// @ts-check
 import { Marked } from 'marked'
 import { bundledLanguages } from 'shiki/bundle/web'
 import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'

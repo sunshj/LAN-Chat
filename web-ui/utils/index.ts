@@ -2,9 +2,6 @@ import parser from 'ua-parser-js'
 import { marked } from 'marked'
 import axios from 'axios'
 import type { UploadFileResult } from './types'
-import type { Socket } from 'socket.io-client'
-
-export const socketKey = Symbol('socket') as InjectionKey<Socket>
 
 export function getDeviceName(ua: string) {
   const { os, browser } = parser(ua)
