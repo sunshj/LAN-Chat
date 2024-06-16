@@ -1,9 +1,8 @@
-// @ts-check
-import path from 'node:path'
-import fs from 'node:fs'
+const path = require('node:path')
+const fs = require('node:fs')
 
 /** @type {import("electron-builder").Configuration['afterPack']} */
-export default context => {
+module.exports = context => {
   if (process.platform === 'darwin') return
   const unpackedDir = path.join(context.appOutDir, 'locales')
 
@@ -17,7 +16,6 @@ export default context => {
 
   // 删除特定的文件
   const filesToDelete = ['LICENSE.electron.txt', 'LICENSES.chromium.html']
-
   for (const fileName of filesToDelete) {
     const filePath = path.join(context.appOutDir, fileName)
     if (fs.existsSync(filePath)) {

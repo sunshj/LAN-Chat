@@ -8,7 +8,7 @@ import unocss from 'unocss/vite'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin({ exclude: ['express'] })]
   },
   preload: {
     plugins: [externalizeDepsPlugin()]

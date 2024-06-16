@@ -8,13 +8,14 @@
   "files": [
     "!**/.vscode/*",
     "!src/*",
+    "!web-ui/*",
     "!electron.vite.config.{js,ts,mjs,cjs}",
-    "!{eslint.config.js,dev-app-update.yml,CHANGELOG.md,README.md}",
-    "!{.env,.env.*,.npmrc,pnpm-lock.yaml}",
+    "!{uno.config.ts,commitlint.config.js,eslint.config.js,dev-app-update.yml,CHANGELOG.md,README.md}",
+    "!{.env,.env.*,.npmrc,pnpm-lock.yaml,pnpm-workspace.yaml}",
     "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
   ],
   "asarUnpack": ["resources/**"],
-  "afterPack": "./scripts/after-pack.js",
+  "afterPack": "./scripts/after-pack.cjs",
   "win": {
     "executableName": "LAN-Chat",
     "target": ["nsis", "portable"]

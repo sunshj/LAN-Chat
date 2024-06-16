@@ -1,4 +1,4 @@
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
@@ -7,8 +7,6 @@ import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
 import { fetchReleases, getNetworksAddr, isEmptyObj } from './utils'
 import { networkStore, store } from './store'
-
-const __dirname = fileURLToPath(dirname(import.meta.url))
 
 function createWindow(): void {
   // Create the browser window.
@@ -20,7 +18,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       devTools: true,
-      preload: join(__dirname, '../preload/index.mjs'),
+      preload: fileURLToPath(new URL('../preload/index.mjs', import.meta.url)),
       sandbox: false
     }
   })
