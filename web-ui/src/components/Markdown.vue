@@ -1,19 +1,28 @@
 <template>
+  <div class="md-output relative" v-html="output" />
   <div
-    v-overlay="{ visible: isLoading, text: 'Markdown 渲染中...' }"
-    class="md-output relative"
-    v-html="output"
-  />
+    v-if="isLoading"
+    :class="[
+      'absolute w-full flex items-center gap-2 -bottom-6',
+      {
+        '-left-1': props.isSender,
+        '-right-1 justify-end': !props.isSender
+      }
+    ]"
+  >
+    <IconSpinner />
+    <span>rendering...</span>
+  </div>
 </template>
 
 <script setup lang="ts">
 import MyWorker from '../utils/worker.js?worker'
-import { vOverlay } from '../../../src/shared'
 
 const worker: Worker = new MyWorker()
 
 const props = defineProps<{
   value: string
+  isSender: boolean
 }>()
 
 const emit = defineEmits(['loaded'])

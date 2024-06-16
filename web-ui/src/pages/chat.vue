@@ -1,20 +1,25 @@
 <template>
-  <ElDrawer v-model="visible" class="chat-drawer" direction="btt" size="100%" @closed="onClose">
-    <template #header>
-      <div class="flex flex-col items-center gap-2">
-        <ElBadge
-          is-dot
-          :type="currentChatIsOnline ? 'success' : 'danger'"
-          :offset="[-10, 10]"
-          :badge-style="{ width: '14px', height: '14px' }"
-        >
-          <Avatar :id="appStore.currentChatUser.id" />
-        </ElBadge>
-        <div>{{ appStore.currentChatUser.username }}</div>
-      </div>
-    </template>
-    <div class="h-full w-full flex flex-col items-center gap-2">
-      <div ref="containerRef" class="relative mb-14 w-full flex-1 overflow-y-auto bg-gray-2">
+  <div class="h-full flex flex-col">
+    <header class="flex-0-0-auto p-6">
+      <ElPageHeader @back="$router.push('/')">
+        <template #content>
+          <div class="flex items-center gap-2">
+            <div>{{ appStore.currentChatUser.username }}</div>
+            <ElBadge
+              is-dot
+              :type="currentChatIsOnline ? 'success' : 'danger'"
+              :offset="[-5, 5]"
+              :badge-style="{ width: '10px', height: '10px' }"
+              class="h-30px w-30px"
+            >
+              <Avatar :id="appStore.currentChatUser.id" :size="30" />
+            </ElBadge>
+          </div>
+        </template>
+      </ElPageHeader>
+    </header>
+    <main class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto">
+      <div ref="containerRef" class="relative w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
           <div
             v-for="{ time, content, sender, type, mid, payload } in appStore.currentChatMessages"
@@ -34,6 +39,7 @@
                 <Markdown
                   v-if="isMarkdownValue(content)"
                   :value="content"
+                  :is-sender="sender === appStore.userInfo.id"
                   @loaded="scrollToBottom"
                 />
 
@@ -72,39 +78,40 @@
             </div>
           </div>
         </div>
-        <div
-          class="fixed bottom-0 min-h-14 w-full flex items-start justify-around gap-2 bg-white p-2"
-        >
-          <div
-            :class="['absolute inset-0 z-10 h-1 w-full', uploadPercentage > 0 && 'bg-green-500']"
-            :style="{ translate: `-${100 - uploadPercentage}%` }"
-          />
-
-          <el-upload
-            :show-file-list="false"
-            action="/api/upload"
-            :before-upload="onBeforeUpload"
-            :on-progress="onUploadProgress"
-            :on-success="onUploadSuccess"
-          >
-            <el-button plain size="large">
-              <IconUpload class="text-xl" />
-            </el-button>
-          </el-upload>
-          <div class="flex-1">
-            <TextField
-              ref="textFieldRef"
-              v-model="message"
-              :on-upload-progress="onUploadProgress"
-              :on-upload-success="onUploadSuccess"
-              @enter="send()"
-            />
-          </div>
-          <ElButton type="primary" size="large" :disabled="!message" @click="send()">Send</ElButton>
-        </div>
       </div>
-    </div>
-  </ElDrawer>
+    </main>
+
+    <footer
+      class="relative min-h-14 w-full flex flex-0-0-auto items-start justify-around gap-2 bg-white p-2"
+    >
+      <div
+        :class="['absolute inset-0 z-10 h-1 w-full', uploadPercentage > 0 && 'bg-green-500']"
+        :style="{ translate: `-${100 - uploadPercentage}%` }"
+      />
+
+      <el-upload
+        :show-file-list="false"
+        action="/api/upload"
+        :before-upload="onBeforeUpload"
+        :on-progress="onUploadProgress"
+        :on-success="onUploadSuccess"
+      >
+        <el-button plain size="large">
+          <IconUpload class="text-xl" />
+        </el-button>
+      </el-upload>
+      <div class="flex-1">
+        <TextField
+          ref="textFieldRef"
+          v-model="message"
+          :on-upload-progress="onUploadProgress"
+          :on-upload-success="onUploadSuccess"
+          @enter="send()"
+        />
+      </div>
+      <ElButton type="primary" size="large" :disabled="!message" @click="send()">Send</ElButton>
+    </footer>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -123,17 +130,13 @@ import {
 } from '../utils'
 import MyWorker from '../utils/worker.js?worker'
 import type { Message, MessageType, UploadFileResult } from '../utils/types'
-import type { TextFieldExposed } from './TextField.vue'
+import type { TextFieldExposed } from '../components/TextField.vue'
 
 const worker: Worker = new MyWorker()
 
 const appStore = useAppStore()
 const socket = inject(socketKey)!
-
-const visible = defineModel<boolean>({
-  default: false,
-  required: true
-})
+const route = useRoute()
 
 const message = ref('')
 
@@ -285,13 +288,25 @@ async function onUploadSuccess(res: UploadFileResult) {
   })
 }
 
-function onClose() {
-  message.value = ''
-  appStore.clearCurrentChatUser()
+const handleNewMessage = (msg: Message) => {
+  if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
+    msg.read = true
+  }
+
+  if (msg.type !== 'text') {
+    fileStatus.value.push({ file: msg.content, download: true })
+  }
+
+  nextTick(() => {
+    scrollToBottom()
+  })
 }
 
-watch(visible, value => {
-  if (value && appStore.currentChatMessages.length > 0) {
+onMounted(() => {
+  const uid = route.query.uid as string
+  if (uid) appStore.setCurrentChatUser(uid)
+
+  if (appStore.currentChatMessages.length > 0) {
     appStore.setMessagesAsRead()
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
@@ -309,24 +324,8 @@ watch(visible, value => {
       })
     })
   }
-})
 
-onMounted(() => {
-  socket.on('new-message', (msg: Message) => {
-    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
-      msg.read = true
-    }
-    if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
-    appStore.messages[msg.cid].push(msg)
-
-    if (msg.type !== 'text') {
-      fileStatus.value.push({ file: msg.content, download: true })
-    }
-
-    nextTick(() => {
-      scrollToBottom()
-    })
-  })
+  socket.on('new-message', handleNewMessage)
 
   worker.addEventListener('message', event => {
     const { type, payload } = event.data
@@ -337,7 +336,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  socket.off('new-message')
+  message.value = ''
+  appStore.clearCurrentChatUser()
+  socket.off('new-message', handleNewMessage)
   worker.terminate()
 })
 </script>

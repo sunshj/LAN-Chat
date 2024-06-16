@@ -3,8 +3,8 @@ import type { Directive } from 'vue'
 interface OverlayOptions {
   visible: boolean
   text: string
-  color?: string
-  backgroundColor?: string
+  style?: CSSStyleDeclaration
+  className?: string
 }
 
 export const vOverlay: Directive<HTMLElement, boolean | OverlayOptions> = (el, binding) => {
@@ -20,16 +20,19 @@ export const vOverlay: Directive<HTMLElement, boolean | OverlayOptions> = (el, b
     overlay.style.display = options.visible ? 'flex' : 'none'
   } else {
     const ol = document.createElement('div')
-    ol.className = 'v-overlay'
-    ol.style.position = 'absolute'
-    ol.style.inset = '0'
-    ol.style.width = '100%'
-    ol.style.height = '100%'
-    ol.style.display = options.visible ? 'flex' : 'none'
-    ol.style.justifyContent = 'center'
-    ol.style.alignItems = 'center'
-    ol.style.color = options.color ?? 'black'
-    ol.style.backgroundColor = options.backgroundColor ?? 'rgba(255, 255, 255, 0.9)'
+    ol.className = `v-overlay ${options.className}`
+    const defaultStyle = {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)'
+    }
+
+    Object.assign(ol.style, defaultStyle, options.style)
 
     ol.textContent = options.text
     el.style.position = 'relative'

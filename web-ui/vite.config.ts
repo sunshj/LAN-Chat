@@ -4,14 +4,17 @@ import autoImports from 'unplugin-auto-import/vite'
 import components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import unocss from 'unocss/vite'
+import vueRouter from 'unplugin-vue-router/vite'
+import { VueRouterAutoImports } from 'unplugin-vue-router'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    vueRouter(),
     vue(),
     unocss(),
     autoImports({
-      imports: ['vue', '@vueuse/core', 'pinia'],
+      imports: ['vue', '@vueuse/core', 'pinia', VueRouterAutoImports],
       resolvers: [ElementPlusResolver()]
     }),
     components({

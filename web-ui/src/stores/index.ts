@@ -64,8 +64,13 @@ export const useAppStore = defineStore(
       username: ''
     })
 
-    function setCurrentChatUser(user: User) {
-      currentChatUser.value = user
+    function setCurrentChatUser(userOrId: User | string) {
+      if (typeof userOrId === 'string') {
+        const user = users.value.find(user => user.id === userOrId)
+        if (user) currentChatUser.value = user
+      } else {
+        currentChatUser.value = userOrId
+      }
     }
 
     function clearCurrentChatUser() {

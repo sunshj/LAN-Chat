@@ -40,7 +40,11 @@
     </div>
 
     <ElCard
-      v-overlay="{ visible: !isRunning, text: 'Server is NOT running', color: 'deepskyblue' }"
+      v-overlay="{
+        visible: !isRunning,
+        text: 'Server is NOT running',
+        className: 'text-blue-500'
+      }"
       shadow="never"
       class="w-full flex justify-center"
     >

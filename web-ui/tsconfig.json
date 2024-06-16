@@ -19,5 +19,11 @@
     "skipLibCheck": true
   },
   "references": [{ "path": "./tsconfig.node.json" }],
-  "include": ["src/**/*.ts", "src/**/*.vue", "./auto-imports.d.ts", "./components.d.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "./auto-imports.d.ts",
+    "./components.d.ts",
+    "./typed-router.d.ts"
+  ]
 }

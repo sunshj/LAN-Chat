@@ -17,10 +17,12 @@
     "socket.io-client": "^4.7.5",
     "ua-parser-js": "^1.0.38",
     "vue-aplayer-next": "^1.0.1",
-    "vue-boring-avatars": "^1.4.0"
+    "vue-boring-avatars": "^1.4.0",
+    "vue-router": "^4.3.3"
   },
   "devDependencies": {
     "@types/seedrandom": "^3.0.8",
-    "@types/ua-parser-js": "^0.7.39"
+    "@types/ua-parser-js": "^0.7.39",
+    "unplugin-vue-router": "^0.9.1"
   }
 }
