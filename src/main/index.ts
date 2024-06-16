@@ -6,7 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
 import { fetchReleases, getNetworksAddr } from './utils'
-import { store } from './store'
+import { networks, store } from './store'
 
 const __dirname = fileURLToPath(dirname(import.meta.url))
 
@@ -109,7 +109,16 @@ app.whenReady().then(() => {
   // IPC
   ipcMain.handle('start-server', startServer)
   ipcMain.handle('stop-server', stopServer)
-  ipcMain.handle('get-networks', getNetworksAddr)
+  ipcMain.handle('get-networks', () => {
+    if (Object.keys(store.get('networks')).length === 0) {
+      store.set(
+        'networks',
+        getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
+      )
+    }
+
+    return networks.value
+  })
   ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
   ipcMain.handle('fetch-releases', fetchReleases)
   ipcMain.handle('get-version', () => app.getVersion())

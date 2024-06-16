@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { type BrowserWindow, Menu, app, dialog } from 'electron'
+import { type BrowserWindow, Menu, app, dialog, shell } from 'electron'
 import { checkUpgrade, getResPath } from './utils'
 import { store, users } from './store'
 
@@ -13,6 +13,16 @@ export function createMenu(mainWindow: BrowserWindow) {
         {
           label: '打开调试',
           click: () => mainWindow.webContents.openDevTools()
+        },
+        {
+          label: '查看数据',
+          click: () => {
+            if (import.meta.env.DEV) {
+              store.openInEditor()
+            } else {
+              shell.openPath(store.path)
+            }
+          }
         },
         {
           label: '清空数据',
@@ -88,29 +98,34 @@ export function createMenu(mainWindow: BrowserWindow) {
       ]
     },
     {
-      label: '检查更新',
-      click: () => checkUpgrade(mainWindow)
-    },
-    {
-      label: '关于',
-      click: () => {
-        const isPortable = process.env.PORTABLE_EXECUTABLE_DIR !== undefined
-        const info = {
-          版本: app.getVersion() + (isPortable ? ' (portable)' : ' (setup)'),
-          Electron: process.versions.electron,
-          Chromium: process.versions.chrome,
-          'Node.js': process.versions.node,
-          OS: `${os.type()} ${os.arch()} ${os.release()}`
+      label: '帮助',
+      submenu: [
+        {
+          label: '检查更新',
+          click: () => checkUpgrade(mainWindow)
+        },
+        {
+          label: '关于',
+          click: () => {
+            const isPortable = process.env.PORTABLE_EXECUTABLE_DIR !== undefined
+            const info = {
+              版本: app.getVersion() + (isPortable ? ' (portable)' : ' (setup)'),
+              Electron: process.versions.electron,
+              Chromium: process.versions.chrome,
+              'Node.js': process.versions.node,
+              OS: `${os.type()} ${os.arch()} ${os.release()}`
+            }
+            dialog.showMessageBox({
+              title: '关于 LAN Chat',
+              type: 'info',
+              message: 'LAN Chat',
+              detail: Object.entries(info)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join('\n')
+            })
+          }
         }
-        dialog.showMessageBox({
-          title: '关于 LAN Chat',
-          type: 'info',
-          message: 'LAN Chat',
-          detail: Object.entries(info)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join('\n')
-        })
-      }
+      ]
     },
     {
       label: '退出',
