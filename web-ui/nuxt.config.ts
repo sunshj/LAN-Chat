@@ -12,14 +12,32 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['stores']
   },
+  experimental: {
+    payloadExtraction: false
+  },
+  elementPlus: {
+    icon: false
+  },
   piniaPersistedstate: {
     storage: 'localStorage'
+  },
+
+  websocketProxy: {
+    target: 'http://127.0.0.1:3000',
+    path: '/socket.io'
+  },
+
+  vite: {
+    worker: {
+      format: 'es'
+    }
   },
 
   devServer: {
     port: 8080,
     host: '0.0.0.0'
   },
+
   nitro: {
     experimental: {
       websocket: true
@@ -28,18 +46,17 @@ export default defineNuxtConfig({
     output: {
       publicDir: '../resources/ui'
     },
+
     devProxy: {
       '/api': {
         target: 'http://127.0.0.1:3000/api',
-        prependPath: true,
         changeOrigin: true
-      },
-      '/socket.io': {
-        target: 'http://127.0.0.1:3000',
-        changeOrigin: true,
-        prependPath: true,
-        ws: true
       }
+      // '/socket.io': {
+      //   target: 'http://127.0.0.1:3000',
+      //   changeOrigin: true,
+      //   ws: true
+      // }
     },
 
     routeRules: {

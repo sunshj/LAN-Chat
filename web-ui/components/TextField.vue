@@ -15,8 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { uploadFile } from '../utils'
-import type { UploadFileResult } from '../utils/types'
 import type { InputInstance } from 'element-plus'
 
 const inputRef = ref<InputInstance | null>(null)

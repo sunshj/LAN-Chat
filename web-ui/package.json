@@ -3,27 +3,33 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "type-check": "vue-tsc --noEmit",
-    "build": "vue-tsc && vite build"
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "postinstall": "nuxt prepare",
+    "type-check": "nuxt typecheck"
   },
   "dependencies": {
     "@imengyu/vue3-context-menu": "^1.4.1",
-    "marked": "^12.0.2",
+    "@pinia/nuxt": "^0.5.1",
+    "marked": "^13.0.0",
     "marked-shiki": "^1.1.0",
+    "nuxt": "3.6.5",
     "pinia": "^2.1.7",
-    "pinia-plugin-persistedstate": "^3.2.1",
     "seedrandom": "^3.0.5",
-    "shiki": "^1.6.2",
+    "shiki": "^1.6.5",
     "socket.io-client": "^4.7.5",
     "ua-parser-js": "^1.0.38",
+    "vue": "^3.4.27",
     "vue-aplayer-next": "^1.0.1",
     "vue-boring-avatars": "^1.4.0",
     "vue-router": "^4.3.3"
   },
   "devDependencies": {
-    "@types/seedrandom": "^3.0.8",
-    "@types/ua-parser-js": "^0.7.39",
-    "unplugin-vue-router": "^0.9.1"
+    "@element-plus/nuxt": "^1.0.9",
+    "@nuxt/devtools": "^1.3.3",
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
+    "@unocss/nuxt": "^0.61.0",
+    "@vueuse/nuxt": "^10.11.0",
+    "http-proxy": "^1.18.1"
   }
 }

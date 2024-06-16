@@ -9,7 +9,7 @@
     "dev": "chcp 65001 && electron-vite dev -w",
     "start": "electron-vite preview",
     "prebuild": "node scripts/clean && rimraf dist",
-    "build:webui": "pnpm -F web-ui-nuxt build",
+    "build:webui": "pnpm -F web-ui build",
     "build": "pnpm prebuild && pnpm build:webui && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm build && electron-builder --dir",

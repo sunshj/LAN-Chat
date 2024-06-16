@@ -16,9 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import MyWorker from '../utils/worker.js?worker'
+import MyWorker from '@/assets/worker.js?worker'
 
-const worker: Worker = new MyWorker()
+const worker = new MyWorker()
 
 const props = defineProps<{
   value: string
