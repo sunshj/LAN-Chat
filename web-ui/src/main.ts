@@ -5,7 +5,6 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createRouter, createWebHashHistory } from 'vue-router/auto'
 import { routes } from 'vue-router/auto-routes'
 import App from './app.vue'
-import {} from 'vite-ssg'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 
 const router = createRouter({
