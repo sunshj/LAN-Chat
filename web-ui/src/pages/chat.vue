@@ -1,22 +1,19 @@
 <template>
   <div class="h-full flex flex-col">
     <header class="flex-0-0-auto p-6">
-      <ElPageHeader @back="$router.push('/')">
-        <template #content>
-          <div class="flex items-center gap-2">
-            <div>{{ appStore.currentChatUser.username }}</div>
-            <ElBadge
-              is-dot
-              :type="currentChatIsOnline ? 'success' : 'danger'"
-              :offset="[-5, 5]"
-              :badge-style="{ width: '10px', height: '10px' }"
-              class="h-30px w-30px"
-            >
-              <Avatar :id="appStore.currentChatUser.id" :size="30" />
-            </ElBadge>
-          </div>
-        </template>
-      </ElPageHeader>
+      <div class="flex items-center gap-2">
+        <IconArrowLeft class="mr-2 cursor-pointer" @click="$router.push('/')" />
+        <ElBadge
+          is-dot
+          :type="currentChatIsOnline ? 'success' : 'danger'"
+          :offset="[-5, 5]"
+          :badge-style="{ width: '10px', height: '10px' }"
+          class="h-30px w-30px"
+        >
+          <Avatar :id="appStore.currentChatUser.id" :size="30" />
+        </ElBadge>
+        <div>{{ appStore.currentChatUser.username }}</div>
+      </div>
     </header>
     <main class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto">
       <div ref="containerRef" class="relative w-full flex-1 overflow-y-auto bg-gray-2">
@@ -86,7 +83,7 @@
     >
       <div
         :class="['absolute inset-0 z-10 h-1 w-full', uploadPercentage > 0 && 'bg-green-500']"
-        :style="{ translate: `-${100 - uploadPercentage}%` }"
+        :style="{ translate: `-${remainUploadPercent}` }"
       />
 
       <el-upload
@@ -268,6 +265,7 @@ function onBeforeUpload() {
 }
 
 const uploadPercentage = ref(0)
+const remainUploadPercent = computed(() => `${100 - uploadPercentage.value}%`)
 
 function onUploadProgress(evt: UploadProgressEvent) {
   uploadPercentage.value = Number.parseFloat(evt.percent.toFixed(2))

@@ -93,8 +93,8 @@
   },
   "lint-staged": {
     "*.{vue,js,ts}": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix .",
+      "prettier --write ."
     ]
   },
   "prettier": "@sunshj/prettier-config",
