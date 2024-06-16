@@ -1,13 +1,12 @@
+name: CI Lint and Type Check
+
 on:
   pull_request:
   push:
-    branches: [main]
-
-name: CI Lint
+    branches: ['*']
 
 jobs:
   build:
-    name: Lint
     runs-on: ubuntu-latest
 
     strategy:
@@ -40,3 +39,6 @@ jobs:
 
       - name: Lint
         run: pnpm run lint
+
+      - name: WebUI Type Check
+        run: pnpm -F web-ui run type-check
