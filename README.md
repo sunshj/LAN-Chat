@@ -27,3 +27,19 @@ $ pnpm dev
 $ pnpm build:win
 
 ```
+
+### Release
+
+正常发版
+
+```bash
+npx bumpp
+```
+
+构建失败，重新发版
+
+```
+git tag -d v1.0.1
+npx bumpp
+# 选择as-is
+```
