@@ -62,7 +62,15 @@ export function getNetworksAddr() {
 }
 
 export async function fetchReleases() {
-  const { data: res } = await axios.get('https://api.github.com/repos/sunshj/LAN-Chat/releases')
+  const { data: res } = await axios
+    .get('https://api.github.com/repos/sunshj/LAN-Chat/releases')
+    .catch(error => {
+      dialog.showErrorBox(
+        'LAN Chat',
+        `获取版本信息失败：${error.response?.statusText} ${error.response?.status}`
+      )
+      return error
+    })
   return res
 }
 

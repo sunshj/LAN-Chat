@@ -15,7 +15,10 @@ export async function startServer(
   _event: IpcMainInvokeEvent,
   { host, port }: { host: string; port: number }
 ) {
-  stopServer()
+  if (server) {
+    io.close()
+    server.close()
+  }
   const app = express()
   server = http.createServer(app)
   io = new Server(server, {
@@ -56,5 +59,5 @@ export function stopServer() {
     server.close()
   }
 
-  return server?.listening
+  return server.listening
 }
