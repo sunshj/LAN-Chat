@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "top.sunshj.lan-chat",
-  "productName": "LAN-Chat",
+  "productName": "LAN Chat",
   "directories": {
     "buildResources": "build"
   },
@@ -17,7 +17,7 @@
   "asarUnpack": ["resources/**"],
   "afterPack": "./scripts/after-pack.cjs",
   "win": {
-    "executableName": "LAN-Chat",
+    "executableName": "LAN Chat",
     "target": ["nsis", "portable"]
   },
   "nsis": {
