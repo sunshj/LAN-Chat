@@ -1,4 +1,5 @@
 import Store from 'electron-store'
+import { getResPath } from './utils'
 
 interface User {
   id: string
@@ -12,6 +13,7 @@ export const store = new Store<{
   quitAppTipChecked: boolean
 }>({
   name: 'stores',
+  cwd: getResPath(),
   defaults: {
     users: [],
     networks: {},
