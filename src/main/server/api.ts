@@ -19,11 +19,8 @@ const upload = multer({
   })
 })
 
-router.get('/', (req, res) => {
-  const timestamp = Number.parseInt(req.query.t as string)
-  res.send({
-    message: new Date(timestamp).toLocaleString()
-  })
+router.get('/', (_req, res) => {
+  res.status(404).send()
 })
 
 router.get('/users', (_req, res) => {

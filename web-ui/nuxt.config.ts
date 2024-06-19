@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  app: {
+    head: {
+      title: 'LAN Chat'
+    }
+  },
   devtools: { enabled: false },
   modules: [
     '@unocss/nuxt',
@@ -53,13 +58,9 @@ export default defineNuxtConfig({
       }
     },
 
-    routeRules: {
-      '/': {
-        prerender: true
-      },
-      '/chat': {
-        prerender: true
-      }
+    prerender: {
+      crawlLinks: true,
+      routes: ['/', '/chat', '/404.html']
     }
   }
 })

@@ -28,6 +28,9 @@ export async function startServer(
   app.use(express.static(path.join(getResPath(), 'ui')))
 
   app.use('/api', apiRouter)
+  app.use('/*', (_req, res) => {
+    res.redirect('/404.html')
+  })
 
   io.on('connection', socket => {
     /** chat socket handle  */
@@ -53,5 +56,5 @@ export function stopServer() {
     server.close()
   }
 
-  return server.listening
+  return server?.listening
 }

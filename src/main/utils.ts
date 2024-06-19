@@ -22,6 +22,7 @@ export function $notify(
   const notification = new Notification({
     title,
     body: message,
+    icon: path.join(getResPath(), 'icon.png'),
     ...options
   })
   notification.show()

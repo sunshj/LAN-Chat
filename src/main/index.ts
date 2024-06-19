@@ -15,7 +15,7 @@ function createWindow(): void {
     height: 600,
     show: false,
     autoHideMenuBar: false,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       devTools: true,
       preload: fileURLToPath(new URL('../preload/index.mjs', import.meta.url)),

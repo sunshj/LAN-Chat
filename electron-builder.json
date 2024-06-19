@@ -31,8 +31,5 @@
   "portable": {
     "artifactName": "${name}-${version}-portable.${ext}"
   },
-  "appImage": {
-    "artifactName": "${name}-${version}.${ext}"
-  },
   "npmRebuild": false
 }
