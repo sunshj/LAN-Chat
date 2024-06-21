@@ -57,7 +57,7 @@
     "prettier": "^3.2.5",
     "rimraf": "^5.0.7",
     "simple-git-hooks": "^2.11.1",
-    "typescript": "^5.3.3",
+    "typescript": "5.3.3",
     "unocss": "^0.60.3",
     "unplugin-auto-import": "^0.17.6",
     "unplugin-vue-components": "^0.27.0",
