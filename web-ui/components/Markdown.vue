@@ -52,7 +52,7 @@ onMounted(() => {
 })
 
 onUpdated(() => {
-  document.querySelectorAll('a').forEach(el => {
+  document.querySelectorAll('.md-output a').forEach(el => {
     el.setAttribute('target', '_blank')
   })
 })
