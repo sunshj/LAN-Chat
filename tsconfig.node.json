@@ -1,9 +1,10 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "compilerOptions": {
+    "composite": true,
     "module": "ES2020",
     "moduleResolution": "Bundler",
     "types": ["electron-vite/node"]
   },
-  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*"]
+  "include": ["electron.vite.config.ts", "src/main/**/*.ts"]
 }

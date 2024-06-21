@@ -5,15 +5,15 @@
     "baseUrl": ".",
     "paths": {
       "@renderer/*": ["src/renderer/src/*"]
-    }
+    },
+    "outDir": "./dist"
   },
   "include": [
+    "src/preload/index.d.ts",
     "src/renderer/auto-imports.d.ts",
     "src/renderer/components.d.ts",
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*.vue",
-    "src/renderer/src/**/*",
-    "src/preload/*.d.ts",
-    "src/shared/index.ts"
+    "src/renderer/src/**/*.ts"
   ]
 }
