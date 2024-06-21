@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { useQRCode } from '@vueuse/integrations/useQRCode'
-import { vOverlay } from '../../shared'
+import { vOverlay } from './directives/overlay'
 
 const isRunning = ref(false)
 
