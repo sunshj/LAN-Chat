@@ -105,9 +105,12 @@ export function getVideoCover(filename: string, sec = 1) {
 
 export async function createAbsoluteUrl(relativePath?: string) {
   if (!relativePath) return ''
-  const { data: buffer } = await axios.get(formatFileUrl(relativePath), {
-    responseType: 'arraybuffer'
-  })
-
-  return URL.createObjectURL(new Blob([buffer]))
+  try {
+    const { data: buffer } = await axios.get(formatFileUrl(relativePath), {
+      responseType: 'arraybuffer'
+    })
+    return URL.createObjectURL(new Blob([buffer]))
+  } catch {
+    return ''
+  }
 }

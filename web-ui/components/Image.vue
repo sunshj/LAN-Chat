@@ -12,7 +12,7 @@
       <div
         class="aspect-ratio-square h-full flex cursor-auto items-center justify-center bg-gray-1 text-gray-400"
       >
-        加载失败
+        图片加载失败
       </div>
     </template>
   </el-image>
