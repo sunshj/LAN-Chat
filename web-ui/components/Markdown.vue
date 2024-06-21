@@ -51,6 +51,12 @@ onMounted(() => {
   })
 })
 
+onUpdated(() => {
+  document.querySelectorAll('a').forEach(el => {
+    el.setAttribute('target', '_blank')
+  })
+})
+
 onBeforeUnmount(() => {
   worker.terminate()
 })

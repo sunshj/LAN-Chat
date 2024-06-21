@@ -27,12 +27,8 @@
           >
             <div
               :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']"
-              @contextmenu.prevent="
-                !(type === 'text' && appStore.isSupportTouch) && handleContextMenu($event, mid)
-              "
-              @click.prevent="
-                type === 'text' && appStore.isSupportTouch && handleContextMenu($event, mid)
-              "
+              @contextmenu.prevent="handleContextMenu($event, mid)"
+              @click.stop
             >
               <div v-if="type === 'text'">
                 <Markdown
@@ -68,7 +64,6 @@
                   v-else
                   :url="formatFileUrl(content)"
                   :support-download="fileSupportDownload(content)"
-                  @click.stop
                 />
               </div>
               <p class="relative block w-full text-end text-xs text-[#777]">

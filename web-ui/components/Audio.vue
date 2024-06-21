@@ -14,9 +14,11 @@ const props = defineProps<{
   audio: NonNullable<Message['payload']>['audio']
 }>()
 
+const picUrl = await createAbsoluteUrl(props.audio?.pic)
+
 const music = {
   src: props.url,
-  pic: formatFileUrl(props.audio?.pic),
+  pic: picUrl,
   title: props.audio?.artist ? `${props.audio?.title} -` : props.audio?.title,
   artist: ` ${props.audio?.artist}`
 }

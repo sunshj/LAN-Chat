@@ -158,12 +158,6 @@ export const useAppStore = defineStore(
       )
     })
 
-    const isSupportTouch = ref(false)
-
-    onMounted(() => {
-      isSupportTouch.value = Reflect.has(window, 'ontouchstart')
-    })
-
     return {
       userInfo,
       setUserInfo,
@@ -189,8 +183,7 @@ export const useAppStore = defineStore(
       deleteMessage,
       setMessagesAsRead,
       cleanUselessChat,
-      unreadMessagesCount,
-      isSupportTouch
+      unreadMessagesCount
     }
   },
   {

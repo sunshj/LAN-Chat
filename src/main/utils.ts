@@ -90,6 +90,7 @@ export async function checkUpgrade(win: BrowserWindow) {
       title: 'LAN Chat',
       type: 'question',
       message: '发现新版本，是否升级？',
+      detail: latestRelease.body,
       buttons: ['升级', '取消']
     })
     .then(async ({ response }) => {

@@ -1,5 +1,5 @@
 import parser from 'ua-parser-js'
-import { marked } from 'marked'
+import { type TokensList, marked } from 'marked'
 import axios from 'axios'
 import type { UploadFileResult } from './types'
 
@@ -23,36 +23,16 @@ export function getOriginalFilename(filename: string) {
 }
 
 export function isMarkdownValue(value: string) {
-  const tokenTypes: string[] = []
-
-  marked(value, {
-    walkTokens: token => {
-      tokenTypes.push(token.type)
-    }
-  })
-
-  const isMarkdown = [
-    'space',
-    'code',
-    'fences',
-    'heading',
-    'hr',
-    'link',
-    'blockquote',
-    'list',
-    'html',
-    'def',
-    'table',
-    'lheading',
-    'escape',
-    'tag',
-    'reflink',
-    'strong',
-    'codespan',
-    'url'
-  ].some(tokenType => tokenTypes.includes(tokenType))
-
-  return isMarkdown
+  function containsNonTextTokens(tokens: TokensList) {
+    return tokens.some(token => {
+      if (token.type !== 'text' && token.type !== 'paragraph') return true
+      // @ts-expect-error
+      if (token.tokens && containsNonTextTokens(token.tokens)) return true
+      return false
+    })
+  }
+  const tokens = marked.lexer(value)
+  return containsNonTextTokens(tokens)
 }
 
 export async function getMarkdownPlainText(value: string) {
@@ -121,4 +101,13 @@ export function getVideoCover(filename: string, sec = 1) {
       })
     })
   })
+}
+
+export async function createAbsoluteUrl(relativePath?: string) {
+  if (!relativePath) return ''
+  const { data: buffer } = await axios.get(formatFileUrl(relativePath), {
+    responseType: 'arraybuffer'
+  })
+
+  return URL.createObjectURL(new Blob([buffer]))
 }
