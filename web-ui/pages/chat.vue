@@ -308,7 +308,7 @@ onBeforeUnmount(() => {
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 10px;
-  background-color: #fff;
+  background-color: white;
   word-break: break-all;
   box-shadow: 0 0 1px #f2f3f4;
   max-width: 100%;
@@ -319,14 +319,16 @@ onBeforeUnmount(() => {
   top: 0;
   content: '';
   border: 10px solid transparent;
-  border-top: 10px solid #fff;
+  border-top: 10px solid white;
 }
 
 .message.sender {
+  background-color: #dcf8c6;
   border-top-right-radius: 0;
 }
 
 .message.sender::before {
+  border-top-color: #dcf8c6;
   right: -10px;
 }
 
