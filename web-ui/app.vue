@@ -8,29 +8,29 @@
 <script setup lang="ts">
 const appStore = useAppStore()
 
-const socket = useNuxtApp().$socket
+const { $socket } = useNuxtApp()
 
 onMounted(() => {
   appStore.cleanUselessChat()
 
-  socket.on('connect', async () => {
+  $socket.on('connect', async () => {
     const storageUid = appStore.userInfo.id || 'invalid_uid'
     const userExist = await appStore.fetchUser(storageUid)
     if (userExist) {
-      socket.emit('online', appStore.userInfo.id)
+      $socket.emit('online', appStore.userInfo.id)
     } else {
       const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
       appStore.setUserInfo(user)
-      socket.emit('online', user.id)
+      $socket.emit('online', user.id)
     }
   })
 
-  socket.on('new-message', (msg: Message) => {
+  $socket.on('new-message', (msg: Message) => {
     if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
     appStore.messages[msg.cid].push(msg)
   })
 
-  socket.on('get-users', async (userIds: string[]) => {
+  $socket.on('get-users', async (userIds: string[]) => {
     const remainIds = userIds.filter(id => id !== appStore.userInfo.id)
     const allUsers = await appStore.fetchUsers()
     appStore.setUsers(allUsers)
@@ -43,7 +43,7 @@ onMounted(() => {
     }
   })
 
-  socket.on('disconnect', () => {
+  $socket.on('disconnect', () => {
     appStore.setOnlineUsers([])
   })
 })

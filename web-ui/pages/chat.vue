@@ -95,15 +95,13 @@
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
 import { type UploadFile, type UploadProgressEvent, useZIndex } from 'element-plus'
-import ContextMenu from '@imengyu/vue3-context-menu'
-import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import MyWorker from '@/assets/worker.js?worker'
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
 const worker = new MyWorker()
 
 const appStore = useAppStore()
-const socket = useNuxtApp().$socket
+const { $contextmenu, $socket } = useNuxtApp()
 const route = useRoute()
 
 const message = ref('')
@@ -128,10 +126,9 @@ const currentSelectMid = ref('')
 const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid.value))
 
 const { nextZIndex } = useZIndex()
-
 function handleContextMenu(e: MouseEvent, mid: string) {
   currentSelectMid.value = mid
-  ContextMenu.showContextMenu({
+  $contextmenu.showContextMenu({
     x: e.x,
     y: e.y,
     zIndex: nextZIndex(),
@@ -208,7 +205,7 @@ const send = useThrottleFn(() => {
   if (!message.value.trim()) return
   if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
   const msg = appStore.addMessage(message.value)
-  socket.emit('new-message', msg)
+  $socket.emit('new-message', msg)
   message.value = ''
 
   nextTick(() => {
@@ -244,7 +241,7 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
 
   const msg = appStore.addMessage(filename, { type, payload })
   fileStatus.value.push({ file: msg.content, download: true })
-  socket.emit('new-message', msg)
+  $socket.emit('new-message', msg)
   nextTick(() => {
     scrollToBottom()
   })
@@ -287,7 +284,7 @@ onMounted(() => {
     })
   }
 
-  socket.on('new-message', handleNewMessage)
+  $socket.on('new-message', handleNewMessage)
 
   worker.addEventListener('message', event => {
     const { type, payload } = event.data
@@ -300,7 +297,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   message.value = ''
   appStore.clearCurrentChatUser()
-  socket.off('new-message', handleNewMessage)
+  $socket.off('new-message', handleNewMessage)
   worker.terminate()
 })
 </script>

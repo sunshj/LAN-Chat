@@ -24,7 +24,7 @@
 <script setup lang="ts">
 const appStore = useAppStore()
 
-const socket = useNuxtApp().$socket
+const { $socket } = useNuxtApp()
 
 const visible = defineModel<boolean>({
   default: false,
@@ -35,6 +35,6 @@ const editable = ref(false)
 async function saveProfile() {
   editable.value = false
   await appStore.updateUser(appStore.userInfo)
-  socket.emit('get-users')
+  $socket.emit('get-users')
 }
 </script>
