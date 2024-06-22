@@ -7,7 +7,6 @@ export interface UploadFileResult {
     mimetype: string
     originalname: string
     path: string
-    payload: MessagePayload
     size: number
   }
 }
