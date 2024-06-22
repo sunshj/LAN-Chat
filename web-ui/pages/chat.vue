@@ -1,22 +1,6 @@
 <template>
   <div class="h-full flex flex-col">
-    <header class="flex-0-0-auto p-6">
-      <div class="flex items-center gap-2">
-        <NuxtLink href="/">
-          <IconArrowLeft class="mr-2 cursor-pointer" />
-        </NuxtLink>
-        <ElBadge
-          is-dot
-          :type="currentChatIsOnline ? 'success' : 'danger'"
-          :offset="[-5, 5]"
-          :badge-style="{ width: '10px', height: '10px' }"
-          class="h-30px w-30px"
-        >
-          <Avatar :id="appStore.currentChatUser.id" :size="30" />
-        </ElBadge>
-        <div>{{ appStore.currentChatUser.username }}</div>
-      </div>
-    </header>
+    <ChatHeader :online="currentChatIsOnline" />
     <main class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto">
       <div ref="containerRef" class="relative w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
@@ -110,7 +94,7 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
-import { type UploadProgressEvent, useZIndex } from 'element-plus'
+import { type UploadFile, type UploadProgressEvent, useZIndex } from 'element-plus'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import MyWorker from '@/assets/worker.js?worker'
@@ -126,11 +110,6 @@ const message = ref('')
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const textFieldRef = ref<TextFieldExposed | null>(null)
-
-interface FileStatus {
-  file: string
-  download: boolean
-}
 
 const fileStatus = ref<FileStatus[]>([])
 
@@ -237,13 +216,6 @@ const send = useThrottleFn(() => {
   })
 }, 2000)
 
-function getMessageType(mimetype: string): MessageType {
-  if (mimetype.includes('image')) return 'image'
-  if (mimetype.includes('video')) return 'video'
-  if (mimetype.includes('audio')) return 'audio'
-  return 'file'
-}
-
 function onBeforeUpload() {
   if (!currentChatIsOnline.value) {
     ElMessage.error('当前用户不在线，无法发送文件')
@@ -261,10 +233,15 @@ function onUploadProgress(evt: UploadProgressEvent) {
   }
 }
 
-async function onUploadSuccess(res: UploadFileResult) {
-  const { filename, mimetype, payload } = res.data
+async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
+  const { filename, mimetype } = res.data
   const type = getMessageType(mimetype)
+
+  const payload: MessagePayload = {}
   payload.video = type === 'video' ? await getVideoCover(filename) : undefined
+  payload.audio = type === 'audio' ? await getAudioFileInfo(file.raw!) : undefined
+  payload.image = type === 'image' ? await getImageThumbnail(file.raw!) : undefined
+
   const msg = appStore.addMessage(filename, { type, payload })
   fileStatus.value.push({ file: msg.content, download: true })
   socket.emit('new-message', msg)

@@ -1,7 +1,5 @@
-import parser from 'ua-parser-js'
-import { type TokensList, marked } from 'marked'
 import axios from 'axios'
-import type { UploadFileResult } from './types'
+import parser from 'ua-parser-js'
 
 export function getDeviceName(ua: string) {
   const { os, browser } = parser(ua)
@@ -20,36 +18,6 @@ export function randomId(n = 6) {
 
 export function getOriginalFilename(filename: string) {
   return filename.slice(filename.indexOf('-') + 1)
-}
-
-export function isMarkdownValue(value: string) {
-  function containsNonTextTokens(tokens: TokensList) {
-    return tokens.some(token => {
-      if (token.type !== 'text' && token.type !== 'paragraph') return true
-      // @ts-expect-error
-      if (token.tokens && containsNonTextTokens(token.tokens)) return true
-      return false
-    })
-  }
-  const tokens = marked.lexer(value)
-  return containsNonTextTokens(tokens)
-}
-
-export async function getMarkdownPlainText(value: string) {
-  const htmlString = await marked(value)
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(htmlString, 'text/html')
-  const walker = document.createTreeWalker(doc, NodeFilter.SHOW_TEXT)
-
-  const textList = []
-  let currentNode = walker.currentNode
-
-  while (currentNode) {
-    textList.push(currentNode.textContent)
-    currentNode = walker.nextNode()!
-  }
-
-  return textList.filter(Boolean).join('')
 }
 
 export function downloadFile(url: string, filename: string) {
@@ -73,36 +41,6 @@ export async function uploadFile(file: File, onProgress?: (e: any) => void) {
   return res
 }
 
-export function getVideoCover(filename: string, sec = 1) {
-  return new Promise<{ cover: string }>(resolve => {
-    const video = document.createElement('video')
-    video.src = formatFileUrl(filename)
-    video.addEventListener('loadedmetadata', () => {
-      video.currentTime = Math.min(
-        Math.max(0, (sec < 0 ? video.duration : 0) + sec),
-        video.duration
-      )
-    })
-    video.addEventListener('seeked', () => {
-      const canvas = document.createElement('canvas')
-      canvas.height = video.videoHeight
-      canvas.width = video.videoWidth
-      const ctx = canvas.getContext('2d')
-      // 压缩
-      canvas.height = Math.floor(canvas.height / 2)
-      canvas.width = Math.floor(canvas.width / 2)
-      ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
-      canvas.toBlob(async blob => {
-        const file = new File([blob!], `${getOriginalFilename(filename)}-cover.jpg`, {
-          type: blob?.type
-        })
-        const res = await uploadFile(file)
-        resolve({ cover: res.data.filename })
-      })
-    })
-  })
-}
-
 export async function createAbsoluteUrl(relativePath?: string) {
   if (!relativePath) return ''
   try {
@@ -113,4 +51,18 @@ export async function createAbsoluteUrl(relativePath?: string) {
   } catch {
     return ''
   }
+}
+
+export async function compressImage(file: File, quality = 1) {
+  const imageBitmap = await createImageBitmap(file)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = imageBitmap.width
+  canvas.height = imageBitmap.height
+  const ctx = canvas.getContext('2d')
+  ctx?.drawImage(imageBitmap, 0, 0)
+
+  return await new Promise<Blob>(resolve =>
+    canvas.toBlob(blob => resolve(blob!), file.type, quality)
+  )
 }

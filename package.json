@@ -32,11 +32,9 @@
     "electron-store": "9.0.0",
     "element-plus": "2.7.3",
     "express": "4.19.2",
-    "id3-parser": "3.0.0",
     "joi": "17.13.1",
     "multer": "1.4.5-lts.1",
     "qrcode": "1.5.3",
-    "sharp": "0.33.4",
     "socket.io": "4.7.5"
   },
   "devDependencies": {

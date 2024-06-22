@@ -2,7 +2,7 @@ import path from 'node:path'
 import { Router } from 'express'
 import multer from 'multer'
 import { createId } from '@paralleldrive/cuid2'
-import { getAudioFileInfo, getImageThumbnail, getMessageType, getResPath, randomId } from '../utils'
+import { getResPath, randomId } from '../utils'
 import { userStore } from '../store'
 import { createUserDto, updateUserDto } from './dto'
 
@@ -53,20 +53,10 @@ router.post('/user', createUserDto, (req, res) => {
   })
 })
 
-router.post('/upload', upload.single('file'), async (req, res) => {
+router.post('/upload', upload.single('file'), (req, res) => {
   const file = req.file!
-  const type = getMessageType(file.mimetype)
-  const payload: any = {
-    audio: undefined,
-    video: undefined,
-    image: undefined
-  }
-
-  if (type === 'audio') payload.audio = await getAudioFileInfo(file)
-  if (type === 'image') payload.image = await getImageThumbnail(file)
-
   res.send({
-    data: { ...file, payload }
+    data: file
   })
 })
 

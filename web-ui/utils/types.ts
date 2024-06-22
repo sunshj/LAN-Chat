@@ -47,3 +47,8 @@ export interface Message {
   read?: boolean
   payload?: MessagePayload
 }
+
+export interface FileStatus {
+  file: string
+  download: boolean
+}

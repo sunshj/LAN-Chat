@@ -11,8 +11,6 @@ import {
   dialog
 } from 'electron'
 import axios from 'axios'
-import id3Parser from 'id3-parser'
-import sharp from 'sharp'
 
 export function $notify(
   title: string,
@@ -74,7 +72,7 @@ export async function fetchReleases() {
   return res
 }
 
-export async function checkUpgrade(win: BrowserWindow) {
+export async function checkForUpgrade(win: BrowserWindow) {
   const [latestRelease] = await fetchReleases()
   if (latestRelease.name === app.getVersion()) {
     dialog.showMessageBoxSync({
@@ -129,52 +127,4 @@ export async function upgradeApp(url: string, onProgress?: (val: number) => void
     app.exit()
   }, 100)
   exec(`start "" "${tempPath}"`)
-}
-
-export function getMessageType(mimetype: string) {
-  if (mimetype.includes('image')) return 'image'
-  if (mimetype.includes('video')) return 'video'
-  if (mimetype.includes('audio')) return 'audio'
-  return 'file'
-}
-
-export async function getAudioFileInfo(file: Express.Multer.File) {
-  const buffer = await fs.readFile(file.path)
-  // @ts-expect-error (support for CommonJS)
-  const tags = id3Parser.default(buffer)
-
-  if (tags && tags.title) {
-    const title = tags.title ?? ''
-    const artist = tags.artist ?? ''
-
-    const coverName = `${file?.filename}-cover.jpg`
-    if (tags?.image?.data) {
-      const coverFilePath = path.join(file.destination, coverName)
-
-      await fs.writeFile(coverFilePath, new Uint8Array(tags?.image?.data))
-    }
-
-    return {
-      pic: tags?.image?.data ? coverName : '',
-      title,
-      artist
-    }
-  }
-
-  const filename = file.originalname.slice(0, file.originalname.lastIndexOf('.'))
-  return {
-    pic: '',
-    title: filename.includes('-') ? filename.split('-')[1] : filename,
-    artist: filename.includes('-') ? filename.split('-')[0] : ''
-  }
-}
-
-export async function getImageThumbnail(file: Express.Multer.File) {
-  if (file.size < 1024 * 1024 * 3) return
-  const thumbnail = `${file.filename}-thumbnail.jpg`
-  const thumbnailFilePath = path.join(file.destination, thumbnail)
-
-  sharp.cache({ files: 0 })
-  await sharp(file.path).resize(200).toFile(thumbnailFilePath)
-  return { thumbnail }
 }

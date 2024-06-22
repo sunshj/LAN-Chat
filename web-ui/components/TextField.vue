@@ -43,7 +43,7 @@ const message = defineModel<string>({
 
 const props = defineProps<{
   onUploadProgress?: (event: any) => void
-  onUploadSuccess?: (res: UploadFileResult) => void
+  onUploadSuccess?: (res: UploadFileResult, ...args: any[]) => void
 }>()
 
 const emit = defineEmits<{

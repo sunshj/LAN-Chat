@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { type BrowserWindow, Menu, app, dialog, shell } from 'electron'
-import { checkUpgrade, getResPath } from './utils'
+import { checkForUpgrade, getResPath } from './utils'
 import { store, userStore } from './store'
 
 export function createMenu(mainWindow: BrowserWindow) {
@@ -102,7 +102,7 @@ export function createMenu(mainWindow: BrowserWindow) {
       submenu: [
         {
           label: '检查更新',
-          click: () => checkUpgrade(mainWindow)
+          click: () => checkForUpgrade(mainWindow)
         },
         {
           label: '关于',
