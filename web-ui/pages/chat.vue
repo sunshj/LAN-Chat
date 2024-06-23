@@ -95,14 +95,13 @@
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
 import { type UploadFile, type UploadProgressEvent, useZIndex } from 'element-plus'
-import MyWorker from '@/assets/worker.js?worker'
+import FileWorker from '@/worker/file.worker?worker'
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
-const worker = new MyWorker()
-
+const route = useRoute()
 const appStore = useAppStore()
 const { $contextmenu, $socket } = useNuxtApp()
-const route = useRoute()
+const worker = new FileWorker()
 
 const message = ref('')
 
@@ -205,7 +204,7 @@ const send = useThrottleFn(() => {
   if (!message.value.trim()) return
   if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
   const msg = appStore.addMessage(message.value)
-  $socket.emit('new-message', msg)
+  $socket.emit('$new-message', msg)
   message.value = ''
 
   nextTick(() => {
@@ -241,7 +240,7 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
 
   const msg = appStore.addMessage(filename, { type, payload })
   fileStatus.value.push({ file: msg.content, download: true })
-  $socket.emit('new-message', msg)
+  $socket.emit('$new-message', msg)
   nextTick(() => {
     scrollToBottom()
   })
@@ -270,10 +269,12 @@ onMounted(() => {
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
     if (fileMessages.length > 0) {
-      worker.postMessage({
-        type: 'check-file',
-        payload: fileMessages.map(v => v.content)
-      })
+      worker.postMessage(
+        createMessage(
+          'checkFile',
+          fileMessages.map(v => v.content)
+        )
+      )
     }
 
     nextTick(() => {
@@ -284,11 +285,11 @@ onMounted(() => {
     })
   }
 
-  $socket.on('new-message', handleNewMessage)
+  $socket.on('$new-message', handleNewMessage)
 
   worker.addEventListener('message', event => {
-    const { type, payload } = event.data
-    if (type === 'check-file-reply') {
+    const { type, payload } = extractData(event)
+    if (type === 'checkFileReply') {
       fileStatus.value = payload
     }
   })
@@ -297,7 +298,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   message.value = ''
   appStore.clearCurrentChatUser()
-  $socket.off('new-message', handleNewMessage)
+  $socket.off('$new-message', handleNewMessage)
   worker.terminate()
 })
 </script>

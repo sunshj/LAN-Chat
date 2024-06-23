@@ -1,7 +1,9 @@
-import { io } from 'socket.io-client'
+import { type Socket, io } from 'socket.io-client'
+
+type SocketType = Socket<ServerToClientEvents, ClientToServerEvents>
 
 export default defineNuxtPlugin(() => {
-  const socket = io('/', {
+  const socket: SocketType = io('/', {
     transports: ['websocket']
   })
 

@@ -107,3 +107,20 @@ export async function getImageThumbnail(file: File) {
   const res = await uploadFile(thumbnailFile)
   return { thumbnail: res.data.filename }
 }
+
+export async function checkFileStatus(file: string) {
+  try {
+    const response = await fetch(formatFileUrl(file), {
+      method: 'HEAD'
+    })
+    return {
+      file,
+      download: response.ok
+    }
+  } catch {
+    return {
+      file,
+      download: false
+    }
+  }
+}

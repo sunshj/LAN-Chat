@@ -6,5 +6,5 @@
     "moduleResolution": "Bundler",
     "types": ["electron-vite/node"]
   },
-  "include": ["electron.vite.config.ts", "src/main/**/*.ts"]
+  "include": ["electron.vite.config.ts", "globals.d.ts", "src/main/**/*.ts"]
 }

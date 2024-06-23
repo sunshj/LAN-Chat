@@ -16,9 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import MyWorker from '@/assets/worker.js?worker'
+import MdWorker from '@/worker/md.worker?worker'
 
-const worker = new MyWorker()
+const worker = new MdWorker()
 
 const props = defineProps<{
   value: string
@@ -34,16 +34,13 @@ watchEffect(() => {
   if (!props.value) return
 
   isLoading.value = true
-  worker.postMessage({
-    type: 'markdown-parse',
-    payload: props.value
-  })
+  worker.postMessage(createMessage('markdownParse', props.value))
 })
 
 onMounted(() => {
   worker.addEventListener('message', event => {
-    const { type, payload } = event.data
-    if (type === 'markdown-parse-reply') {
+    const { type, payload } = extractData(event)
+    if (type === 'markdownParseReply') {
       output.value = payload
       emit('loaded')
       isLoading.value = false

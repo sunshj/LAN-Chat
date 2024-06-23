@@ -17,21 +17,21 @@ onMounted(() => {
     const storageUid = appStore.userInfo.id || 'invalid_uid'
     const userExist = await appStore.fetchUser(storageUid)
     if (userExist) {
-      $socket.emit('online', appStore.userInfo.id)
+      $socket.emit('$user-online', appStore.userInfo.id)
     } else {
       const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
       appStore.setUserInfo(user)
-      $socket.emit('online', user.id)
+      $socket.emit('$user-online', user.id)
     }
   })
 
-  $socket.on('new-message', (msg: Message) => {
+  $socket.on('$new-message', msg => {
     if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
     appStore.messages[msg.cid].push(msg)
   })
 
-  $socket.on('get-users', async (userIds: string[]) => {
-    const remainIds = userIds.filter(id => id !== appStore.userInfo.id)
+  $socket.on('$get-users', async usersId => {
+    const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
     const allUsers = await appStore.fetchUsers()
     appStore.setUsers(allUsers)
     const onlineUsers = allUsers.filter(user => remainIds.includes(user.id))

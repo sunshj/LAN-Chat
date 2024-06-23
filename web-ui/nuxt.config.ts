@@ -6,6 +6,7 @@ export default defineNuxtConfig({
       title: 'LAN Chat'
     }
   },
+  sourcemap: false,
   devtools: { enabled: false },
   modules: [
     '@unocss/nuxt',
