@@ -22,6 +22,10 @@ export function isMarkdownValue(value: string) {
   return containsNonTextTokens(tokens)
 }
 
+export function generateMarkdownCodeBlock(language: string, code: string) {
+  return `\`\`\`${language}\n${code}\n\`\`\``
+}
+
 export async function getMarkdownPlainText(value: string) {
   const htmlString = await marked(value)
   const parser = new DOMParser()

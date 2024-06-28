@@ -1,9 +1,9 @@
 <template>
-  <div class="md-output relative" v-html="output" />
+  <div ref="mdRef" class="md-output relative" v-html="output" />
   <div
     v-if="isLoading"
     :class="[
-      'absolute w-full flex items-center gap-2 -bottom-6',
+      'w-full flex items-center gap-2 -bottom-6',
       {
         '-left-1': props.isSender,
         '-right-1 justify-end': !props.isSender
@@ -13,39 +13,66 @@
     <IconSpinner />
     <span>rendering...</span>
   </div>
+  <div v-if="errorMsg" class="mt-2 w-full text-center text-sm text-red-600">{{ errorMsg }}</div>
 </template>
 
 <script setup lang="ts">
-import MdWorker from '@/worker/md.worker?worker'
-
-const worker = new MdWorker()
+const { $mdWorker } = useNuxtApp()
 
 const props = defineProps<{
+  id: string
   value: string
   isSender: boolean
 }>()
 
 const emit = defineEmits(['loaded'])
+const appStore = useAppStore()
+const fileStore = useFileStore()
 
 const output = ref(props.value)
+const errorMsg = ref('')
 const isLoading = ref(false)
+
+const mdRef = ref<HTMLDivElement | null>(null)
 
 watchEffect(() => {
   if (!props.value) return
-
   isLoading.value = true
-  worker.postMessage(createMessage('markdownParse', props.value))
+
+  if (appStore.initialScrolled) {
+    useIntersectionObserver(mdRef, (entries, el) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !(entry.target as HTMLDivElement).dataset.render) {
+          fileStore.setMarkdown(md => md.concat({ id: props.id, value: props.value }))
+          el.unobserve(entry.target)
+        }
+      })
+
+      $mdWorker.postMessage(createMessage('markdownParse', toRaw(fileStore.markdown)))
+    })
+  }
 })
 
-onMounted(() => {
-  worker.addEventListener('message', event => {
-    const { type, payload } = extractData(event)
-    if (type === 'markdownParseReply') {
-      output.value = payload
-      emit('loaded')
-      isLoading.value = false
+const handleMarkdownParseReply = (event: MessageEvent) => {
+  const { type, payload } = extractData(event)
+
+  if (type === 'markdownParseReply') {
+    if (mdRef.value && mdRef.value.dataset.render) return
+    console.log('payload:', payload)
+    const data = payload.find(v => v.id === props.id)
+    if (data?.error) errorMsg.value = data.error
+    if (data?.value) {
+      output.value = data.value
+      fileStore.setMarkdown(md => md.filter(v => v.id !== props.id))
+      mdRef.value?.setAttribute('data-render', 'true')
     }
-  })
+    emit('loaded')
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  $mdWorker.addEventListener('message', handleMarkdownParseReply)
 })
 
 onUpdated(() => {
@@ -55,13 +82,22 @@ onUpdated(() => {
 })
 
 onBeforeUnmount(() => {
-  worker.terminate()
+  $mdWorker.removeEventListener('message', handleMarkdownParseReply)
 })
 </script>
 
 <style>
 .md-output {
   line-height: 24px;
+}
+
+.md-output h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.5em;
 }
 
 .md-output li {
@@ -77,6 +113,7 @@ pre.shiki {
   padding: 6px;
   border-radius: 4px;
   overflow-x: auto;
+  margin: 6px 0;
 }
 
 pre.shiki:hover::before {

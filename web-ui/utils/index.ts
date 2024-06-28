@@ -20,6 +20,14 @@ export function getOriginalFilename(filename: string) {
   return filename.slice(filename.indexOf('-') + 1)
 }
 
+export function getFileExtension(filename: string) {
+  return filename.slice(filename.lastIndexOf('.') + 1)
+}
+
+export function getFileContent(url: string) {
+  return fetch(url).then(res => res.text())
+}
+
 export function downloadFile(url: string, filename: string) {
   const a = document.createElement('a')
   a.href = url
@@ -65,4 +73,19 @@ export async function compressImage(file: File, quality = 1) {
   return await new Promise<Blob>(resolve =>
     canvas.toBlob(blob => resolve(blob!), file.type, quality)
   )
+}
+
+export function unique<T, K extends keyof T>(array: T[], getKey?: K | ((item: T) => T[K])) {
+  const result: T[] = []
+  const keys = new Set()
+
+  array.forEach(item => {
+    const key = getKey ? (typeof getKey === 'function' ? getKey(item) : item[getKey]) : item
+    if (!keys.has(key)) {
+      keys.add(key)
+      result.push(item)
+    }
+  })
+
+  return result
 }

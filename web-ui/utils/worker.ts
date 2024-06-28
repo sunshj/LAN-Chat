@@ -3,8 +3,8 @@ type EventData = {
   checkFile: string[]
   checkFileReply: FileStatus[]
   // markdown
-  markdownParse: string
-  markdownParseReply: string
+  markdownParse: MarkdownParse[]
+  markdownParseReply: MarkdownParse[]
 }
 
 export type WorkerEventData = {

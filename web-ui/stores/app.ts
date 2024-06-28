@@ -1,6 +1,12 @@
 export const useAppStore = defineStore(
   'app',
   () => {
+    const initialScrolled = ref(false)
+
+    function setInitialScrolled(value: boolean) {
+      initialScrolled.value = value
+    }
+
     const userInfo = ref<User>({
       id: '',
       username: ''
@@ -159,6 +165,8 @@ export const useAppStore = defineStore(
     })
 
     return {
+      initialScrolled,
+      setInitialScrolled,
       userInfo,
       setUserInfo,
       fetchUser,

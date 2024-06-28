@@ -1,57 +1,25 @@
 <template>
   <div class="h-full flex flex-col">
     <ChatHeader :online="currentChatIsOnline" />
-    <main class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto">
+    <main
+      id="mainContainer"
+      class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto"
+    >
       <div ref="containerRef" class="relative w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
           <div
-            v-for="{ time, content, sender, type, mid, payload } in appStore.currentChatMessages"
-            :key="time"
-            :class="sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
+            v-for="msg in appStore.currentChatMessages"
+            :key="msg.time"
+            :class="msg.sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
           >
             <div
-              :class="['message', sender === appStore.userInfo.id ? 'sender' : 'receiver']"
-              @contextmenu.prevent="handleContextMenu($event, mid)"
+              :class="['message', msg.sender === appStore.userInfo.id ? 'sender' : 'receiver']"
+              @contextmenu.prevent="handleContextMenu($event, msg.mid)"
               @click.stop
             >
-              <div v-if="type === 'text'">
-                <Markdown
-                  v-if="isMarkdownValue(content)"
-                  :value="content"
-                  :is-sender="sender === appStore.userInfo.id"
-                  @loaded="scrollToBottom"
-                />
-
-                <div v-else>{{ content }}</div>
-              </div>
-
-              <Image
-                v-else-if="type === 'image'"
-                :url="formatFileUrl(content)"
-                :thumbnail="formatFileUrl(payload?.image?.thumbnail || content)"
-              />
-
-              <div v-else>
-                <Video
-                  v-if="type === 'video'"
-                  :cover="formatFileUrl(payload?.video?.cover)"
-                  :url="formatFileUrl(content)"
-                />
-
-                <Audio
-                  v-else-if="type === 'audio'"
-                  :url="formatFileUrl(content)"
-                  :audio="payload?.audio"
-                />
-
-                <File
-                  v-else
-                  :url="formatFileUrl(content)"
-                  :support-download="fileSupportDownload(content)"
-                />
-              </div>
+              <ChatPreviewer :message="msg" @loaded="scrollToBottom" />
               <p class="relative block w-full text-end text-xs text-[#777]">
-                {{ formatTimeAgo(new Date(time)) }}
+                {{ formatTimeAgo(new Date(msg.time)) }}
               </p>
             </div>
           </div>
@@ -95,29 +63,29 @@
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
 import { type UploadFile, type UploadProgressEvent, useZIndex } from 'element-plus'
-import FileWorker from '@/worker/file.worker?worker'
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
 const route = useRoute()
 const appStore = useAppStore()
-const { $contextmenu, $socket } = useNuxtApp()
-const worker = new FileWorker()
+const fileStore = useFileStore()
+
+const { $contextmenu, $socket, $fileWorker } = useNuxtApp()
 
 const message = ref('')
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const textFieldRef = ref<TextFieldExposed | null>(null)
 
-const fileStatus = ref<FileStatus[]>([])
-
-const fileSupportDownload = (file: string) =>
-  fileStatus.value.find(f => f.file === file)?.download ?? false
-
 const scrollToBottom = useDebounceFn(() => {
   if (!containerRef.value) return
   const { scrollHeight, clientHeight, scrollTop } = containerRef.value
   if (scrollHeight - clientHeight - scrollTop > 20) {
-    containerRef.value?.scrollTo(0, scrollHeight - clientHeight)
+    containerRef.value.scrollTo(0, scrollHeight - clientHeight)
+    containerRef.value.addEventListener('scrollend', () => {
+      appStore.setInitialScrolled(true)
+    })
+  } else {
+    appStore.setInitialScrolled(true)
   }
 })
 
@@ -125,6 +93,8 @@ const currentSelectMid = ref('')
 const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid.value))
 
 const { nextZIndex } = useZIndex()
+const { text: selectedText } = useTextSelection()
+
 function handleContextMenu(e: MouseEvent, mid: string) {
   currentSelectMid.value = mid
   $contextmenu.showContextMenu({
@@ -134,9 +104,9 @@ function handleContextMenu(e: MouseEvent, mid: string) {
     items: [
       {
         label: '复制',
-        hidden: currentSelectMessage.value?.type !== 'text',
+        hidden: currentSelectMessage.value?.type !== 'text' && !selectedText.value,
         async onClick() {
-          const text = window.getSelection()?.toString() || currentSelectMessage.value?.content
+          const text = selectedText.value || currentSelectMessage.value?.content
           await copyText(text)
           window.getSelection()?.removeAllRanges()
         }
@@ -239,26 +209,30 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
   payload.image = type === 'image' ? await getImageThumbnail(file.raw!) : undefined
 
   const msg = appStore.addMessage(filename, { type, payload })
-  fileStatus.value.push({ file: msg.content, download: true })
+  fileStore.fileStatus.push({ file: msg.content, download: true })
   $socket.emit('$new-message', msg)
   nextTick(() => {
     scrollToBottom()
   })
 }
 
-const handleNewMessage = (msg: Message) => {
+function handleNewMessage(msg: Message) {
   if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
     msg.read = true
   }
 
   if (msg.type !== 'text') {
-    fileStatus.value.push({ file: msg.content, download: true })
+    fileStore.fileStatus.push({ file: msg.content, download: true })
   }
 
   nextTick(() => {
     scrollToBottom()
   })
 }
+
+onBeforeMount(() => {
+  appStore.setInitialScrolled(false)
+})
 
 onMounted(() => {
   const uid = route.query.uid as string
@@ -269,7 +243,7 @@ onMounted(() => {
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
     if (fileMessages.length > 0) {
-      worker.postMessage(
+      $fileWorker.postMessage(
         createMessage(
           'checkFile',
           fileMessages.map(v => v.content)
@@ -279,27 +253,20 @@ onMounted(() => {
 
     nextTick(() => {
       scrollToBottom()
-      nextTick(() => {
-        textFieldRef.value?.focus()
-      })
+      textFieldRef.value?.focus()
     })
   }
 
   $socket.on('$new-message', handleNewMessage)
-
-  worker.addEventListener('message', event => {
-    const { type, payload } = extractData(event)
-    if (type === 'checkFileReply') {
-      fileStatus.value = payload
-    }
-  })
 })
 
 onBeforeUnmount(() => {
   message.value = ''
+  appStore.setInitialScrolled(false)
   appStore.clearCurrentChatUser()
+  fileStore.setFileStatus([])
+  fileStore.setMarkdown([])
   $socket.off('$new-message', handleNewMessage)
-  worker.terminate()
 })
 </script>
 

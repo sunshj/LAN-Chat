@@ -5,7 +5,7 @@ import { getHighlighterCore } from 'shiki/core'
 import loadWasm from 'shiki/wasm'
 import markedShiki from 'marked-shiki'
 
-async function markdownParser(value: string) {
+async function markdownParser(id: string, value: string) {
   const highlighter = await getHighlighterCore({
     langs: Object.values(bundledLanguages),
     themes: [githubLightDefaultTheme],
@@ -27,14 +27,24 @@ async function markdownParser(value: string) {
   )
   const html = await marked.parse(value)
 
-  return html
+  return {
+    id,
+    value: html
+  }
 }
 
 self.addEventListener('message', async event => {
   const { type, payload } = extractData(event)
 
   if (type === 'markdownParse') {
-    const result = await markdownParser(payload)
+    const promises = payload.map(({ id, value }) => markdownParser(id, value))
+    const data = await Promise.allSettled(promises)
+
+    const result = data.map((item, index) => {
+      if (item.status === 'fulfilled') return item.value
+      return { ...payload[index], error: '无法解析为 Markdown' }
+    })
+
     self.postMessage(createMessage('markdownParseReply', result))
   }
 })
