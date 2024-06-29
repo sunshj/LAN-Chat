@@ -3,7 +3,7 @@ name: CI Lint and Type Check
 on:
   pull_request:
   push:
-    branches: ['*']
+    branches: []
 
 jobs:
   build:
