@@ -58,7 +58,7 @@ const handleMarkdownParseReply = (event: MessageEvent) => {
 
   if (type === 'markdownParseReply') {
     if (mdRef.value && mdRef.value.dataset.render) return
-    console.log('payload:', payload)
+
     const data = payload.find(v => v.id === props.id)
     if (data?.error) errorMsg.value = data.error
     if (data?.value) {
