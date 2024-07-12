@@ -4,9 +4,10 @@ import multer from 'multer'
 import { createId } from '@paralleldrive/cuid2'
 import { getResPath, randomId } from '../utils'
 import { userStore } from '../store'
-import { createUserDto, updateUserDto } from './dto'
+import { createUserDto, updateUserDto } from './schema'
 
 const router = Router()
+
 const upload = multer({
   storage: multer.diskStorage({
     destination(_req, _file, cb) {

@@ -5,23 +5,24 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  array-includes: npm:@nolyfill/array-includes@latest
-  array.prototype.findlast: npm:@nolyfill/array.prototype.findlast@latest
-  array.prototype.flat: npm:@nolyfill/array.prototype.flat@latest
-  array.prototype.flatmap: npm:@nolyfill/array.prototype.flatmap@latest
-  array.prototype.toreversed: npm:@nolyfill/array.prototype.toreversed@latest
-  array.prototype.tosorted: npm:@nolyfill/array.prototype.tosorted@latest
-  es-iterator-helpers: npm:@nolyfill/es-iterator-helpers@latest
-  hasown: npm:@nolyfill/hasown@latest
-  isarray: npm:@nolyfill/isarray@latest
-  object.assign: npm:@nolyfill/object.assign@latest
-  object.entries: npm:@nolyfill/object.entries@latest
-  object.fromentries: npm:@nolyfill/object.fromentries@latest
-  object.hasown: npm:@nolyfill/object.hasown@latest
-  object.values: npm:@nolyfill/object.values@latest
-  side-channel: npm:@nolyfill/side-channel@latest
-  string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@latest
-  typedarray: npm:@nolyfill/typedarray@latest
+  array-includes: npm:@nolyfill/array-includes@^1
+  array.prototype.findlast: npm:@nolyfill/array.prototype.findlast@^1
+  array.prototype.flat: npm:@nolyfill/array.prototype.flat@^1
+  array.prototype.flatmap: npm:@nolyfill/array.prototype.flatmap@^1
+  array.prototype.toreversed: npm:@nolyfill/array.prototype.toreversed@^1
+  array.prototype.tosorted: npm:@nolyfill/array.prototype.tosorted@^1
+  es-iterator-helpers: npm:@nolyfill/es-iterator-helpers@^1
+  hasown: npm:@nolyfill/hasown@^1
+  isarray: npm:@nolyfill/isarray@^1
+  object.assign: npm:@nolyfill/object.assign@^1
+  object.entries: npm:@nolyfill/object.entries@^1
+  object.fromentries: npm:@nolyfill/object.fromentries@^1
+  object.hasown: npm:@nolyfill/object.hasown@^1
+  object.values: npm:@nolyfill/object.values@^1
+  side-channel: npm:@nolyfill/side-channel@^1
+  string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@^1
+  typedarray: npm:@nolyfill/typedarray@^1
+  is-core-module: npm:@nolyfill/is-core-module@^1
 
 importers:
 
@@ -54,9 +55,6 @@ importers:
       express:
         specifier: 4.19.2
         version: 4.19.2
-      joi:
-        specifier: 17.13.1
-        version: 17.13.1
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -66,6 +64,9 @@ importers:
       socket.io:
         specifier: 4.7.5
         version: 4.7.5
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@electron-toolkit/tsconfig':
         specifier: 1.0.1
@@ -1729,16 +1730,6 @@ packages:
       protobufjs: 7.3.2
       yargs: 17.7.2
 
-  /@hapi/hoek@9.3.0:
-    resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
-    dev: false
-
-  /@hapi/topo@5.1.0:
-    resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
-    dependencies:
-      '@hapi/hoek': 9.3.0
-    dev: false
-
   /@humanwhocodes/config-array@0.11.14:
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
@@ -1966,6 +1957,12 @@ packages:
 
   /@nolyfill/hasown@1.0.29:
     resolution: {integrity: sha512-9h/nxZqmCy26r9VXGUz+Q77vq3eINXOYgE4st3dj6DoE7tulfJueCLw5d4hfDy3S8mKg4cFXaP+KxYQ+txvMzw==}
+    engines: {node: '>=12.4.0'}
+    requiresBuild: true
+    optional: true
+
+  /@nolyfill/is-core-module@1.0.32:
+    resolution: {integrity: sha512-xmhh+wwmaCtNjY7slRZ/U+/NGjPii1dfKyYCv8iHofIbMkXFLyZTpdsIoiGbtf/JQRfQuwlohZ6B/sb2CrQbFw==}
     engines: {node: '>=12.4.0'}
 
   /@nolyfill/isarray@1.0.29:
@@ -2905,20 +2902,6 @@ packages:
 
   /@shikijs/core@1.6.5:
     resolution: {integrity: sha512-XcQYt6e4L61ruAxHiL3Xg1DL/XkWWjzDdeckB/DtN8jAxoAU+bcxsV6DetC8NafHpL4YpGhxy9iXF0ND/u6HmA==}
-    dev: false
-
-  /@sideway/address@4.1.5:
-    resolution: {integrity: sha512-IqO/DUQHUkPeixNQ8n0JA6102hT9CmaljNTPmQ1u8MEhBo/R4Q8eKLN/vGZxuebwOroDB4cbpjheD4+/sKFK4Q==}
-    dependencies:
-      '@hapi/hoek': 9.3.0
-    dev: false
-
-  /@sideway/formula@3.0.1:
-    resolution: {integrity: sha512-/poHZJJVjx3L+zVD6g9KgHfYnb443oi7wLu/XKojDviHy6HOEOA6z1Trk5aR1dGcmPenJEgb2sK2I80LeS3MIg==}
-    dev: false
-
-  /@sideway/pinpoint@2.0.0:
-    resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
     dev: false
 
   /@sindresorhus/is@4.6.0:
@@ -6400,7 +6383,7 @@ packages:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
     dependencies:
       debug: 3.2.7
-      is-core-module: 2.14.0
+      is-core-module: /@nolyfill/is-core-module@1.0.32
       resolve: 1.22.8
     transitivePeerDependencies:
       - supports-color
@@ -7740,12 +7723,6 @@ packages:
       ci-info: 3.9.0
     dev: true
 
-  /is-core-module@2.14.0:
-    resolution: {integrity: sha512-a5dFJih5ZLYlRtDc0dZWP7RiKr6xIKzmn/oAYCDvdLThadVgyJwlaoQPmRtMSpz+rk0OGAgIu+TcM9HUF0fk1A==}
-    engines: {node: '>= 0.4'}
-    dependencies:
-      hasown: /@nolyfill/hasown@1.0.29
-
   /is-decimal@1.0.4:
     resolution: {integrity: sha512-RGdriMmQQvZ2aqaQq3awNA6dCGtKpiDFcOzrTWrDAT2MiWrKQVPmxLGHl7Y2nNu6led0kEyoX0enY0qXYsv9zw==}
     dev: true
@@ -7928,16 +7905,6 @@ packages:
   /jiti@1.21.6:
     resolution: {integrity: sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==}
     hasBin: true
-
-  /joi@17.13.1:
-    resolution: {integrity: sha512-vaBlIKCyo4FCUtCm7Eu4QZd/q02bWcxfUO6YSXAZOWF6gzcLBeba8kwotUdYJjDLW8Cz8RywsSOqiNJZW0mNvg==}
-    dependencies:
-      '@hapi/hoek': 9.3.0
-      '@hapi/topo': 5.1.0
-      '@sideway/address': 4.1.5
-      '@sideway/formula': 3.0.1
-      '@sideway/pinpoint': 2.0.0
-    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -8805,7 +8772,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       hosted-git-info: 4.1.0
-      is-core-module: 2.14.0
+      is-core-module: /@nolyfill/is-core-module@1.0.32
       semver: 7.6.2
       validate-npm-package-license: 3.0.4
     dev: true
@@ -9909,7 +9876,7 @@ packages:
     resolution: {integrity: sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==}
     hasBin: true
     dependencies:
-      is-core-module: 2.14.0
+      is-core-module: /@nolyfill/is-core-module@1.0.32
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
@@ -9917,7 +9884,7 @@ packages:
     resolution: {integrity: sha512-U7WjGVG9sH8tvjW5SmGbQuui75FiyjAX72HX15DwBBwF9dNiQZRQAg9nnPhYy+TUnE0+VcrttuvNI8oSxZcocA==}
     hasBin: true
     dependencies:
-      is-core-module: 2.14.0
+      is-core-module: /@nolyfill/is-core-module@1.0.32
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
@@ -11747,3 +11714,7 @@ packages:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.5.2
+
+  /zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+    dev: false

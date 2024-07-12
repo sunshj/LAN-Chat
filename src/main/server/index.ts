@@ -31,7 +31,7 @@ export async function startServer(
   app.use(express.static(path.join(getResPath(), 'ui')))
 
   app.use('/api', apiRouter)
-  app.use('/*', (_req, res) => {
+  app.all('/*', (_req, res) => {
     res.redirect('/404.html')
   })
 
