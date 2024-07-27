@@ -47,6 +47,11 @@ onMounted(() => {
     appStore.setOnlineUsers([])
   })
 })
+
+onBeforeUnmount(() => {
+  $socket.off('$new-message')
+  $socket.off('$get-users')
+})
 </script>
 
 <style>

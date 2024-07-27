@@ -4,7 +4,7 @@ import multer from 'multer'
 import { createId } from '@paralleldrive/cuid2'
 import { getResPath, randomId } from '../utils'
 import { userStore } from '../store'
-import { createUserDto, updateUserDto } from './schema'
+import { createUserDto, updateUserDto } from './dto'
 
 const router = Router()
 

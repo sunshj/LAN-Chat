@@ -55,6 +55,9 @@ importers:
       express:
         specifier: 4.19.2
         version: 4.19.2
+      express-validate-kit:
+        specifier: ^0.0.4
+        version: 0.0.4
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -6812,6 +6815,11 @@ packages:
     dependencies:
       homedir-polyfill: 1.0.3
     dev: true
+
+  /express-validate-kit@0.0.4:
+    resolution: {integrity: sha512-cAYqij+xS97p8sAWi4VR03SdYS+mcl2RNQ381qk4q0Q2FmnUlW4BYri5sjIFsjWCCu8y8hxi26hCEQjtRg9GaA==}
+    engines: {node: '>= 18'}
+    dev: false
 
   /express@4.19.2:
     resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
