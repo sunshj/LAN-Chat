@@ -37,7 +37,7 @@ function showVideo(url: string) {
       })
     },
     showConfirmButton: false,
-    closeOnClickModal: true,
+    closeOnClickModal: false,
     customClass: 'video-message-box',
     closeOnPressEscape: true,
     draggable: true
