@@ -6,7 +6,7 @@ export const updateUserDto = zodValidator({
     username: z.string({ message: 'username is required' }).min(1)
   }),
   params: z.object({
-    id: z.string({ message: 'id is required' })
+    id: z.string()
   })
 })
 
