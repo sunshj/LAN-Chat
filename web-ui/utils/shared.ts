@@ -28,6 +28,13 @@ export function getFileContent(url: string) {
   return fetch(url).then(res => res.text())
 }
 
+export function getMessageType(mimetype: string): MessageType {
+  if (mimetype.includes('image')) return 'image'
+  if (mimetype.includes('video')) return 'video'
+  if (mimetype.includes('audio')) return 'audio'
+  return 'file'
+}
+
 export function downloadFile(url: string, filename: string) {
   const a = document.createElement('a')
   a.href = url
@@ -59,20 +66,6 @@ export async function createAbsoluteUrl(relativePath?: string) {
   } catch {
     return ''
   }
-}
-
-export async function compressImage(file: File, quality = 1) {
-  const imageBitmap = await createImageBitmap(file)
-
-  const canvas = document.createElement('canvas')
-  canvas.width = imageBitmap.width
-  canvas.height = imageBitmap.height
-  const ctx = canvas.getContext('2d')
-  ctx?.drawImage(imageBitmap, 0, 0)
-
-  return await new Promise<Blob>(resolve =>
-    canvas.toBlob(blob => resolve(blob!), file.type, quality)
-  )
 }
 
 export function unique<T, K extends keyof T>(array: T[], getKey?: K | ((item: T) => T[K])) {

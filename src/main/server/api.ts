@@ -2,9 +2,10 @@ import path from 'node:path'
 import { Router } from 'express'
 import multer from 'multer'
 import { createId } from '@paralleldrive/cuid2'
+import { z } from 'zod'
+import { zodValidator } from 'express-validate-kit'
 import { getResPath, randomId } from '../utils'
 import { userStore } from '../store'
-import { createUserDto, updateUserDto } from './dto'
 
 const router = Router()
 
@@ -36,7 +37,16 @@ router.get('/user/:id', (req, res) => {
   })
 })
 
-router.put('/user/:id', updateUserDto, (req, res) => {
+const updateUserValidator = zodValidator({
+  body: z.object({
+    username: z.string({ message: 'username is required' }).min(1)
+  }),
+  params: z.object({
+    id: z.string()
+  })
+})
+
+router.put('/user/:id', updateUserValidator, (req, res) => {
   const user = userStore.findOne(req.params.id)
   if (!user) {
     res.status(404).send('user not found')
@@ -47,7 +57,13 @@ router.put('/user/:id', updateUserDto, (req, res) => {
   })
 })
 
-router.post('/user', createUserDto, (req, res) => {
+const createUserValidator = zodValidator({
+  body: z.object({
+    username: z.string({ message: 'username is required' }).min(1)
+  })
+})
+
+router.post('/user', createUserValidator, (req, res) => {
   const id = createId()
   res.send({
     data: userStore.mutation(id, { username: req.body.username })
