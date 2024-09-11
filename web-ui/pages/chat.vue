@@ -25,9 +25,6 @@
           </div>
         </div>
       </div>
-      <DevOnly>
-        <div id="screenshot" class="w-100" />
-      </DevOnly>
     </main>
 
     <footer

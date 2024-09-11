@@ -2,8 +2,6 @@ type EventData = {
   // file
   checkFile: string[]
   checkFileReply: FileStatus[]
-  checkColorDiversity: ImageData
-  checkColorDiversityReply: boolean
   // markdown
   markdownParse: MarkdownParse[]
   markdownParseReply: MarkdownParse[]

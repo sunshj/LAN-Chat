@@ -23,33 +23,37 @@ function checkColorDiversity(canvas: HTMLCanvasElement, sampleSize = 300) {
   return colorSet.size >= 2
 }
 
-function getVideoCoverOfSeconds(video: HTMLVideoElement, seconds: number = 1) {
-  return new Promise<HTMLCanvasElement>(resolve => {
-    video.addEventListener('loadedmetadata', () => {
+function getVideoScreenshotAtSeconds(videoUrl: string, seconds: number = 1) {
+  const video = document.createElement('video')
+
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')!
+
+  video.addEventListener(
+    'loadedmetadata',
+    () => {
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
       video.currentTime = Math.min(Math.floor(video.duration), seconds)
+    },
+    false
+  )
 
-      video.addEventListener('seeked', () => {
-        console.log('seeked:', seconds, video.currentTime)
-        const canvas = document.createElement('canvas')
-        canvas.width = video.videoWidth
-        canvas.height = video.videoHeight
-        const ctx = canvas.getContext('2d')!
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+  video.muted = true
+  video.setAttribute('crossorigin', 'anonymous')
+  video.src = videoUrl
+  video.play()
 
-        /**
-         * devOnly
-         
-        const screenshotUrl = canvas.toDataURL('image/png')
-        const img = document.createElement('img')
-        img.src = screenshotUrl
-        img.width = 200
-        img.border = '1px solid #ccc'
-        document.querySelector('#screenshot')!.append(img)
-        */
+  return new Promise<HTMLCanvasElement>(resolve => {
+    video.addEventListener(
+      'timeupdate',
+      () => {
+        video.pause()
+        ctx.drawImage(video, 0, 0)
         resolve(canvas)
-      })
-    })
+      },
+      false
+    )
   })
 }
 
@@ -65,14 +69,12 @@ async function getColorfulVideoCover(
   videoUrl: string,
   retryTimes = 15
 ): Promise<HTMLCanvasElement> {
-  const video = document.createElement('video')
-  video.src = videoUrl
-
   const getSeconds = () => videoTimeMap.get(videoUrl) ?? 1
 
-  const canvas = await getVideoCoverOfSeconds(video, getSeconds())
+  const canvas = await getVideoScreenshotAtSeconds(videoUrl, getSeconds())
 
   const isColorful = checkColorDiversity(canvas)
+
   if (!isColorful && retryTimes > 0) {
     videoTimeMap.set(videoUrl, getSeconds() + 3)
 

@@ -21,17 +21,3 @@ export async function getImageThumbnail(file: File) {
   const res = await uploadFile(thumbnailFile)
   return { thumbnail: res.data.filename }
 }
-
-export function imageDataToBlob(imageData: ImageData) {
-  const w = imageData.width
-  const h = imageData.height
-  const canvas = document.createElement('canvas')
-  canvas.width = w
-  canvas.height = h
-  const ctx = canvas.getContext('2d')
-  ctx?.putImageData(imageData, 0, 0, w, h, 0, 0)
-
-  return new Promise<Blob>(resolve => {
-    canvas.toBlob(blob => resolve(blob!))
-  })
-}
