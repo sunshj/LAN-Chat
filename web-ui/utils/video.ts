@@ -76,7 +76,7 @@ async function getColorfulVideoCover(
   const isColorful = checkColorDiversity(canvas)
 
   if (!isColorful && retryTimes > 0) {
-    videoTimeMap.set(videoUrl, getSeconds() + 3)
+    videoTimeMap.set(videoUrl, getSeconds() + 1)
 
     return getColorfulVideoCover(videoUrl, retryTimes - 1).finally(() => {
       videoTimeMap.delete(videoUrl)
