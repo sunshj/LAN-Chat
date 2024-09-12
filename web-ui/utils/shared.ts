@@ -17,6 +17,7 @@ export function randomId(n = 6) {
 }
 
 export function getOriginalFilename(filename: string) {
+  filename = decodeURIComponent(filename)
   return filename.slice(filename.indexOf('-') + 1)
 }
 

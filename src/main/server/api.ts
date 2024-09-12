@@ -16,7 +16,7 @@ const upload = multer({
     },
     filename(_req, file, cb) {
       file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8')
-      cb(null, `${randomId()}-${file.originalname}`)
+      cb(null, `${randomId()}-${encodeURIComponent(file.originalname)}`)
     }
   })
 })
@@ -79,7 +79,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
 
 router.get('/download/:filename', (req, res) => {
   const filename = req.params.filename
-  res.download(path.join(getResPath(), 'uploads', filename))
+  res.download(path.join(getResPath(), 'uploads', encodeURIComponent(filename)))
 })
 
 export default router
