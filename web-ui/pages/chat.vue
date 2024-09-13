@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { formatTimeAgo } from '@vueuse/core'
-import { type UploadFile, type UploadProgressEvent, useZIndex } from 'element-plus'
+import { useZIndex, type UploadFile, type UploadProgressEvent } from 'element-plus'
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
 const route = useRoute()

@@ -1,4 +1,4 @@
-export const chatEventHandler = (io: ServerType, socket: SocketType) => {
+export function chatEventHandler(io: ServerType, socket: SocketType) {
   const getConnectionUsersId = async () => {
     const connections = await io.fetchSockets()
     return connections.map(v => v.data.userId)

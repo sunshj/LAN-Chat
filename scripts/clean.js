@@ -1,5 +1,6 @@
-import path from 'node:path'
 import fs from 'node:fs'
+import path from 'node:path'
+import process from 'node:process'
 
 // 清空resources/uploads目录: 只清理文件，保留uploads目录和.gitkeep
 const uploadsDir = path.join(process.cwd(), 'resources', 'uploads')

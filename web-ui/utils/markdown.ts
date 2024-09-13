@@ -1,4 +1,4 @@
-import { type TokensList, marked } from 'marked'
+import { marked, type TokensList } from 'marked'
 
 export function isMarkdownValue(value: string) {
   function containsNonTextTokens(tokens: TokensList) {

@@ -59,7 +59,7 @@ async function preview() {
   }
 }
 
-const handleCheckFileReply = (event: MessageEvent) => {
+function handleCheckFileReply(event: MessageEvent) {
   const { type, payload } = extractData(event)
 
   if (type === 'checkFileReply') {

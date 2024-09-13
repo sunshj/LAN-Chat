@@ -20,8 +20,8 @@ import type { InputInstance } from 'element-plus'
 const inputRef = ref<InputInstance | null>(null)
 
 export interface TextFieldExposed {
-  focus(): void
-  clear(): void
+  focus: () => void
+  clear: () => void
 }
 
 defineExpose<TextFieldExposed>({

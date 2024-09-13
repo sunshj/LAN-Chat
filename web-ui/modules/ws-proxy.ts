@@ -1,5 +1,6 @@
 import { defineNuxtModule, logger } from '@nuxt/kit'
 import { createProxyServer } from 'http-proxy'
+import type { Buffer } from 'node:buffer'
 import type { IncomingMessage } from 'node:http'
 import type { Duplex } from 'node:stream'
 

@@ -53,7 +53,7 @@ watchEffect(() => {
   }
 })
 
-const handleMarkdownParseReply = (event: MessageEvent) => {
+function handleMarkdownParseReply(event: MessageEvent) {
   const { type, payload } = extractData(event)
 
   if (type === 'markdownParseReply') {

@@ -1,5 +1,6 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import process from 'node:process'
 import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
 
 // Custom APIs for renderer
 export const api = {

@@ -1,9 +1,10 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { type BrowserWindow, Menu, app, dialog, shell } from 'electron'
-import { checkForUpgrade, getResPath } from './utils'
+import process from 'node:process'
+import { app, dialog, Menu, shell, type BrowserWindow } from 'electron'
 import { store, userStore } from './store'
+import { checkForUpgrade, getResPath } from './utils'
 
 export function createMenu(mainWindow: BrowserWindow) {
   return Menu.buildFromTemplate([

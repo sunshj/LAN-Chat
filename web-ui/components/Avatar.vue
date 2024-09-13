@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import BoringAvatar from 'vue-boring-avatars'
 import seedrandom from 'seedrandom'
+import BoringAvatar from 'vue-boring-avatars'
 
 const props = withDefaults(
   defineProps<{

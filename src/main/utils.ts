@@ -1,16 +1,17 @@
-import crypto from 'node:crypto'
-import path from 'node:path'
-import os from 'node:os'
-import fs from 'node:fs/promises'
 import { exec } from 'node:child_process'
-import {
-  type BrowserWindow,
-  Notification,
-  type NotificationConstructorOptions,
-  app,
-  dialog
-} from 'electron'
+import crypto from 'node:crypto'
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import process from 'node:process'
 import axios from 'axios'
+import {
+  app,
+  dialog,
+  Notification,
+  type BrowserWindow,
+  type NotificationConstructorOptions
+} from 'electron'
 
 export function $notify(
   title: string,

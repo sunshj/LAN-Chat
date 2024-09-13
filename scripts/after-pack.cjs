@@ -1,5 +1,6 @@
-const path = require('node:path')
 const fs = require('node:fs')
+const path = require('node:path')
+const process = require('node:process')
 
 /** @type {import("electron-builder").Configuration['afterPack']} */
 module.exports = context => {

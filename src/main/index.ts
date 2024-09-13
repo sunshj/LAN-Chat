@@ -1,12 +1,13 @@
 import { join } from 'node:path'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from 'electron'
 import icon from '../../resources/icon.png?asset'
 import { createMenu, createTrayMenu } from './menu'
 import { startServer, stopServer } from './server'
-import { fetchReleases, getNetworksAddr, isEmptyObj } from './utils'
 import { networkStore, store } from './store'
+import { fetchReleases, getNetworksAddr, isEmptyObj } from './utils'
 
 function createWindow(): void {
   // Create the browser window.

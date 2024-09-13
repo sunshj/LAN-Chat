@@ -1,10 +1,10 @@
-import path from 'node:path'
 import http from 'node:http'
+import path from 'node:path'
+import { shell, type IpcMainInvokeEvent } from 'electron'
 import express from 'express'
-import { type IpcMainInvokeEvent, shell } from 'electron'
 import { Server } from 'socket.io'
-import { $notify, getResPath } from '../utils'
 import { networkStore } from '../store'
+import { $notify, getResPath } from '../utils'
 import apiRouter from './api'
 import { chatEventHandler } from './events'
 

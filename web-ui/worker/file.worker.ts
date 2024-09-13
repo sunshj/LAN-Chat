@@ -1,5 +1,5 @@
-import { createMessage, extractData } from '../utils/worker'
 import { formatFileUrl } from '../utils/shared'
+import { createMessage, extractData } from '../utils/worker'
 
 async function checkFileStatus(file: string) {
   try {

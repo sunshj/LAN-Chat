@@ -1,9 +1,9 @@
 import { Marked } from 'marked'
-import { bundledLanguages } from 'shiki/bundle/web'
-import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'
-import { getHighlighterCore } from 'shiki/core'
-import loadWasm from 'shiki/wasm'
 import markedShiki from 'marked-shiki'
+import { bundledLanguages } from 'shiki/bundle/web'
+import { getHighlighterCore } from 'shiki/core'
+import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'
+import loadWasm from 'shiki/wasm'
 import { createMessage, extractData } from '../utils/worker'
 
 async function markdownParser(id: string, value: string) {
