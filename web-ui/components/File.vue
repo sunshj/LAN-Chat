@@ -52,10 +52,10 @@ const previewContent = ref('')
 async function preview() {
   showPreviewSlot.value = !showPreviewSlot.value
   if (SUPPORT_PREVIEW_LANGS.includes(fileExtension.value) || fileExtension.value === 'txt') {
-    const code = await getFileContent(props.url)
+    const code = await readFileContent(props.url)
     previewContent.value = generateMarkdownCodeBlock(fileExtension.value, code)
   } else {
-    previewContent.value = await getFileContent(props.url)
+    previewContent.value = await readFileContent(props.url)
   }
 }
 

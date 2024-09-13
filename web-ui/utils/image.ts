@@ -1,4 +1,5 @@
 export async function compressImage(file: File, quality = 1) {
+  const { promise, resolve } = withResolvers<Blob>()
   const imageBitmap = await createImageBitmap(file)
 
   const canvas = document.createElement('canvas')
@@ -7,9 +8,9 @@ export async function compressImage(file: File, quality = 1) {
   const ctx = canvas.getContext('2d')
   ctx?.drawImage(imageBitmap, 0, 0)
 
-  return await new Promise<Blob>(resolve =>
-    canvas.toBlob(blob => resolve(blob!), file.type, quality)
-  )
+  canvas.toBlob(blob => resolve(blob!), file.type, quality)
+
+  return promise
 }
 
 export async function getImageThumbnail(file: File) {

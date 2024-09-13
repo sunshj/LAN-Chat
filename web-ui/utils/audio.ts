@@ -1,31 +1,31 @@
-import id3Parser from 'id3-parser'
-import { convertFileToBuffer } from 'id3-parser/lib/util'
+import { parseBlob } from 'music-metadata'
+
+interface AudioInfo {
+  title: string
+  artist: string
+  pic: string
+}
 
 export async function getAudioFileInfo(file: File) {
-  const tags = await convertFileToBuffer(file).then(id3Parser)
-
-  if (tags && tags.title) {
-    const { title, artist = '' } = tags
-    const coverName = `${file?.name}-cover.jpg`
-    let picUrl = ''
-    if (tags?.image?.data) {
-      const blob = new Uint8Array(tags.image.data!)
-      const coverFile = new File([blob], coverName, { type: tags.image.type })
-      const res = await uploadFile(coverFile)
-      picUrl = res.data.filename
-    }
-
-    return {
-      pic: picUrl,
-      title,
-      artist
-    }
+  const { common } = await parseBlob(file)
+  const info: AudioInfo = {
+    title: '',
+    artist: '',
+    pic: ''
   }
 
   const filename = file.name.slice(0, file.name.lastIndexOf('.'))
-  return {
-    pic: '',
-    title: filename.includes('-') ? filename.split('-')[1] : filename,
-    artist: filename.includes('-') ? filename.split('-')[0] : ''
+  const coverName = `${file?.name}-cover.jpg`
+
+  info.title = common.title || filename.includes('-') ? filename.split('-')[1] : filename
+  info.artist = common.artist || filename.includes('-') ? filename.split('-')[0] : ''
+
+  if (common.picture && common.picture.length > 0) {
+    const [pic] = common.picture
+    const coverFile = new File([pic.data], coverName, { type: pic.format })
+    const res = await uploadFile(coverFile)
+    info.pic = res.data.filename
   }
+
+  return info
 }

@@ -24,8 +24,8 @@ function checkColorDiversity(canvas: HTMLCanvasElement, sampleSize = 300) {
 }
 
 function getVideoScreenshotAtSeconds(videoUrl: string, seconds: number = 1) {
+  const { promise, resolve } = withResolvers<HTMLCanvasElement>()
   const video = document.createElement('video')
-
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')!
 
@@ -44,17 +44,17 @@ function getVideoScreenshotAtSeconds(videoUrl: string, seconds: number = 1) {
   video.src = videoUrl
   video.play()
 
-  return new Promise<HTMLCanvasElement>(resolve => {
-    video.addEventListener(
-      'timeupdate',
-      () => {
-        video.pause()
-        ctx.drawImage(video, 0, 0)
-        resolve(canvas)
-      },
-      false
-    )
-  })
+  video.addEventListener(
+    'timeupdate',
+    () => {
+      video.pause()
+      ctx.drawImage(video, 0, 0)
+      resolve(canvas)
+    },
+    false
+  )
+
+  return promise
 }
 
 const videoTimeMap = new Map<string, number>()
@@ -88,16 +88,17 @@ async function getColorfulVideoCover(
 }
 
 export async function getVideoCover(filename: string) {
+  const { promise, resolve } = withResolvers<{ cover: string }>()
   const videoUrl = formatFileUrl(filename)
   const canvas = await getColorfulVideoCover(videoUrl)
 
-  return new Promise<{ cover: string }>(resolve => {
-    canvas.toBlob(async blob => {
-      const file = new File([blob!], `${getOriginalFilename(filename)}-cover.jpg`, {
-        type: blob!.type
-      })
-      const res = await uploadFile(file)
-      resolve({ cover: res.data.filename })
+  canvas.toBlob(async blob => {
+    const file = new File([blob!], `${getOriginalFilename(filename)}-cover.jpg`, {
+      type: blob!.type
     })
+    const res = await uploadFile(file)
+    resolve({ cover: res.data.filename })
   })
+
+  return promise
 }

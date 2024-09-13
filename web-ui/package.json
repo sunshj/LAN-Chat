@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@imengyu/vue3-context-menu": "1.4.1",
-    "id3-parser": "3.0.0",
     "marked": "13.0.0",
     "marked-shiki": "1.1.0",
+    "music-metadata": "^10.5.0",
     "nuxt": "3.6.5",
     "pinia": "2.1.7",
     "seedrandom": "3.0.5",

@@ -25,8 +25,8 @@ export function getFileExtension(filename: string) {
   return filename.slice(filename.lastIndexOf('.') + 1)
 }
 
-export function getFileContent(url: string) {
-  return fetch(url).then(res => res.text())
+export async function readFileContent(url: string) {
+  return await fetch(url).then(res => res.text())
 }
 
 export function getMessageType(mimetype: string): MessageType {
@@ -57,18 +57,6 @@ export async function uploadFile(file: File, onProgress?: (e: any) => void) {
   return res
 }
 
-export async function createAbsoluteUrl(relativePath?: string) {
-  if (!relativePath) return ''
-  try {
-    const { data: buffer } = await axios.get(formatFileUrl(relativePath), {
-      responseType: 'arraybuffer'
-    })
-    return URL.createObjectURL(new Blob([buffer]))
-  } catch {
-    return ''
-  }
-}
-
 export function unique<T, K extends keyof T>(array: T[], getKey?: K | ((item: T) => T[K])) {
   const result: T[] = []
   const keys = new Set()
@@ -82,4 +70,20 @@ export function unique<T, K extends keyof T>(array: T[], getKey?: K | ((item: T)
   })
 
   return result
+}
+
+export function withResolvers<T>() {
+  let resolve: (value: T) => void
+  let reject: (reason?: any) => void
+
+  const promise = new Promise<T>((_resolve, _reject) => {
+    resolve = _resolve
+    reject = _reject
+  })
+
+  return {
+    promise,
+    resolve: resolve!,
+    reject: reject!
+  }
 }
