@@ -26,7 +26,7 @@ export const useFileStore = defineStore(
   },
   {
     persist: {
-      paths: ['fileStatus']
+      pick: ['fileStatus']
     }
   }
 )
