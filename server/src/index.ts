@@ -1,5 +1,4 @@
 import http from 'node:http'
-import path from 'node:path'
 import express from 'express'
 import { Server } from 'socket.io'
 import { createApiRouter } from './api'
