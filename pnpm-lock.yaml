@@ -50,8 +50,8 @@ importers:
         specifier: 2.7.3
         version: 2.7.3(vue@3.4.4)
       lan-chat-server:
-        specifier: workspace:^
-        version: link:server
+        specifier: workspace:*
+        version: link:packages/server
       qrcode:
         specifier: 1.5.3
         version: 1.5.3
@@ -141,7 +141,16 @@ importers:
         specifier: 1.8.27
         version: 1.8.27(typescript@5.3.3)
 
-  server:
+  packages/cli:
+    dependencies:
+      citty:
+        specifier: ^0.1.6
+        version: 0.1.6
+      lan-chat-server:
+        specifier: workspace:*
+        version: link:../server
+
+  packages/server:
     dependencies:
       '@paralleldrive/cuid2':
         specifier: 2.2.2

@@ -1,4 +1,4 @@
-import type { Message } from '../../web-ui/utils/types'
+import type { Message } from '../../../web-ui/utils/types'
 import type { Server, Socket } from 'socket.io'
 
 export type User = {

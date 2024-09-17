@@ -1,6 +1,7 @@
 {
   "name": "lan-chat",
-  "version": "1.0.36",
+  "version": "1.1.0-beta.1",
+  "private": true,
   "description": "局域网聊天与传输工具",
   "type": "module",
   "author": "sunshj",
@@ -14,6 +15,8 @@
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm build && electron-builder --dir",
     "build:win": "pnpm build && electron-builder --win",
+    "build:packages": "pnpm -r --filter=./packages/* run build",
+    "release:packages": "bumpp && pnpm build:packages && pnpm -r publish",
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -30,7 +33,7 @@
     "axios": "1.7.2",
     "electron-store": "9.0.0",
     "element-plus": "2.7.3",
-    "lan-chat-server": "workspace:^",
+    "lan-chat-server": "workspace:*",
     "qrcode": "1.5.3",
     "socket.io": "4.7.5"
   },

@@ -9,4 +9,4 @@ resources/uploads/**
 resources/stores.json
 !resources/**/.gitkeep
 
-cli/ui/**
+packages/cli/ui/**
