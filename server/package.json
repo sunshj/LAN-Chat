@@ -1,0 +1,48 @@
+{
+  "name": "lan-chat-server",
+  "private": true,
+  "packageManager": "pnpm@9.5.0",
+  "type": "module",
+  "license": "MIT",
+  "author": "sunshj",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "pnpm build",
+    "release": "bumpp && npm publish"
+  },
+  "dependencies": {
+    "@paralleldrive/cuid2": "2.2.2",
+    "express": "4.19.2",
+    "express-validate-kit": "^0.1.1",
+    "multer": "1.4.5-lts.1",
+    "socket.io": "4.7.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.21",
+    "@types/multer": "1.4.11"
+  }
+}

@@ -1,20 +1,27 @@
 import http from 'node:http'
 import path from 'node:path'
-import { shell, type IpcMainInvokeEvent } from 'electron'
 import express from 'express'
 import { Server } from 'socket.io'
-import { networkStore } from '../store'
-import { $notify, getResPath } from '../utils'
-import apiRouter from './api'
+import { createApiRouter } from './api'
 import { chatEventHandler } from './events'
+import type { UserStore } from './types'
+
+export * from './types'
 
 let server: http.Server
 let io: Server
 
-export async function startServer(
-  _event: IpcMainInvokeEvent,
-  { host, port }: { host: string; port: number }
-) {
+interface StartServerOptions {
+  host: string
+  port: number
+  uiPath: string
+  uploadsPath: string
+  userStore: UserStore
+  onListening?: (host: string, port: number) => void
+}
+
+export async function startServer(options: StartServerOptions) {
+  const { host, port, uiPath, uploadsPath, onListening, userStore } = options
   if (server) {
     io.close()
     server.close()
@@ -28,9 +35,9 @@ export async function startServer(
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use(express.static(path.join(getResPath(), 'ui')))
+  app.use(express.static(uiPath))
 
-  app.use('/api', apiRouter)
+  app.use('/api', createApiRouter(userStore, uploadsPath))
   app.all('/*', (_req, res) => {
     res.redirect('/404.html')
   })
@@ -42,12 +49,8 @@ export async function startServer(
 
   return await new Promise<boolean>(resolve => {
     server.listen(port, host, () => {
-      networkStore.incr(host)
+      onListening?.(host, port)
       resolve(server.listening)
-    })
-    const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)
-    notify.addListener('click', () => {
-      shell.openExternal(`http://${host}:${port}`)
     })
   })
 }

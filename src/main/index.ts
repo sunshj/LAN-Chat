@@ -2,12 +2,11 @@ import { join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from 'electron'
+import { app, BrowserWindow, dialog, Menu, shell, Tray } from 'electron'
 import icon from '../../resources/icon.png?asset'
+import { ipcHandler } from './ipc'
 import { createMenu, createTrayMenu } from './menu'
-import { startServer, stopServer } from './server'
-import { networkStore, store } from './store'
-import { fetchReleases, getNetworksAddr, isEmptyObj } from './utils'
+import { store } from './store'
 
 function createWindow(): void {
   // Create the browser window.
@@ -106,19 +105,7 @@ app.whenReady().then(() => {
   })
 
   // IPC
-  ipcMain.handle('start-server', startServer)
-  ipcMain.handle('stop-server', stopServer)
-  ipcMain.handle('get-networks', () => {
-    if (isEmptyObj(store.get('networks'))) {
-      const networks = getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
-      store.set('networks', networks)
-    }
-
-    return networkStore.value
-  })
-  ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
-  ipcMain.handle('fetch-releases', fetchReleases)
-  ipcMain.handle('get-version', () => app.getVersion())
+  ipcHandler()
 
   createWindow()
 

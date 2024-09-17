@@ -1,3 +1,5 @@
+import type { ServerType, SocketType } from './types'
+
 export function chatEventHandler(io: ServerType, socket: SocketType) {
   const getConnectionUsersId = async () => {
     const connections = await io.fetchSockets()

@@ -11,7 +11,8 @@ export default defineNuxtConfig({
   modules: [
     '@unocss/nuxt',
     '@pinia/nuxt',
-    'pinia-plugin-persistedstate/nuxt',
+    // https://github.com/prazdevs/pinia-plugin-persistedstate/tree/00202d50d4512affc348e713b206b844c5fa653d
+    '@pinia-plugin-persistedstate/nuxt',
     '@element-plus/nuxt',
     '@vueuse/nuxt'
   ],
@@ -24,7 +25,7 @@ export default defineNuxtConfig({
   elementPlus: {
     icon: false
   },
-  piniaPluginPersistedstate: {
+  piniaPersistedstate: {
     storage: 'localStorage'
   },
   websocketProxy: {
