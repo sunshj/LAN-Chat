@@ -1,6 +1,6 @@
 {
   "name": "lan-chat-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "packageManager": "pnpm@9.5.0",
   "type": "module",
   "license": "MIT",
@@ -20,10 +20,10 @@
     "copy": "node ./scripts/copy.cjs",
     "prebuild": "pnpm -F web-ui build && pnpm copy",
     "prepublishOnly": "pnpm prebuild && pnpm build",
-    "release": "bumpp --no-tag && npm publish"
+    "release": "bumpp --no-commit && npm publish"
   },
   "dependencies": {
     "citty": "^0.1.6",
-    "lan-chat-server": "workspace:^"
+    "lan-chat-server": "0.0.1"
   }
 }
