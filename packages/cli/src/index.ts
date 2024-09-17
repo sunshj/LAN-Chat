@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineCommand, runMain } from 'citty'
 import { startServer } from 'lan-chat-server'
+import { version as pkgVersion } from '../package.json'
 import { storePath, uploadsPath, userStore } from './store'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -10,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url)
 const main = defineCommand({
   meta: {
     name: 'LAN Chat CLI',
+    version: pkgVersion,
     description: 'A simple chat application for local area networks'
   },
   args: {
