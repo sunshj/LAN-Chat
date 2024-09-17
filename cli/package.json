@@ -1,0 +1,30 @@
+{
+  "name": "lan-chat-cli",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@9.5.0",
+  "type": "module",
+  "license": "MIT",
+  "author": "sunshj",
+  "files": [
+    "bin",
+    "dist",
+    "ui"
+  ],
+  "sideEffects": false,
+  "bin": {
+    "lan-chat": "bin/cli.mjs"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "copy": "node ./scripts/copy.cjs",
+    "prebuild": "pnpm -F web-ui build && pnpm copy",
+    "prepublishOnly": "pnpm prebuild && pnpm build",
+    "release": "bumpp --no-tag && npm publish"
+  },
+  "dependencies": {
+    "citty": "^0.1.6",
+    "lan-chat-server": "workspace:^"
+  }
+}
