@@ -16,8 +16,7 @@
   },
   "scripts": {
     "dev": "tsup --watch",
-    "build": "pnpm copy && tsup",
-    "copy": "node ./scripts/copy.cjs"
+    "build": "tsup"
   },
   "dependencies": {
     "citty": "^0.1.6",

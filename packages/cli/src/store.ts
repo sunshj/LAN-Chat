@@ -11,7 +11,6 @@ const defaultStore: Store = {
 }
 
 export const storePath = `${tmpdir()}/lan-chat-cli-store.json`
-export const uploadsPath = `${tmpdir()}/lan-chat-cli-uploads`
 
 const getStore = (): Store => JSON.parse(readFileSync(storePath, 'utf8')) ?? defaultStore
 

@@ -16,7 +16,7 @@
     "build:unpack": "pnpm build && electron-builder --dir",
     "build:win": "pnpm build && electron-builder --win",
     "build:server": "pnpm -F lan-chat-server build",
-    "build:cli": "pnpm -F lan-chat-cli build",
+    "build:cli": "node scripts/copy && pnpm -F lan-chat-cli build",
     "build:packages": "pnpm build:webui && pnpm build:server && pnpm build:cli",
     "release": "bumpp && pnpm build:packages && pnpm -r publish",
     "format": "prettier --write .",

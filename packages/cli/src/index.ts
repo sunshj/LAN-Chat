@@ -1,12 +1,14 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineCommand, runMain } from 'citty'
 import { startServer } from 'lan-chat-server'
 import { version as pkgVersion } from '../package.json'
-import { storePath, uploadsPath, userStore } from './store'
+import { storePath, userStore } from './store'
 
 const __filename = fileURLToPath(import.meta.url)
+const uploadsPath = `${tmpdir()}/lan-chat-cli-uploads`
 
 const main = defineCommand({
   meta: {
@@ -27,7 +29,7 @@ const main = defineCommand({
       default: '127.0.0.1'
     },
     clean: {
-      description: 'Clean the store',
+      description: 'Clean the store and uploads directory',
       type: 'boolean',
       default: false
     }
