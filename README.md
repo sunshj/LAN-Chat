@@ -30,16 +30,20 @@ $ pnpm build:win
 
 ### Release
 
-正常发版
+```bash
+pnpm release
+```
+
+# LAN-Chat CLI
+
+安装
 
 ```bash
-npx bumpp
+npm i -g lan-chat-cli
 ```
 
-构建失败，重新发版
+查看用法
 
-```
-git tag -d v1.0.1
-npx bumpp
-# 选择as-is
+```bash
+lan-chat -h
 ```

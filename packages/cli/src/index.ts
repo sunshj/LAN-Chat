@@ -32,11 +32,16 @@ const main = defineCommand({
       description: 'Clean the store and uploads directory',
       type: 'boolean',
       default: false
+    },
+    verbose: {
+      description: 'Enable verbose logging',
+      type: 'boolean',
+      default: false
     }
   },
 
   async run({ args }) {
-    const { host, port, clean } = args
+    const { host, port, clean, verbose } = args
     if (clean && existsSync(storePath)) {
       rmSync(storePath, { recursive: true })
     }
@@ -46,8 +51,11 @@ const main = defineCommand({
     }
 
     console.log(`Listening on http://${host}:${port}`)
-    console.log('storePath: ', storePath)
-    console.log('uploadsPath: ', uploadsPath)
+
+    if (verbose) {
+      console.log('storePath: ', storePath)
+      console.log('uploadsPath: ', uploadsPath)
+    }
 
     if (!existsSync(storePath)) {
       writeFileSync(storePath, JSON.stringify({ users: [] }))

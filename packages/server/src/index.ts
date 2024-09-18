@@ -21,6 +21,9 @@ interface StartServerOptions {
 
 export async function startServer(options: StartServerOptions) {
   const { host, port, uiPath, uploadsPath, onListening, userStore } = options
+  if (!Number.isInteger(port) || port <= 0 || port > 65535 || port === 443) {
+    throw new Error('Invalid port number')
+  }
   if (server) {
     io.close()
     server.close()

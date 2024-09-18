@@ -8,7 +8,7 @@ import components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['lan-chat-server'] })]
+    plugins: [externalizeDepsPlugin({ include: ['bufferutil', 'utf-8-validate'] })]
   },
   preload: {
     plugins: [externalizeDepsPlugin()]

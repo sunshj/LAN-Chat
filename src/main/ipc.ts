@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { app, ipcMain, shell } from 'electron'
+import { app, dialog, ipcMain, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
 import { networkStore, store, userStore } from './store'
 import { $notify, fetchReleases, getNetworksAddr, getResPath, isEmptyObj } from './utils'
@@ -19,6 +19,8 @@ export function ipcHandler() {
           shell.openExternal(`http://${host}:${port}`)
         })
       }
+    }).catch((error: any) => {
+      dialog.showErrorBox('Start Server Failed', error.message)
     })
   )
 

@@ -1,47 +1,56 @@
+import process from 'node:process'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  devtools: { enabled: false },
+  sourcemap: false,
+
   app: {
     head: {
       title: 'LAN Chat'
     }
   },
-  sourcemap: false,
-  devtools: { enabled: false },
-  modules: [
-    '@unocss/nuxt',
-    '@pinia/nuxt',
-    // https://github.com/prazdevs/pinia-plugin-persistedstate/tree/00202d50d4512affc348e713b206b844c5fa653d
-    '@pinia-plugin-persistedstate/nuxt',
-    '@element-plus/nuxt',
-    '@vueuse/nuxt'
-  ],
-  imports: {
-    dirs: ['stores']
-  },
+
   experimental: {
     payloadExtraction: false
   },
+
+  runtimeConfig: {
+    public: {
+      WS_URL: process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:3000' : '/'
+    }
+  },
+
+  modules: [
+    '@unocss/nuxt',
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
+    '@element-plus/nuxt',
+    '@vueuse/nuxt'
+  ],
+
+  devServer: {
+    port: 8080,
+    host: '0.0.0.0'
+  },
+
+  imports: {
+    dirs: ['stores']
+  },
+
   elementPlus: {
     icon: false
   },
-  piniaPersistedstate: {
+
+  piniaPluginPersistedstate: {
     storage: 'localStorage'
-  },
-  websocketProxy: {
-    target: 'http://127.0.0.1:3000',
-    path: '/socket.io'
   },
 
   vite: {
     worker: {
       format: 'es'
     }
-  },
-
-  devServer: {
-    port: 8080,
-    host: '0.0.0.0'
   },
 
   nitro: {

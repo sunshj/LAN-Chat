@@ -35,7 +35,6 @@
     "axios": "1.7.2",
     "electron-store": "9.0.0",
     "element-plus": "2.7.3",
-    "lan-chat-server": "workspace:*",
     "qrcode": "1.5.3"
   },
   "devDependencies": {
@@ -52,8 +51,9 @@
     "cz-git": "1.9.2",
     "electron": "28.2.0",
     "electron-builder": "24.9.1",
-    "electron-vite": "2.0.0",
+    "electron-vite": "2.3.0",
     "eslint": "9.10.0",
+    "lan-chat-server": "workspace:*",
     "lint-staged": "15",
     "prettier": "3.2.5",
     "rimraf": "5.0.7",
