@@ -55,9 +55,6 @@ importers:
       qrcode:
         specifier: 1.5.3
         version: 1.5.3
-      socket.io:
-        specifier: 4.7.5
-        version: 4.7.5
     devDependencies:
       '@electron-toolkit/tsconfig':
         specifier: 1.0.1

@@ -8,19 +8,19 @@
       :content="previewContent"
       :ext="fileExtension"
     />
-    <el-button
+    <ElButton
       v-if="supportPreview"
       :class="['w-full', showPreviewSlot && 'sticky bottom-0 left-0']"
       type="primary"
       @click="preview()"
     >
       {{ showPreviewSlot ? '收起' : '预览' }}
-    </el-button>
+    </ElButton>
     <a :href="props.url" :download="getOriginalFilename(props.url)">
-      <el-button class="w-full" type="success" :disabled="!supportDownload">
+      <ElButton class="w-full" type="success" :disabled="!supportDownload">
         <span v-if="!supportDownload">文件已失效</span>
         <IconDownload v-else />
-      </el-button>
+      </ElButton>
     </a>
   </div>
 </template>

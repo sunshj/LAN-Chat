@@ -1,5 +1,5 @@
 <template>
-  <el-image
+  <ElImage
     fit="cover"
     :src="props.thumbnail"
     class="aspect-ratio h-40 cursor-pointer"
@@ -15,7 +15,7 @@
         图片加载失败
       </div>
     </template>
-  </el-image>
+  </ElImage>
 </template>
 
 <script setup lang="ts">

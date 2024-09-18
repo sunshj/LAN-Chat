@@ -36,8 +36,7 @@
     "electron-store": "9.0.0",
     "element-plus": "2.7.3",
     "lan-chat-server": "workspace:*",
-    "qrcode": "1.5.3",
-    "socket.io": "4.7.5"
+    "qrcode": "1.5.3"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "1.0.1",
@@ -97,8 +96,8 @@
   },
   "lint-staged": {
     "*.{vue,js,ts}": [
-      "eslint --fix .",
-      "prettier --write ."
+      "eslint --fix",
+      "prettier --write"
     ]
   },
   "prettier": "@sunshj/prettier-config",

@@ -35,17 +35,17 @@
         :style="{ translate: `-${remainUploadPercent}` }"
       />
 
-      <el-upload
+      <ElUpload
         :show-file-list="false"
         action="/api/upload"
         :before-upload="onBeforeUpload"
         :on-progress="onUploadProgress"
         :on-success="onUploadSuccess"
       >
-        <el-button plain size="large">
+        <ElButton plain size="large">
           <IconUpload class="text-xl" />
-        </el-button>
-      </el-upload>
+        </ElButton>
+      </ElUpload>
       <div class="flex-1">
         <TextField
           ref="textFieldRef"

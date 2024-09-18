@@ -1,12 +1,12 @@
 <template>
   <div class="relative aspect-video max-w-40vw overflow-hidden rounded-lg lt-sm:max-w-none">
-    <el-image :src="props.cover" class="h-full min-w-40vw w-full">
+    <ElImage :src="props.cover" class="h-full min-w-40vw w-full">
       <template #error>
         <div class="h-full w-full flex cursor-auto justify-center bg-gray-1 text-gray-400">
           封面加载失败
         </div>
       </template>
-    </el-image>
+    </ElImage>
 
     <IconVideoPlay
       class="absolute left-1/2 top-1/2 cursor-pointer rounded-full text-5xl text-amber transition-all -translate-1/2 hover:scale-110"
