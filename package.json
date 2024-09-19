@@ -18,7 +18,7 @@
     "build:server": "pnpm -F lan-chat-server build",
     "build:cli": "node scripts/copy && pnpm -F lan-chat-cli build",
     "build:vscode": "node scripts/copy && pnpm -F vscode-lan-chat build",
-    "build:packages": "pnpm build:webui && pnpm build:server && pnpm build:cli && build:vscode",
+    "build:packages": "pnpm build:webui && pnpm build:server && pnpm build:cli && pnpm build:vscode",
     "release": "bumpp && pnpm build:packages && pnpm -r publish",
     "format": "prettier --write .",
     "lint": "eslint .",
