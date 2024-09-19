@@ -1,9 +1,10 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { defineCommand, runMain } from 'citty'
-import { startServer } from 'lan-chat-server'
+import { startServer, stopServer } from 'lan-chat-server'
 import { version as pkgVersion } from '../package.json'
 import { storeHandlers, storePath } from './store'
 
@@ -76,3 +77,14 @@ const main = defineCommand({
 })
 
 runMain(main)
+
+const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGKILL']
+
+function exitHandler() {
+  stopServer()
+  process.exit(0)
+}
+
+signals.forEach(signal => {
+  process.on(signal, exitHandler)
+})

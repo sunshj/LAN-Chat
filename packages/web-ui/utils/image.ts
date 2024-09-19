@@ -20,5 +20,5 @@ export async function getImageThumbnail(file: File) {
   const imageBlob = await compressImage(file, 0.1)
   const thumbnailFile = new File([imageBlob], thumbnailName, { type: file.type })
   const res = await uploadFile(thumbnailFile)
-  return { thumbnail: res.data.filename }
+  return { thumbnail: res.data.newFilename }
 }

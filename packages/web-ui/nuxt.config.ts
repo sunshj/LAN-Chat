@@ -72,6 +72,8 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       routes: ['/', '/chat', '/404.html']
-    }
+    },
+
+    sourceMap: false
   }
 })

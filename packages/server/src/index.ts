@@ -1,15 +1,15 @@
-import http from 'node:http'
-import express from 'express'
 import { Server } from 'socket.io'
-import { createApiRouter } from './api'
+import { z } from 'zod'
 import { chatEventHandler } from './events'
-import { toUserStore, type StoreHandlers } from './store'
+import { createHostServer } from './server'
+import type { StoreHandlers } from './store'
+import type http from 'node:http'
 
 export * from './types'
 export * from './store'
 
-let server: http.Server
-let io: Server
+let server: http.Server | null
+let io: Server | null
 
 interface StartServerOptions {
   host: string
@@ -17,54 +17,66 @@ interface StartServerOptions {
   uiPath: string
   uploadsPath: string
   storeHandlers: StoreHandlers
-  onListening?: (host: string, port: number) => void
+  onListening?: (host: string, port: number) => void | Promise<void>
 }
+
+function cleanUp() {
+  if (server) {
+    server?.close(() => {
+      server = null
+    })
+  }
+
+  if (io) {
+    io?.close(() => {
+      io = null
+    })
+  }
+}
+
+const portSchema = z.object({
+  port: z
+    .number()
+    .int()
+    .min(1)
+    .max(65535)
+    .refine(n => n !== 443, 'Port 443 is not allowed'),
+  host: z.string().min(1).ip({ version: 'v4' }).or(z.literal('localhost'))
+})
 
 export async function startServer(options: StartServerOptions) {
   const { host, port, uiPath, uploadsPath, onListening, storeHandlers } = options
 
-  if (!Number.isInteger(port) || port <= 0 || port > 65535 || port === 443) {
-    throw new Error('Invalid port number')
-  }
-  if (server) {
-    io.close()
-    server.close()
-  }
-  const app = express()
-  server = http.createServer(app)
+  const { error, data } = portSchema.safeParse({ host, port })
+  if (error) throw new Error(error.errors.map(e => e.message).join(', '))
+
+  cleanUp()
+
+  server = createHostServer({
+    uiPath,
+    uploadsPath,
+    storeHandlers
+  })
+
   io = new Server(server, {
     transports: ['websocket'],
     maxHttpBufferSize: 1e8
   })
 
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: true }))
-  app.use(express.static(uiPath))
-
-  app.use('/api', createApiRouter(toUserStore(storeHandlers), uploadsPath))
-  app.all('/*', (_req, res) => {
-    res.redirect('/404.html')
-  })
-
   io.on('connection', socket => {
-    /** chat socket handle  */
-    chatEventHandler(io, socket)
+    chatEventHandler(io!, socket)
   })
 
   return await new Promise<boolean>(resolve => {
-    server.listen(port, host, () => {
-      onListening?.(host, port)
-      resolve(server.listening)
+    server?.listen(data.port, data.host, async () => {
+      await onListening?.(host, port)
+      resolve(server?.listening ?? false)
     })
   })
 }
 
 export function stopServer() {
-  if (server) {
-    io.emit('message', 'Server is shutting down')
-    io.close()
-    server.close()
-  }
-
-  return server.listening
+  io?.emit('message', 'Server is shutting down')
+  cleanUp()
+  return server?.listening ?? false
 }

@@ -97,7 +97,7 @@ export async function getVideoCover(filename: string) {
       type: blob!.type
     })
     const res = await uploadFile(file)
-    resolve({ cover: res.data.filename })
+    resolve({ cover: res.data.newFilename })
   })
 
   return promise

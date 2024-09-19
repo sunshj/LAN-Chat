@@ -200,15 +200,15 @@ function onUploadProgress(evt: UploadProgressEvent) {
 }
 
 async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
-  const { filename, mimetype } = res.data
-  const type = getMessageType(mimetype)
+  const { newFilename, mimetype } = res.data
+  const type = getMessageType(mimetype!)
 
   const payload: MessagePayload = {}
-  payload.video = type === 'video' ? await getVideoCover(filename) : undefined
+  payload.video = type === 'video' ? await getVideoCover(newFilename) : undefined
   payload.audio = type === 'audio' ? await getAudioFileInfo(file.raw!) : undefined
   payload.image = type === 'image' ? await getImageThumbnail(file.raw!) : undefined
 
-  const msg = appStore.addMessage(filename, { type, payload })
+  const msg = appStore.addMessage(newFilename, { type, payload })
   fileStore.fileStatus.push({ file: msg.content, download: true })
   $socket.emit('$new-message', msg)
   nextTick(() => {
