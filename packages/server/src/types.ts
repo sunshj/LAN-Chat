@@ -6,13 +6,6 @@ export type User = {
   username: string
 }
 
-export type UserStore = {
-  findMany: () => User[]
-  findOne: (id: string) => User | null
-  mutation: (id: string, values: Omit<User, 'id'>) => User
-  deleteMany: () => { count: number }
-}
-
 export interface ServerToClientEvents {
   '$get-users': (usersId: string[]) => void
   '$new-message': (message: Message) => void

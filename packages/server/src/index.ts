@@ -3,9 +3,10 @@ import express from 'express'
 import { Server } from 'socket.io'
 import { createApiRouter } from './api'
 import { chatEventHandler } from './events'
-import type { UserStore } from './types'
+import { toUserStore, type StoreHandlers } from './store'
 
 export * from './types'
+export * from './store'
 
 let server: http.Server
 let io: Server
@@ -15,12 +16,13 @@ interface StartServerOptions {
   port: number
   uiPath: string
   uploadsPath: string
-  userStore: UserStore
+  storeHandlers: StoreHandlers
   onListening?: (host: string, port: number) => void
 }
 
 export async function startServer(options: StartServerOptions) {
-  const { host, port, uiPath, uploadsPath, onListening, userStore } = options
+  const { host, port, uiPath, uploadsPath, onListening, storeHandlers } = options
+
   if (!Number.isInteger(port) || port <= 0 || port > 65535 || port === 443) {
     throw new Error('Invalid port number')
   }
@@ -39,7 +41,7 @@ export async function startServer(options: StartServerOptions) {
   app.use(express.urlencoded({ extended: true }))
   app.use(express.static(uiPath))
 
-  app.use('/api', createApiRouter(userStore, uploadsPath))
+  app.use('/api', createApiRouter(toUserStore(storeHandlers), uploadsPath))
   app.all('/*', (_req, res) => {
     res.redirect('/404.html')
   })

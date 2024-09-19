@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { app, dialog, ipcMain, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
-import { networkStore, store, userStore } from './store'
+import { networkStore, store, storeHandlers } from './store'
 import { $notify, fetchReleases, getNetworksAddr, getResPath, isEmptyObj } from './utils'
 
 export function ipcHandler() {
@@ -11,7 +11,7 @@ export function ipcHandler() {
       port,
       uiPath: path.join(getResPath(), 'ui'),
       uploadsPath: path.join(getResPath(), 'uploads'),
-      userStore,
+      storeHandlers,
       onListening(host) {
         networkStore.incr(host)
         const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)
@@ -31,7 +31,6 @@ export function ipcHandler() {
       const networks = getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
       store.set('networks', networks)
     }
-
     return networkStore.value
   })
 

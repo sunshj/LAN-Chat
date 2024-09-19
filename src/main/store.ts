@@ -1,5 +1,6 @@
 import Store from 'electron-store'
 import { getResPath } from './utils'
+import type { StoreHandlers } from 'lan-chat-server'
 
 interface User {
   id: string
@@ -22,21 +23,14 @@ export const store = new Store<{
   }
 })
 
-export const userStore = {
-  findMany() {
-    return store.get('users', [])
+export const storeHandlers: StoreHandlers = {
+  get() {
+    return {
+      users: store.get('users', [])
+    }
   },
-  findOne(id: string) {
-    return store.get('users', [])?.find(user => user.id === id) ?? null
-  },
-  mutation(id: string, values: Omit<User, 'id'>) {
-    store.set('users', [...store.get('users', []).filter(u => u.id !== id), { id, ...values }])
-    return { id, ...values }
-  },
-  deleteMany() {
-    const count = store.get('users', []).length
-    store.set('users', [])
-    return { count }
+  set(_store) {
+    store.set('users', _store.users)
   }
 }
 

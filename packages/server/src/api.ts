@@ -6,7 +6,7 @@ import { Router } from 'express'
 import { zodValidator } from 'express-validate-kit'
 import multer from 'multer'
 import { z } from 'zod'
-import type { UserStore } from './types'
+import type { UserStore } from './store'
 
 const randomId = (n = 16) => crypto.randomBytes(16).toString('hex').slice(0, n)
 

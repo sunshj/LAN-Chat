@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { defineCommand, runMain } from 'citty'
 import { startServer } from 'lan-chat-server'
 import { version as pkgVersion } from '../package.json'
-import { storePath, userStore } from './store'
+import { storeHandlers, storePath } from './store'
 
 const __filename = fileURLToPath(import.meta.url)
 const uploadsPath = `${tmpdir()}/lan-chat-cli-uploads`
@@ -70,7 +70,7 @@ const main = defineCommand({
       port: Number(port),
       uiPath: path.resolve(__filename, '../..', 'ui'),
       uploadsPath,
-      userStore
+      storeHandlers
     })
   }
 })

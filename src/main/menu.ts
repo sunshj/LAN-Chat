@@ -3,7 +3,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { app, dialog, Menu, shell, type BrowserWindow } from 'electron'
-import { store, userStore } from './store'
+import { store } from './store'
 import { checkForUpgrade, getResPath } from './utils'
 
 export function createMenu(mainWindow: BrowserWindow) {
@@ -28,7 +28,7 @@ export function createMenu(mainWindow: BrowserWindow) {
         {
           label: '清空数据',
           click: () => {
-            const total = userStore.findMany().length
+            const total = store.get('users', []).length
             if (total === 0) {
               dialog.showMessageBox({
                 title: 'LAN Chat',
