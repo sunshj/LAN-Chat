@@ -26,7 +26,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "tsup --watch",
-    "build": "tsup && vsce package --no-dependencies",
+    "build": "tsup && vsce package --no-dependencies -o dist",
     "generate": "vscode-ext-gen --output src/generated/meta.ts --scope LANChat",
     "prepare": "pnpm generate",
     "type-check": "tsc --noEmit"
