@@ -2,7 +2,7 @@
   "publisher": "sunshj",
   "name": "vscode-lan-chat",
   "displayName": "LAN Chat",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "private": true,
   "description": "LAN Chat vscode extension",
   "icon": "./res/icon.png",
