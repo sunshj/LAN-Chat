@@ -6,13 +6,13 @@ import process from 'node:process'
 const uploadsDir = path.join(process.cwd(), 'resources', 'uploads')
 const aliveFiles = ['.gitkeep', 'THIS_FILE_SHOULD_NOT_BE_DELETED']
 
-function findOrCreateFile(file) {
+function ensureFile(file) {
   const filePath = path.join(file)
   if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, '')
   return filePath
 }
 
-aliveFiles.forEach(file => findOrCreateFile(path.join(uploadsDir, file)))
+aliveFiles.forEach(file => ensureFile(path.join(uploadsDir, file)))
 
 fs.readdirSync(uploadsDir).forEach(file => {
   if (!aliveFiles.includes(file)) {

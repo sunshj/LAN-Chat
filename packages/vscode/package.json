@@ -1,0 +1,103 @@
+{
+  "publisher": "sunshj",
+  "name": "vscode-lan-chat",
+  "displayName": "LAN Chat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LAN Chat vscode extension",
+  "icon": "./res/icon.png",
+  "license": "MIT",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunshj/vscode-lan-chat"
+  },
+  "files": [
+    "LICENSE.md",
+    "README.md",
+    "dist/*",
+    "res/**/*"
+  ],
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup && vsce package --no-dependencies",
+    "generate": "vscode-ext-gen --output src/generated/meta.ts --scope LANChat",
+    "prepare": "pnpm generate",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lan-chat-server": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.89.0",
+    "@vscode/vsce": "^2.32.0",
+    "reactive-vscode": "^0.2.0",
+    "vscode-ext-gen": "^0.4.3"
+  },
+  "engines": {
+    "vscode": "^1.92.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "category": "LAN Chat",
+        "title": "start server",
+        "command": "LANChat.start"
+      },
+      {
+        "category": "LAN Chat",
+        "title": "stop server",
+        "command": "LANChat.stop"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "LANChat.port": {
+          "type": "number",
+          "default": 3000,
+          "maximum": 65535,
+          "minimum": 1,
+          "description": "port of the server"
+        },
+        "LANChat.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "host of the server"
+        },
+        "LANChat.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "auto start the server when vscode start"
+        },
+        "LANChat.autoStop": {
+          "type": "boolean",
+          "default": true,
+          "description": "auto stop the server when vscode exit"
+        },
+        "LANChat.enableTempPath": {
+          "type": "boolean",
+          "default": true,
+          "description": "enable temp path, if false, use the path in current workspace"
+        },
+        "LANChat.storePath": {
+          "type": "string",
+          "scope": "window",
+          "default": ".lan-chat/store.json",
+          "description": "the folder to store server json data"
+        },
+        "LANChat.uploadsPath": {
+          "type": "string",
+          "scope": "window",
+          "default": ".lan-chat/uploads",
+          "description": "the folder to store uploaded files"
+        }
+      }
+    }
+  }
+}

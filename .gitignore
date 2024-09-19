@@ -10,3 +10,7 @@ resources/stores.json
 !resources/**/.gitkeep
 
 packages/cli/ui/**
+
+packages/vscode/res/ui/**
+packages/vscode/src/generated
+packages/vscode/**.vsix

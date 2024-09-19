@@ -9,11 +9,10 @@
     "!**/.vscode/*",
     "!src/*",
     "!packages/*",
-    "!web-ui/*",
-    "!electron.vite.config.{js,ts,mjs,cjs}",
-    "!{bump.config.ts,uno.config.ts,commitlint.config.js,eslint.config.js,dev-app-update.yml,CHANGELOG.md,README.md}",
+    "!*.config.{js,ts,mjs,cjs}",
+    "!{dev-app-update.yml,CHANGELOG.md,README.md}",
     "!{.env,.env.*,.npmrc,pnpm-lock.yaml,pnpm-workspace.yaml}",
-    "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
+    "!{tsconfig?(.*).json}"
   ],
   "asarUnpack": ["resources/**"],
   "afterPack": "./scripts/after-pack.cjs",

@@ -59,7 +59,7 @@ export default defineNuxtConfig({
     },
     preset: 'static',
     output: {
-      publicDir: '../resources/ui'
+      publicDir: '../../resources/ui'
     },
 
     devProxy: {

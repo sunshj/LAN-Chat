@@ -25,6 +25,13 @@
       "presentation": {
         "hidden": true
       }
+    },
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"],
+      "outFiles": ["${workspaceFolder}/packages/vscode/dist/**/*.js"]
     }
   ],
   "compounds": [

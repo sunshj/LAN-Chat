@@ -42,6 +42,3 @@ jobs:
 
       - name: Type Check
         run: pnpm run type-check
-
-      - name: WebUI Type Check
-        run: pnpm -F web-ui run type-check
