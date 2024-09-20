@@ -9,8 +9,8 @@ export function ipcHandler() {
     startServer({
       host,
       port,
-      uiPath: path.join(getResPath(), 'ui'),
-      uploadsPath: path.join(getResPath(), 'uploads'),
+      uiDir: path.join(getResPath(), 'ui'),
+      uploadsDir: path.join(getResPath(), 'uploads'),
       storeHandlers,
       onListening(host) {
         networkStore.incr(host)

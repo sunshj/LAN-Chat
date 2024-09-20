@@ -1,8 +1,7 @@
 import { Server } from 'socket.io'
 import { z } from 'zod'
 import { chatEventHandler } from './events'
-import { createHostServer } from './server'
-import type { StoreHandlers } from './store'
+import { createHostServer, type CreateServerOptions } from './server'
 import type http from 'node:http'
 
 export * from './types'
@@ -11,12 +10,9 @@ export * from './store'
 let server: http.Server | null
 let io: Server | null
 
-interface StartServerOptions {
+interface StartServerOptions extends CreateServerOptions {
   host: string
   port: number
-  uiPath: string
-  uploadsPath: string
-  storeHandlers: StoreHandlers
   onListening?: (host: string, port: number) => void | Promise<void>
 }
 
@@ -45,7 +41,7 @@ const portSchema = z.object({
 })
 
 export async function startServer(options: StartServerOptions) {
-  const { host, port, uiPath, uploadsPath, onListening, storeHandlers } = options
+  const { host, port, uiDir, uploadsDir, onListening, storeHandlers } = options
 
   const { error, data } = portSchema.safeParse({ host, port })
   if (error) throw new Error(error.errors.map(e => e.message).join(', '))
@@ -53,8 +49,8 @@ export async function startServer(options: StartServerOptions) {
   cleanUp()
 
   server = createHostServer({
-    uiPath,
-    uploadsPath,
+    uiDir,
+    uploadsDir,
     storeHandlers
   })
 

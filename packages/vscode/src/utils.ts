@@ -5,14 +5,14 @@ import { displayName } from './generated/meta'
 
 export const logger = defineLogger(displayName)
 
-export function ensureFile(filepath: string, content?: string) {
+export function ensureFile(filepath: string, content: string = '') {
   if (!existsSync(filepath)) {
     mkdirSync(path.dirname(filepath), { recursive: true })
-    writeFileSync(filepath, content ?? '')
+    writeFileSync(filepath, content)
   }
   const file = readFileSync(filepath, 'utf8')
   if (!file.trim()) {
-    writeFileSync(filepath, content ?? '')
+    writeFileSync(filepath, content)
   }
   return filepath
 }

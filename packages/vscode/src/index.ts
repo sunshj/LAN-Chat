@@ -63,21 +63,21 @@ const { activate, deactivate } = defineExtension(() => {
     logger.info('LAN Chat Server: <start>')
 
     const storePath = ensureFile(
-      path.join(cwd.value!, config.storePath),
+      path.join(cwd.value ?? '', config.storePath),
       JSON.stringify(defaultStore)
     )
 
-    const uploadsPath = ensureDir(path.join(cwd.value!, config.uploadsPath))
-    const uiPath = Uri.joinPath(extensionContext.value!.extensionUri!, 'res/ui').fsPath
+    const uploadsDir = ensureDir(path.join(cwd.value ?? '', config.uploadsDir))
+    const uiDir = Uri.joinPath(extensionContext.value!.extensionUri!, 'res/ui').fsPath
 
     logger.info('Store path', JSON.stringify(storePath))
-    logger.info('Uploads path', JSON.stringify(uploadsPath))
+    logger.info('Uploads path', JSON.stringify(uploadsDir))
 
     isRunning.value = await startServer({
       host: config.host,
       port: config.port,
-      uiPath,
-      uploadsPath,
+      uiDir,
+      uploadsDir,
       storeHandlers: createStoreHandlers(storePath)
     })
 
@@ -94,7 +94,7 @@ const { activate, deactivate } = defineExtension(() => {
           const panel = window.createWebviewPanel('lan-chat', 'LAN Chat', ViewColumn.One, {
             enableScripts: true,
             retainContextWhenHidden: true,
-            localResourceRoots: [Uri.file(uiPath), Uri.file(uploadsPath)]
+            localResourceRoots: [Uri.file(uiDir), Uri.file(uploadsDir)]
           })
 
           panel.webview.html = getWebviewContents(webUri.toString())

@@ -30,7 +30,6 @@
     "@types/seedrandom": "3.0.8",
     "@types/ua-parser-js": "0.7.39",
     "@unocss/nuxt": "0.61.0",
-    "@vueuse/nuxt": "10.11.0",
-    "http-proxy": "1.18.1"
+    "@vueuse/nuxt": "10.11.0"
   }
 }

@@ -12,7 +12,7 @@
 | `LANChat.autoStop`       | auto stop the server when vscode exit                         | `boolean` | `true`                   |
 | `LANChat.enableTempPath` | enable temp path, if false, use the path in current workspace | `boolean` | `true`                   |
 | `LANChat.storePath`      | the folder to store server json data                          | `string`  | `".lan-chat/store.json"` |
-| `LANChat.uploadsPath`    | the folder to store uploaded files                            | `string`  | `".lan-chat/uploads"`    |
+| `LANChat.uploadsDir`     | the folder to store uploaded files                            | `string`  | `".lan-chat/uploads"`    |
 
 <!-- configs -->
 

@@ -18,9 +18,9 @@ import { lookup } from 'mrmime'
 import { z } from 'zod'
 import { toUserStore, type StoreHandlers } from './store'
 
-interface CreateServerOptions {
-  uiPath: string
-  uploadsPath: string
+export interface CreateServerOptions {
+  uiDir: string
+  uploadsDir: string
   storeHandlers: StoreHandlers
 }
 
@@ -47,10 +47,10 @@ export function createHostServer(options: CreateServerOptions) {
       const result = await serveStatic(event, {
         fallthrough: true,
         getContents(id) {
-          return readCachedFile(join(options.uiPath, id))
+          return readCachedFile(join(options.uiDir, id))
         },
         async getMeta(id) {
-          const stats = await stat(join(options.uiPath, id)).catch(() => undefined)
+          const stats = await stat(join(options.uiDir, id)).catch(() => undefined)
           if (!stats || !stats.isFile()) return
 
           return {
@@ -78,14 +78,14 @@ export function createHostServer(options: CreateServerOptions) {
   router.get(
     '/api/user/:id',
     eventHandler(event => {
-      const uid = getRouterParam(event, 'id') as string
+      const uid = getRouterParam(event, 'id')!
       return {
         data: userStore.findOne(uid)
       }
     })
   )
 
-  const updateUserSchema = z.object({
+  const userSchema = z.object({
     username: z.string({ message: 'username is required' }).min(1)
   })
 
@@ -93,7 +93,7 @@ export function createHostServer(options: CreateServerOptions) {
     '/api/user/:id',
     eventHandler(async event => {
       const uid = getRouterParam(event, 'id') as string
-      const { username } = await readValidatedBody(event, updateUserSchema.parse)
+      const { username } = await readValidatedBody(event, userSchema.parse)
       const user = userStore.findOne(uid)
       if (!user) throw createError('user not found')
       return {
@@ -102,15 +102,11 @@ export function createHostServer(options: CreateServerOptions) {
     })
   )
 
-  const createUserSchema = z.object({
-    username: z.string({ message: 'username is required' }).min(1)
-  })
-
   router.post(
     '/api/user',
     eventHandler(async event => {
       const id = createId()
-      const { username } = await readValidatedBody(event, createUserSchema.parse)
+      const { username } = await readValidatedBody(event, userSchema.parse)
       return {
         data: userStore.mutation(id, { username })
       }
@@ -121,7 +117,7 @@ export function createHostServer(options: CreateServerOptions) {
     '/api/upload',
     eventHandler(async event => {
       const { files } = await readFiles(event, {
-        uploadDir: options.uploadsPath,
+        uploadDir: options.uploadsDir,
         encoding: 'utf-8',
         filename(_name, _ext, part) {
           return `${createId()}-${encodeURIComponent(part.originalFilename!)}`
@@ -129,7 +125,6 @@ export function createHostServer(options: CreateServerOptions) {
       })
 
       const [file] = files.file!
-      console.log('file: ', file)
 
       return {
         data: file
@@ -140,8 +135,8 @@ export function createHostServer(options: CreateServerOptions) {
   router.get(
     '/api/download/:filename',
     eventHandler(event => {
-      const filename = getRouterParam(event, 'filename') as string
-      const filePath = join(options.uploadsPath, filename)
+      const filename = getRouterParam(event, 'filename')!
+      const filePath = join(options.uploadsDir, filename)
       return createReadStream(filePath)
     })
   )
