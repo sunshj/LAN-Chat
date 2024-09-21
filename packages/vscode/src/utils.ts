@@ -27,17 +27,17 @@ export function ensureDir(dir: string) {
 export function getWebviewContents(iframeUrl: string) {
   return `<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            padding: 0;
-        }
+      body {
+        margin: 0;
+        height: 100vh;
+        padding: 0;
+      }
     </style>
-</head>
-<body>
-    <iframe src=${iframeUrl} width="100%" height="100%" frameborder="0" allow="fullscreen"></iframe>
-</body>
+  </head>
+  <body>
+    <iframe src="${iframeUrl}" width="100%" height="100%" frameborder="0" allow="fullscreen"></iframe>
+  </body>
 </html>`
 }
