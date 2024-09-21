@@ -1,14 +1,15 @@
-import { Server } from 'socket.io'
 import { z } from 'zod'
-import { chatEventHandler } from './events'
 import { createHostServer, type CreateServerOptions } from './server'
+import { createWsServer } from './ws'
 import type http from 'node:http'
+import type { WebSocketServer } from 'ws'
 
-export * from './types'
+export * from './client'
 export * from './store'
+export * from './types'
 
 let server: http.Server | null
-let io: Server | null
+let wss: WebSocketServer | null
 
 interface StartServerOptions extends CreateServerOptions {
   host: string
@@ -23,9 +24,9 @@ function cleanUp() {
     })
   }
 
-  if (io) {
-    io?.close(() => {
-      io = null
+  if (wss) {
+    wss?.close(() => {
+      wss = null
     })
   }
 }
@@ -54,14 +55,7 @@ export async function startServer(options: StartServerOptions) {
     storeHandlers
   })
 
-  io = new Server(server, {
-    transports: ['websocket'],
-    maxHttpBufferSize: 1e8
-  })
-
-  io.on('connection', socket => {
-    chatEventHandler(io!, socket)
-  })
+  wss = createWsServer(server)
 
   return await new Promise<boolean>(resolve => {
     server?.listen(data.port, data.host, async () => {
@@ -72,7 +66,7 @@ export async function startServer(options: StartServerOptions) {
 }
 
 export function stopServer() {
-  io?.emit('message', 'Server is shutting down')
+  wss?.broadcast('Server is shutting down')
   cleanUp()
   return server?.listening ?? false
 }

@@ -18,7 +18,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      WS_URL: process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:3000' : '/'
+      wsUrl: process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:3000' : '/'
     }
   },
 

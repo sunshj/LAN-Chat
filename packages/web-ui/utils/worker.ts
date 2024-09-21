@@ -18,7 +18,7 @@ export type WorkerEventData = {
  * 提取事件数据(类型安全)
  * @param event
  */
-export function extractData(event: MessageEvent<WorkerEventData>) {
+export function extractWorkerData(event: MessageEvent<WorkerEventData>) {
   return event.data
 }
 
@@ -27,6 +27,6 @@ export function extractData(event: MessageEvent<WorkerEventData>) {
  * @param type
  * @param payload
  */
-export function createMessage<T extends keyof EventData>(type: T, payload: EventData[T]) {
+export function createWorkerMessage<T extends keyof EventData>(type: T, payload: EventData[T]) {
   return { type, payload }
 }

@@ -15,6 +15,11 @@
       "types": "./dist/index.d.ts",
       "require": "./dist/index.js",
       "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "require": "./dist/client.js",
+      "import": "./dist/client.js"
     }
   },
   "typesVersions": {
@@ -36,10 +41,11 @@
     "h3": "1.12.0",
     "h3-formidable": "^1.0.0",
     "mrmime": "^2.0.0",
-    "socket.io": "^4.7.5",
+    "ws": "^8.18.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/formidable": "^3.4.5"
+    "@types/formidable": "^3.4.5",
+    "@types/ws": "^8.5.12"
   }
 }

@@ -52,10 +52,12 @@
           v-model="message"
           :on-upload-progress="onUploadProgress"
           :on-upload-success="onUploadSuccess"
-          @enter="send()"
+          @enter="sendMessage()"
         />
       </div>
-      <ElButton type="primary" size="large" :disabled="!message" @click="send()">Send</ElButton>
+      <ElButton type="primary" size="large" :disabled="!message" @click="sendMessage()">
+        Send
+      </ElButton>
     </footer>
   </div>
 </template>
@@ -69,7 +71,7 @@ const route = useRoute()
 const appStore = useAppStore()
 const fileStore = useFileStore()
 
-const { $contextmenu, $socket, $fileWorker } = useNuxtApp()
+const { $contextmenu, $fileWorker, $ws } = useNuxtApp()
 
 const message = ref('')
 
@@ -87,7 +89,7 @@ const scrollToBottom = useDebounceFn(() => {
   } else {
     appStore.setInitialScrolled(true)
   }
-})
+}, 1500)
 
 const currentSelectMid = ref('')
 const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid.value))
@@ -170,11 +172,12 @@ const currentChatIsOnline = computed(() => {
   return appStore.onlineUsers.map(u => u.id).includes(appStore.currentChatUser.id)
 })
 
-const send = useThrottleFn(() => {
+const sendMessage = useThrottleFn(() => {
   if (!message.value.trim()) return
   if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
   const msg = appStore.addMessage(message.value)
-  $socket.emit('$new-message', msg)
+  $ws.send(createWsMessage('$new-message', msg))
+
   message.value = ''
 
   nextTick(() => {
@@ -210,25 +213,20 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
 
   const msg = appStore.addMessage(newFilename, { type, payload })
   fileStore.fileStatus.push({ file: msg.content, download: true })
-  $socket.emit('$new-message', msg)
+  $ws.send(createWsMessage('$new-message', msg))
   nextTick(() => {
     scrollToBottom()
   })
 }
 
-function handleNewMessage(msg: Message) {
-  if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
-    msg.read = true
+watch($ws.data, newData => {
+  const { type } = parseWsMessage(newData)
+  if (type === '$new-message') {
+    nextTick(() => {
+      scrollToBottom()
+    })
   }
-
-  if (msg.type !== 'text') {
-    fileStore.fileStatus.push({ file: msg.content, download: true })
-  }
-
-  nextTick(() => {
-    scrollToBottom()
-  })
-}
+})
 
 onBeforeMount(() => {
   appStore.setInitialScrolled(false)
@@ -244,7 +242,7 @@ onMounted(() => {
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
     if (fileMessages.length > 0) {
       $fileWorker.postMessage(
-        createMessage(
+        createWorkerMessage(
           'checkFile',
           fileMessages.map(v => v.content)
         )
@@ -256,8 +254,6 @@ onMounted(() => {
       textFieldRef.value?.focus()
     })
   }
-
-  $socket.on('$new-message', handleNewMessage)
 })
 
 onBeforeUnmount(() => {
@@ -266,7 +262,6 @@ onBeforeUnmount(() => {
   appStore.clearCurrentChatUser()
   fileStore.setFileStatus([])
   fileStore.setMarkdown([])
-  $socket.off('$new-message', handleNewMessage)
 })
 </script>
 

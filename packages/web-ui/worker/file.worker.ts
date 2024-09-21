@@ -1,5 +1,5 @@
 import { formatFileUrl } from '../utils/shared'
-import { createMessage, extractData } from '../utils/worker'
+import { createWorkerMessage, extractWorkerData } from '../utils/worker'
 
 async function checkFileStatus(file: string) {
   try {
@@ -20,11 +20,11 @@ async function checkFileStatus(file: string) {
 }
 
 self.addEventListener('message', async event => {
-  const { type, payload } = extractData(event)
+  const { type, payload } = extractWorkerData(event)
 
   if (type === 'checkFile') {
     const promises = payload.map(v => checkFileStatus(v))
     const result = await Promise.all(promises)
-    self.postMessage(createMessage('checkFileReply', result))
+    self.postMessage(createWorkerMessage('checkFileReply', result))
   }
 })
