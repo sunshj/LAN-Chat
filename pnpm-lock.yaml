@@ -24,6 +24,11 @@ overrides:
   string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@^1
   typedarray: npm:@nolyfill/typedarray@^1
 
+patchedDependencies:
+  regex@4.3.2:
+    hash: h7hkaqr5f2jpi6rdquzcktueli
+    path: patches/regex@4.3.2.patch
+
 importers:
 
   .:
@@ -10047,7 +10052,7 @@ packages:
   /oniguruma-to-js@0.4.3:
     resolution: {integrity: sha512-X0jWUcAlxORhOqqBREgPMgnshB7ZGYszBNspP+tS9hPD3l13CdaXcHbgImoHUHlrvGx/7AvFEkTRhAGYh+jzjQ==}
     dependencies:
-      regex: 4.3.2
+      regex: 4.3.2(patch_hash=h7hkaqr5f2jpi6rdquzcktueli)
     dev: false
 
   /open@8.4.2:
@@ -10972,9 +10977,10 @@ packages:
       '@eslint-community/regexpp': 4.11.0
     dev: true
 
-  /regex@4.3.2:
+  /regex@4.3.2(patch_hash=h7hkaqr5f2jpi6rdquzcktueli):
     resolution: {integrity: sha512-kK/AA3A9K6q2js89+VMymcboLOlF5lZRCYJv3gzszXFHBr6kO6qLGzbm+UIugBEV8SMMKCTR59txoY6ctRHYVw==}
     dev: false
+    patched: true
 
   /regexp-ast-analysis@0.7.1:
     resolution: {integrity: sha512-sZuz1dYW/ZsfG17WSAG7eS85r5a0dDsvg+7BiiYR5o6lKCAtUrEwdmRmaGF6rwVj3LcmAeYkOWKEPlbPzN3Y3A==}

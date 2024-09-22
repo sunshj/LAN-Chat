@@ -94,6 +94,9 @@
       "side-channel": "npm:@nolyfill/side-channel@^1",
       "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@^1",
       "typedarray": "npm:@nolyfill/typedarray@^1"
+    },
+    "patchedDependencies": {
+      "regex@4.3.2": "patches/regex@4.3.2.patch"
     }
   },
   "lint-staged": {
