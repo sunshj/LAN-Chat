@@ -7,30 +7,48 @@
 
 <script setup lang="ts">
 const appStore = useAppStore()
+const fileStore = useFileStore()
+const { $ws } = useNuxtApp()
 
-const { $socket } = useNuxtApp()
-
-onMounted(() => {
-  appStore.cleanUselessChat()
-
-  $socket.on('connect', async () => {
+watch($ws.status, async newStatus => {
+  if (newStatus === 'OPEN') {
     const storageUid = appStore.userInfo.id || 'invalid_uid'
     const userExist = await appStore.fetchUser(storageUid)
+
     if (userExist) {
-      $socket.emit('$user-online', appStore.userInfo.id)
+      $ws.send(createWsMessage('$user-online', appStore.userInfo.id))
     } else {
       const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
       appStore.setUserInfo(user)
-      $socket.emit('$user-online', user.id)
+      $ws.send(createWsMessage('$user-online', user.id))
     }
-  })
+  }
 
-  $socket.on('$new-message', msg => {
+  if (newStatus === 'CLOSED') {
+    appStore.setOnlineUsers([])
+  }
+})
+
+watch($ws.data, async newData => {
+  const { type, payload } = parseWsMessage(newData)
+  if (type === '$new-message') {
+    const msg = payload
     if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
     appStore.messages[msg.cid].push(msg)
-  })
 
-  $socket.on('$get-users', async usersId => {
+    // set message read
+    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
+      msg.read = true
+    }
+
+    // set file downloaded
+    if (msg.type !== 'text') {
+      fileStore.fileStatus.push({ file: msg.content, download: true })
+    }
+  }
+
+  if (type === '$get-users') {
+    const usersId = payload
     const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
     const allUsers = await appStore.fetchUsers()
     appStore.setUsers(allUsers)
@@ -41,16 +59,11 @@ onMounted(() => {
     if (currentChatUser) {
       appStore.setCurrentChatUser(currentChatUser)
     }
-  })
-
-  $socket.on('disconnect', () => {
-    appStore.setOnlineUsers([])
-  })
+  }
 })
 
-onBeforeUnmount(() => {
-  $socket.off('$new-message')
-  $socket.off('$get-users')
+onBeforeMount(() => {
+  appStore.cleanUselessChat()
 })
 </script>
 

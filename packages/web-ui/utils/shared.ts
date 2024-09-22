@@ -1,4 +1,9 @@
 import axios from 'axios'
+import {
+  defineWsMessageHandler,
+  type WebSocketClientToServerMessage,
+  type WebSocketServerToClientMessage
+} from 'lan-chat-server/client'
 import parser from 'ua-parser-js'
 
 export function getDeviceName(ua: string) {
@@ -87,3 +92,10 @@ export function withResolvers<T>() {
     reject: reject!
   }
 }
+
+const { createWsMessage, parseWsMessage } = defineWsMessageHandler<
+  WebSocketClientToServerMessage,
+  WebSocketServerToClientMessage
+>()
+
+export { createWsMessage, parseWsMessage }

@@ -1,70 +1,64 @@
-import http from 'node:http'
-import express from 'express'
-import { Server } from 'socket.io'
-import { createApiRouter } from './api'
-import { chatEventHandler } from './events'
-import { toUserStore, type StoreHandlers } from './store'
+import { z } from 'zod'
+import { createHostServer, type CreateServerOptions } from './server'
+import { createWsServer } from './ws'
+import type http from 'node:http'
+import type { WebSocketServer } from 'ws'
 
-export * from './types'
+export * from './client'
 export * from './store'
+export * from './types'
 
-let server: http.Server
-let io: Server
+let server: http.Server | null
+let wss: WebSocketServer | null
 
-interface StartServerOptions {
+interface StartServerOptions extends CreateServerOptions {
   host: string
   port: number
-  uiPath: string
-  uploadsPath: string
-  storeHandlers: StoreHandlers
-  onListening?: (host: string, port: number) => void
+  onListening?: (host: string, port: number) => void | Promise<void>
 }
 
+function cleanUp() {
+  wss?.close()
+  wss?.clients.forEach(client => client.terminate())
+  server?.close()
+}
+
+const portSchema = z.object({
+  port: z
+    .number()
+    .int()
+    .min(1)
+    .max(65535)
+    .refine(n => n !== 443, 'Port 443 is not allowed'),
+  host: z.string().min(1).ip({ version: 'v4' }).or(z.literal('localhost'))
+})
+
 export async function startServer(options: StartServerOptions) {
-  const { host, port, uiPath, uploadsPath, onListening, storeHandlers } = options
+  const { host, port, uiDir, uploadsDir, onListening, storeHandlers } = options
 
-  if (!Number.isInteger(port) || port <= 0 || port > 65535 || port === 443) {
-    throw new Error('Invalid port number')
-  }
-  if (server) {
-    io.close()
-    server.close()
-  }
-  const app = express()
-  server = http.createServer(app)
-  io = new Server(server, {
-    transports: ['websocket'],
-    maxHttpBufferSize: 1e8
+  const { error, data } = portSchema.safeParse({ host, port })
+  if (error) throw new Error(error.errors.map(e => e.message).join(', '))
+
+  cleanUp()
+
+  server = createHostServer({
+    uiDir,
+    uploadsDir,
+    storeHandlers
   })
 
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: true }))
-  app.use(express.static(uiPath))
-
-  app.use('/api', createApiRouter(toUserStore(storeHandlers), uploadsPath))
-  app.all('/*', (_req, res) => {
-    res.redirect('/404.html')
-  })
-
-  io.on('connection', socket => {
-    /** chat socket handle  */
-    chatEventHandler(io, socket)
-  })
+  wss = createWsServer(server)
 
   return await new Promise<boolean>(resolve => {
-    server.listen(port, host, () => {
-      onListening?.(host, port)
-      resolve(server.listening)
+    server?.listen(data.port, data.host, async () => {
+      await onListening?.(host, port)
+      resolve(server?.listening ?? false)
     })
   })
 }
 
 export function stopServer() {
-  if (server) {
-    io.emit('message', 'Server is shutting down')
-    io.close()
-    server.close()
-  }
-
-  return server.listening
+  wss?.broadcast('Server is shutting down')
+  cleanUp()
+  return server?.listening ?? false
 }

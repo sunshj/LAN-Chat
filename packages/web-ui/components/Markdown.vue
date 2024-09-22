@@ -48,13 +48,13 @@ watchEffect(() => {
         }
       })
 
-      $mdWorker.postMessage(createMessage('markdownParse', toRaw(fileStore.markdown)))
+      $mdWorker.postMessage(createWorkerMessage('markdownParse', toRaw(fileStore.markdown)))
     })
   }
 })
 
 function handleMarkdownParseReply(event: MessageEvent) {
-  const { type, payload } = extractData(event)
+  const { type, payload } = extractWorkerData(event)
 
   if (type === 'markdownParseReply') {
     if (mdRef.value && mdRef.value.dataset.render) return

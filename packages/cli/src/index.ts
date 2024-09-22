@@ -1,14 +1,15 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { defineCommand, runMain } from 'citty'
-import { startServer } from 'lan-chat-server'
+import { startServer, stopServer } from 'lan-chat-server'
 import { version as pkgVersion } from '../package.json'
 import { storeHandlers, storePath } from './store'
 
 const __filename = fileURLToPath(import.meta.url)
-const uploadsPath = `${tmpdir()}/lan-chat-cli-uploads`
+const uploadsDir = `${tmpdir()}/lan-chat-cli-uploads`
 
 const main = defineCommand({
   meta: {
@@ -36,7 +37,8 @@ const main = defineCommand({
     verbose: {
       description: 'Enable verbose logging',
       type: 'boolean',
-      default: false
+      default: false,
+      alias: 'v'
     }
   },
 
@@ -46,33 +48,44 @@ const main = defineCommand({
       rmSync(storePath, { recursive: true })
     }
 
-    if (clean && existsSync(uploadsPath)) {
-      rmSync(uploadsPath, { recursive: true })
+    if (clean && existsSync(uploadsDir)) {
+      rmSync(uploadsDir, { recursive: true })
     }
 
     console.log(`Listening on http://${host}:${port}`)
 
     if (verbose) {
       console.log('storePath: ', storePath)
-      console.log('uploadsPath: ', uploadsPath)
+      console.log('uploadsDir: ', uploadsDir)
     }
 
     if (!existsSync(storePath)) {
       writeFileSync(storePath, JSON.stringify({ users: [] }))
     }
 
-    if (!existsSync(uploadsPath)) {
-      mkdirSync(uploadsPath, { recursive: true })
+    if (!existsSync(uploadsDir)) {
+      mkdirSync(uploadsDir, { recursive: true })
     }
 
     await startServer({
       host,
       port: Number(port),
-      uiPath: path.resolve(__filename, '../..', 'ui'),
-      uploadsPath,
+      uiDir: path.resolve(__filename, '../..', 'ui'),
+      uploadsDir,
       storeHandlers
     })
   }
 })
 
 runMain(main)
+
+const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGKILL']
+
+function exitHandler() {
+  stopServer()
+  process.exit(0)
+}
+
+signals.forEach(signal => {
+  process.on(signal, exitHandler)
+})

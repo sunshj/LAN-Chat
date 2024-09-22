@@ -91,7 +91,7 @@
           "default": ".lan-chat/store.json",
           "description": "the folder to store server json data"
         },
-        "LANChat.uploadsPath": {
+        "LANChat.uploadsDir": {
           "type": "string",
           "scope": "window",
           "default": ".lan-chat/uploads",

@@ -24,7 +24,7 @@ export async function getAudioFileInfo(file: File) {
     const [pic] = common.picture
     const coverFile = new File([pic.data], coverName, { type: pic.format })
     const res = await uploadFile(coverFile)
-    info.pic = res.data.filename
+    info.pic = res.data.newFilename
   }
 
   return info

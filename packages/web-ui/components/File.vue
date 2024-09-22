@@ -60,7 +60,7 @@ async function preview() {
 }
 
 function handleCheckFileReply(event: MessageEvent) {
-  const { type, payload } = extractData(event)
+  const { type, payload } = extractWorkerData(event)
 
   if (type === 'checkFileReply') {
     fileStore.setFileStatus(payload)
