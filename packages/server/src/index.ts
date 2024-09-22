@@ -18,17 +18,9 @@ interface StartServerOptions extends CreateServerOptions {
 }
 
 function cleanUp() {
-  if (server) {
-    server?.close(() => {
-      server = null
-    })
-  }
-
-  if (wss) {
-    wss?.close(() => {
-      wss = null
-    })
-  }
+  wss?.close()
+  wss?.clients.forEach(client => client.terminate())
+  server?.close()
 }
 
 const portSchema = z.object({
