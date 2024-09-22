@@ -12,7 +12,7 @@
     "!*.config.{js,ts,mjs,cjs}",
     "!{dev-app-update.yml,CHANGELOG.md,README.md}",
     "!{.env,.env.*,.npmrc,pnpm-lock.yaml,pnpm-workspace.yaml}",
-    "!{tsconfig?(.*).json}"
+    "!{tsconfig.json,tsconfig.web.json,tsconfig.node.json}"
   ],
   "asarUnpack": ["resources/**"],
   "afterPack": "./scripts/after-pack.cjs",
