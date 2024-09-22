@@ -19,8 +19,8 @@ export type WebSocketMessageData<T> = {
   }
 }[keyof T]
 
-export function defineWsMessageHandler<M>() {
-  function createWsMessage<T extends M, K extends keyof T = keyof T>(
+export function defineWsMessageHandler<ServerMessage, ClientMessage>() {
+  function createWsMessage<T extends ServerMessage, K extends keyof T = keyof T>(
     ...args: T[K] extends never
       ? Parameters<(type: K) => 0>
       : Parameters<(type: K, payload: T[K]) => 0>
@@ -28,7 +28,7 @@ export function defineWsMessageHandler<M>() {
     return JSON.stringify(args)
   }
 
-  function parseWsMessage<T = M>(message: any) {
+  function parseWsMessage<T = ClientMessage>(message: any) {
     try {
       const [type, payload] = JSON.parse(message.toString())
       const data = { type, payload }

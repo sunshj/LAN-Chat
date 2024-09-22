@@ -18,8 +18,10 @@ declare module 'ws' {
 export function createWsServer(server: http.Server) {
   const wss = new WebSocketServer({ server, maxPayload: 1e8 })
 
-  const { createWsMessage } = defineWsMessageHandler<WebSocketServerToClientMessage>()
-  const { parseWsMessage } = defineWsMessageHandler<WebSocketClientToServerMessage>()
+  const { createWsMessage, parseWsMessage } = defineWsMessageHandler<
+    WebSocketServerToClientMessage,
+    WebSocketClientToServerMessage
+  >()
 
   function broadcast(data: string) {
     wss.clients.forEach((ws: WebSocket) => {

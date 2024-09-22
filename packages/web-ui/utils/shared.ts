@@ -93,7 +93,9 @@ export function withResolvers<T>() {
   }
 }
 
-const { parseWsMessage } = defineWsMessageHandler<WebSocketServerToClientMessage>()
-const { createWsMessage } = defineWsMessageHandler<WebSocketClientToServerMessage>()
+const { createWsMessage, parseWsMessage } = defineWsMessageHandler<
+  WebSocketClientToServerMessage,
+  WebSocketServerToClientMessage
+>()
 
 export { createWsMessage, parseWsMessage }

@@ -37,16 +37,13 @@ watch($ws.data, async newData => {
     appStore.messages[msg.cid].push(msg)
 
     // set message read
-    if (
-      payload.receiver === appStore.userInfo.id &&
-      payload.sender === appStore.currentChatUser.id
-    ) {
-      payload.read = true
+    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
+      msg.read = true
     }
 
     // set file downloaded
-    if (payload.type !== 'text') {
-      fileStore.fileStatus.push({ file: payload.content, download: true })
+    if (msg.type !== 'text') {
+      fileStore.fileStatus.push({ file: msg.content, download: true })
     }
   }
 
