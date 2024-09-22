@@ -3,14 +3,13 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, dialog, Menu, shell, Tray } from 'electron'
-// import icon from '../../resources/icon.png?asset'
 import { ipcHandler } from './ipc'
 import { createMenu, createTrayMenu } from './menu'
 import { store } from './store'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const currentDirname = dirname(fileURLToPath(import.meta.url))
 
-const icon = join(__dirname, '../../resources/icon.png')
+const icon = join(currentDirname, '../../resources/icon.png')
 
 function createWindow(): void {
   // Create the browser window.
@@ -22,7 +21,7 @@ function createWindow(): void {
     icon,
     webPreferences: {
       devTools: true,
-      preload: join(__dirname, '../preload/index.mjs'),
+      preload: join(currentDirname, '../preload/index.mjs'),
       sandbox: false
     }
   })
@@ -43,7 +42,7 @@ function createWindow(): void {
   if (is.dev && process.env.ELECTRON_RENDERER_URL) {
     mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(currentDirname, '../renderer/index.html'))
   }
 
   mainWindow.on('close', event => {
