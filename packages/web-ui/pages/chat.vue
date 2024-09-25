@@ -71,7 +71,7 @@ const route = useRoute()
 const appStore = useAppStore()
 const fileStore = useFileStore()
 
-const { $contextmenu, $fileWorker, $ws } = useNuxtApp()
+const { $contextmenu, $fileWorker, $socket } = useNuxtApp()
 
 const message = ref('')
 
@@ -89,7 +89,7 @@ const scrollToBottom = useDebounceFn(() => {
   } else {
     appStore.setInitialScrolled(true)
   }
-}, 1500)
+}, 1000)
 
 const currentSelectMid = ref('')
 const currentSelectMessage = computed(() => appStore.getMessage(currentSelectMid.value))
@@ -176,7 +176,7 @@ const sendMessage = useThrottleFn(() => {
   if (!message.value.trim()) return
   if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
   const msg = appStore.addMessage(message.value)
-  $ws.send(createWsMessage('$new-message', msg))
+  $socket.invoke('$new-message', msg)
 
   message.value = ''
 
@@ -213,19 +213,17 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
 
   const msg = appStore.addMessage(newFilename, { type, payload })
   fileStore.fileStatus.push({ file: msg.content, download: true })
-  $ws.send(createWsMessage('$new-message', msg))
+  $socket.invoke('$new-message', msg)
+
   nextTick(() => {
     scrollToBottom()
   })
 }
 
-watch($ws.data, newData => {
-  const { type } = parseWsMessage(newData)
-  if (type === '$new-message') {
-    nextTick(() => {
-      scrollToBottom()
-    })
-  }
+$socket.handle('$new-message', () => {
+  nextTick(() => {
+    scrollToBottom()
+  })
 })
 
 onBeforeMount(() => {

@@ -8,57 +8,50 @@
 <script setup lang="ts">
 const appStore = useAppStore()
 const fileStore = useFileStore()
-const { $ws } = useNuxtApp()
+const { $socket } = useNuxtApp()
 
-watch($ws.status, async newStatus => {
-  if (newStatus === 'OPEN') {
-    const storageUid = appStore.userInfo.id || 'invalid_uid'
-    const userExist = await appStore.fetchUser(storageUid)
+$socket.on('open', async () => {
+  const storageUid = appStore.userInfo.id || 'invalid_uid'
+  const userExist = await appStore.fetchUser(storageUid)
 
-    if (userExist) {
-      $ws.send(createWsMessage('$user-online', appStore.userInfo.id))
-    } else {
-      const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
-      appStore.setUserInfo(user)
-      $ws.send(createWsMessage('$user-online', user.id))
-    }
-  }
-
-  if (newStatus === 'CLOSED') {
-    appStore.setOnlineUsers([])
+  if (userExist) {
+    $socket.invoke('$user-online', appStore.userInfo.id)
+  } else {
+    const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
+    appStore.setUserInfo(user)
+    $socket.invoke('$user-online', user.id)
   }
 })
 
-watch($ws.data, async newData => {
-  const { type, payload } = parseWsMessage(newData)
-  if (type === '$new-message') {
-    const msg = payload
-    if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
-    appStore.messages[msg.cid].push(msg)
+$socket.on('close', () => {
+  appStore.setOnlineUsers([])
+})
 
-    // set message read
-    if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
-      msg.read = true
-    }
+$socket.handle('$new-message', msg => {
+  if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
+  appStore.messages[msg.cid].push(msg)
 
-    // set file downloaded
-    if (msg.type !== 'text') {
-      fileStore.fileStatus.push({ file: msg.content, download: true })
-    }
+  // set message read
+  if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
+    msg.read = true
   }
 
-  if (type === '$get-users') {
-    const usersId = payload
-    const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
-    const allUsers = await appStore.fetchUsers()
-    appStore.setUsers(allUsers)
-    const onlineUsers = allUsers.filter(user => remainIds.includes(user.id))
-    appStore.setOnlineUsers(onlineUsers)
-    // currentChatUser rename
-    const currentChatUser = onlineUsers.find(user => user.id === appStore.currentChatUser.id)
-    if (currentChatUser) {
-      appStore.setCurrentChatUser(currentChatUser)
-    }
+  // set file downloaded
+  if (msg.type !== 'text') {
+    fileStore.fileStatus.push({ file: msg.content, download: true })
+  }
+})
+
+$socket.handle('$get-users', async usersId => {
+  const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
+  const allUsers = await appStore.fetchUsers()
+  appStore.setUsers(allUsers)
+  const onlineUsers = allUsers.filter(user => remainIds.includes(user.id))
+  appStore.setOnlineUsers(onlineUsers)
+
+  const currentChatUser = onlineUsers.find(user => user.id === appStore.currentChatUser.id)
+  if (currentChatUser) {
+    appStore.setCurrentChatUser(currentChatUser)
   }
 })
 

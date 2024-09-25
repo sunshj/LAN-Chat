@@ -41,3 +41,45 @@ export function defineWsMessageHandler<ServerMessage, ClientMessage>() {
 
   return { createWsMessage, parseWsMessage }
 }
+
+export class WebSocketClient<
+  CTS = WebSocketClientToServerMessage,
+  STC = WebSocketServerToClientMessage
+> {
+  private parseMessage: (message: any) => WebSocketMessageData<STC>
+
+  constructor(public ws: WebSocket) {
+    const { parseWsMessage } = defineWsMessageHandler()
+    this.parseMessage = parseWsMessage
+  }
+
+  invoke<K extends keyof CTS>(
+    ...args: CTS[K] extends never
+      ? Parameters<(type: K) => 0>
+      : Parameters<(type: K, payload: CTS[K]) => 0>
+  ) {
+    this.ws.send(JSON.stringify(args))
+  }
+
+  handle<K extends keyof STC>(
+    ...args: STC[K] extends never
+      ? Parameters<(name: K, listener: () => void) => 0>
+      : Parameters<(name: K, listener: (payload: STC[K]) => void) => 0>
+  ) {
+    const [name, listener] = args
+    this.ws.addEventListener('message', event => {
+      const { type, payload } = this.parseMessage(event.data)
+      if (name === type) {
+        listener(payload as STC[K])
+      }
+    })
+  }
+
+  /** alias of `WebSocket.addEventListener`  */
+  on<K extends keyof WebSocketEventMap>(
+    name: K,
+    listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any
+  ) {
+    this.ws.addEventListener(name, listener)
+  }
+}
