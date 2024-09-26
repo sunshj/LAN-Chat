@@ -7,9 +7,9 @@ export const useFileStore = defineStore(
       fileStatus.value = newFileStatus
     }
 
-    const markdown = ref<MarkdownParse[]>([])
+    const markdown = ref<ParsedMarkdown[]>([])
 
-    function setMarkdown(md: MarkdownParse[] | ((prev: MarkdownParse[]) => MarkdownParse[])) {
+    function setMarkdown(md: ParsedMarkdown[] | ((prev: ParsedMarkdown[]) => ParsedMarkdown[])) {
       if (Array.isArray(md)) {
         markdown.value = toRaw(md)
       } else {

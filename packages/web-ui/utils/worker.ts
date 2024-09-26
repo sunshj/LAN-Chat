@@ -1,11 +1,11 @@
 export type WorkerEventsMap = {
   'check-file': string[]
-  'parse-markdown': MarkdownParse[]
+  'parse-markdown': ParsedMarkdown[]
 }
 
 export type ReplyEventsMap = {
   'check-file-reply': FileStatus[]
-  'parse-markdown-reply': MarkdownParse[]
+  'parse-markdown-reply': ParsedMarkdown[]
 }
 
 export type WorkerEventData<T> = {
