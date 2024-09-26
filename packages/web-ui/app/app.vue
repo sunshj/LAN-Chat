@@ -10,8 +10,13 @@ const appStore = useAppStore()
 const fileStore = useFileStore()
 const { $socket } = useNuxtApp()
 
-$socket.on('connect', async () => {
+onBeforeMount(() => {
+  appStore.cleanUselessChat()
+})
+
+async function onConnect() {
   const storageUid = appStore.userInfo.id || 'invalid_uid'
+  console.log('storageUid: ', storageUid)
   const userExist = await appStore.fetchUser(storageUid)
 
   if (userExist) {
@@ -21,15 +26,15 @@ $socket.on('connect', async () => {
     appStore.setUserInfo(user)
     $socket.emit('$user-online', user.id)
   }
-})
+}
 
-$socket.on('disconnect', () => {
+function onDisconnect() {
   appStore.setOnlineUsers([])
-})
+}
 
-$socket.on('$new-message', msg => {
+function handleNewMessage(msg: Message) {
   if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
-  appStore.messages[msg.cid].push(msg)
+  appStore.messages[msg.cid]!.push(msg)
 
   // set message read
   if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
@@ -40,9 +45,9 @@ $socket.on('$new-message', msg => {
   if (msg.type !== 'text') {
     fileStore.fileStatus.push({ file: msg.content, download: true })
   }
-})
+}
 
-$socket.on('$get-users', async usersId => {
+async function handleGetUsers(usersId: string[]) {
   const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
   const allUsers = await appStore.fetchUsers()
   appStore.setUsers(allUsers)
@@ -53,15 +58,18 @@ $socket.on('$get-users', async usersId => {
   if (currentChatUser) {
     appStore.setCurrentChatUser(currentChatUser)
   }
-})
+}
 
-onBeforeMount(() => {
-  appStore.cleanUselessChat()
-})
+$socket.on('connect', onConnect)
+$socket.on('$new-message', handleNewMessage)
+$socket.on('$get-users', handleGetUsers)
+$socket.on('disconnect', onDisconnect)
 
 onBeforeUnmount(() => {
-  $socket.off('$new-message')
-  $socket.off('$get-users')
+  $socket.off('connect', onConnect)
+  $socket.off('disconnect', onDisconnect)
+  $socket.off('$new-message', handleNewMessage)
+  $socket.off('$get-users', handleGetUsers)
 })
 </script>
 

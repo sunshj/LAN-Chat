@@ -17,8 +17,8 @@ export async function getAudioFileInfo(file: File) {
   const filename = file.name.slice(0, file.name.lastIndexOf('.'))
   const coverName = `${file?.name}-cover.jpg`
 
-  info.title = common.title || filename.includes('-') ? filename.split('-')[1] : filename
-  info.artist = common.artist || filename.includes('-') ? filename.split('-')[0] : ''
+  info.title = common.title || (filename.includes('-') ? filename.split('-')[1] : filename)
+  info.artist = common.artist || (filename.includes('-') ? filename.split('-')[0] : '')
 
   if (common.picture && common.picture.length > 0) {
     const [pic] = common.picture

@@ -1,4 +1,4 @@
-import FileWorker from '@/worker?worker'
+import FileWorker from '../worker?worker'
 
 export default defineNuxtPlugin(() => {
   const worker = new WorkerClient(new FileWorker())

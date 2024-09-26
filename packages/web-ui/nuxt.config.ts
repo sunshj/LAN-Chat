@@ -6,6 +6,8 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   sourcemap: false,
 
+  srcDir: './app',
+
   app: {
     head: {
       title: 'LAN Chat'
@@ -36,7 +38,7 @@ export default defineNuxtConfig({
   },
 
   imports: {
-    dirs: ['stores']
+    dirs: ['./app/stores']
   },
 
   elementPlus: {
@@ -51,7 +53,6 @@ export default defineNuxtConfig({
     worker: {
       format: 'es'
     },
-
     server: {
       hmr: {
         clientPort: 8080

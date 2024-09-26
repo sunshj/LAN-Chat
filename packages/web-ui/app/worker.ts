@@ -66,7 +66,7 @@ server.on('parse-markdown', async payload => {
 
   const result = data.map((item, index) => {
     if (item.status === 'fulfilled') return item.value
-    return { ...payload[index], error: '无法解析为 Markdown' }
+    return { ...payload[index]!, error: '无法解析为 Markdown' }
   })
 
   server.emit('parse-markdown-reply', result)
