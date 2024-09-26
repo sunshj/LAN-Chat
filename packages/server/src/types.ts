@@ -1,5 +1,5 @@
 import type { FileJSON } from 'formidable'
-import type { Server, Socket } from 'socket.io'
+import type { Server } from 'socket.io'
 
 export type UploadedFile = FileJSON
 
