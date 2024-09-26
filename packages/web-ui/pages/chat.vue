@@ -242,11 +242,9 @@ onMounted(() => {
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
     if (fileMessages.length > 0) {
-      $fileWorker.postMessage(
-        createWorkerMessage(
-          'checkFile',
-          fileMessages.map(v => v.content)
-        )
+      $fileWorker.invoke(
+        'check-file',
+        fileMessages.map(v => v.content)
       )
     }
 

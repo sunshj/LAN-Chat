@@ -50,6 +50,12 @@ export default defineNuxtConfig({
   vite: {
     worker: {
       format: 'es'
+    },
+
+    server: {
+      hmr: {
+        clientPort: 8080
+      }
     }
   },
 

@@ -1,5 +1,5 @@
 import { formatFileUrl } from '../utils/shared'
-import { createWorkerMessage, extractWorkerData } from '../utils/worker'
+import { WorkerClient } from '../utils/worker'
 
 async function checkFileStatus(file: string) {
   try {
@@ -11,7 +11,7 @@ async function checkFileStatus(file: string) {
       download: response.ok
     }
   } catch (error) {
-    console.log('checkFileStatus error:', error)
+    console.error('checkFileStatus error:', error)
     return {
       file,
       download: false
@@ -20,11 +20,11 @@ async function checkFileStatus(file: string) {
 }
 
 self.addEventListener('message', async event => {
-  const { type, payload } = extractWorkerData(event)
+  const { type, payload } = WorkerClient.parse(event)
 
-  if (type === 'checkFile') {
+  if (type === 'check-file') {
     const promises = payload.map(v => checkFileStatus(v))
     const result = await Promise.all(promises)
-    self.postMessage(createWorkerMessage('checkFileReply', result))
+    self.postMessage(WorkerClient.replyFormat('check-file-reply', result))
   }
 })

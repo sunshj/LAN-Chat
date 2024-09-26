@@ -59,19 +59,11 @@ async function preview() {
   }
 }
 
-function handleCheckFileReply(event: MessageEvent) {
-  const { type, payload } = extractWorkerData(event)
-
-  if (type === 'checkFileReply') {
-    fileStore.setFileStatus(payload)
-  }
-}
-
-onMounted(() => {
-  $fileWorker.addEventListener('message', handleCheckFileReply)
+const cleanUp = $fileWorker.handle('check-file-reply', data => {
+  fileStore.setFileStatus(data)
 })
 
 onBeforeUnmount(() => {
-  $fileWorker.removeEventListener('message', handleCheckFileReply)
+  cleanUp()
 })
 </script>

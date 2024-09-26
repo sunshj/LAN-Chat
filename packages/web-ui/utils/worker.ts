@@ -1,32 +1,55 @@
-type EventData = {
-  // file
-  checkFile: string[]
-  checkFileReply: FileStatus[]
-  // markdown
-  markdownParse: MarkdownParse[]
-  markdownParseReply: MarkdownParse[]
+export type WorkerEventsMap = {
+  'check-file': string[]
+  'parse-markdown': MarkdownParse[]
 }
 
-export type WorkerEventData = {
-  [K in keyof EventData]: {
-    type: K
-    payload: EventData[K]
+export type ReplyEventsMap = {
+  'check-file-reply': FileStatus[]
+  'parse-markdown-reply': MarkdownParse[]
+}
+
+export type WorkerEventData<T> = {
+  [K in keyof T]: { type: K; payload: T[K] }
+}[keyof T]
+
+export class WorkerClient<WorkerEvents = WorkerEventsMap, ReplyEvents = ReplyEventsMap> {
+  constructor(public worker: Worker) {}
+
+  /**
+   * Handle worker event
+   * @param name event name
+   * @param listener event listener
+   * @return remove listener function
+   */
+  handle<K extends keyof ReplyEvents>(name: K, listener: (payload: ReplyEvents[K]) => void) {
+    const messageHandler = (event: MessageEvent) => {
+      const { type, payload } = WorkerClient.parse<ReplyEvents>(event)
+      if (type === name) {
+        listener(payload as ReplyEvents[K])
+      }
+    }
+
+    this.worker.addEventListener('message', messageHandler)
+
+    return () => {
+      this.worker.removeEventListener('message', messageHandler)
+    }
   }
-}[keyof EventData]
 
-/**
- * 提取事件数据(类型安全)
- * @param event
- */
-export function extractWorkerData(event: MessageEvent<WorkerEventData>) {
-  return event.data
-}
+  /**
+   *  Invoke worker event
+   * @param type  event type
+   * @param payload  event payload
+   */
+  invoke<K extends keyof WorkerEvents>(type: K, payload: WorkerEvents[K]) {
+    this.worker.postMessage({ type, payload })
+  }
 
-/**
- * 创建消息(类型安全)
- * @param type
- * @param payload
- */
-export function createWorkerMessage<T extends keyof EventData>(type: T, payload: EventData[T]) {
-  return { type, payload }
+  static parse<T = WorkerEventsMap>(event: MessageEvent<WorkerEventData<T>>) {
+    return event.data
+  }
+
+  static replyFormat<K extends keyof ReplyEventsMap>(type: K, payload: ReplyEventsMap[K]) {
+    return { type, payload }
+  }
 }
