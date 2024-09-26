@@ -16,7 +16,6 @@ onBeforeMount(() => {
 
 async function onConnect() {
   const storageUid = appStore.userInfo.id || 'invalid_uid'
-  console.log('storageUid: ', storageUid)
   const userExist = await appStore.fetchUser(storageUid)
 
   if (userExist) {

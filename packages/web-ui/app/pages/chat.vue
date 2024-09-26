@@ -221,7 +221,6 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
 }
 
 function handleNewMessage() {
-  console.log('emit scrollToBottom')
   nextTick(() => {
     scrollToBottom()
   })
