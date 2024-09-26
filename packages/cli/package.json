@@ -14,7 +14,7 @@
     "lan-chat": "bin/cli.mjs"
   },
   "scripts": {
-    "dev": "tsup --watch",
+    "dev": "tsup --watch --onSuccess \"node dist -v\"",
     "build": "tsup",
     "type-check": "tsc --noEmit"
   },

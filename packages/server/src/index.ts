@@ -1,14 +1,13 @@
 import { z } from 'zod'
 import { createHostServer, type CreateServerOptions } from './server'
-import { createWsServer } from './ws'
-import type http from 'node:http'
-import type { WebSocketServer } from 'ws'
+import { createWSServer } from './ws'
+import type { WebSocketServer } from './types'
+import type { Server } from 'node:http'
 
-export * from './client'
 export * from './store'
 export * from './types'
 
-let server: http.Server | null
+let server: Server | null
 let wss: WebSocketServer | null
 
 interface StartServerOptions extends CreateServerOptions {
@@ -19,11 +18,10 @@ interface StartServerOptions extends CreateServerOptions {
 
 function cleanUp() {
   wss?.close()
-  wss?.clients.forEach(client => client.terminate())
   server?.close()
 }
 
-const portSchema = z.object({
+const schema = z.object({
   port: z
     .number()
     .int()
@@ -36,7 +34,7 @@ const portSchema = z.object({
 export async function startServer(options: StartServerOptions) {
   const { host, port, uiDir, uploadsDir, onListening, storeHandlers } = options
 
-  const { error, data } = portSchema.safeParse({ host, port })
+  const { error, data } = schema.safeParse({ host, port })
   if (error) throw new Error(error.errors.map(e => e.message).join(', '))
 
   cleanUp()
@@ -47,7 +45,7 @@ export async function startServer(options: StartServerOptions) {
     storeHandlers
   })
 
-  wss = createWsServer(server)
+  wss = createWSServer(server)
 
   return await new Promise<boolean>(resolve => {
     server?.listen(data.port, data.host, async () => {
@@ -58,7 +56,7 @@ export async function startServer(options: StartServerOptions) {
 }
 
 export function stopServer() {
-  wss?.broadcast('Server is shutting down')
+  wss?.emit('message', 'Server is shutting down')
   cleanUp()
   return server?.listening ?? false
 }
