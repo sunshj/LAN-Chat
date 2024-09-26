@@ -4,6 +4,7 @@ import { createServer } from 'node:http'
 import { join } from 'node:path'
 import { createId } from '@paralleldrive/cuid2'
 import {
+  assertMethod,
   createApp,
   createError,
   createRouter,
@@ -132,9 +133,10 @@ export function createHostServer(options: CreateServerOptions) {
     })
   )
 
-  router.get(
+  router.use(
     '/api/download/:filename',
     eventHandler(event => {
+      assertMethod(event, ['HEAD', 'GET'])
       const filename = getRouterParam(event, 'filename')!
       const filePath = join(options.uploadsDir, filename)
       return createReadStream(filePath)

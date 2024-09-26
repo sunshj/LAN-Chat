@@ -176,7 +176,7 @@ const sendMessage = useThrottleFn(() => {
   if (!message.value.trim()) return
   if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
   const msg = appStore.addMessage(message.value)
-  $socket.invoke('$new-message', msg)
+  $socket.emit('$new-message', msg)
 
   message.value = ''
 
@@ -213,18 +213,21 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
 
   const msg = appStore.addMessage(newFilename, { type, payload })
   fileStore.fileStatus.push({ file: msg.content, download: true })
-  $socket.invoke('$new-message', msg)
+  $socket.emit('$new-message', msg)
 
   nextTick(() => {
     scrollToBottom()
   })
 }
 
-$socket.handle('$new-message', () => {
+function handleNewMessage() {
+  console.log('emit scrollToBottom')
   nextTick(() => {
     scrollToBottom()
   })
-})
+}
+
+$socket.on('$new-message', handleNewMessage)
 
 onBeforeMount(() => {
   appStore.setInitialScrolled(false)
@@ -239,11 +242,9 @@ onMounted(() => {
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
     if (fileMessages.length > 0) {
-      $fileWorker.postMessage(
-        createWorkerMessage(
-          'checkFile',
-          fileMessages.map(v => v.content)
-        )
+      $fileWorker.invoke(
+        'check-file',
+        fileMessages.map(v => v.content)
       )
     }
 
@@ -260,6 +261,7 @@ onBeforeUnmount(() => {
   appStore.clearCurrentChatUser()
   fileStore.setFileStatus([])
   fileStore.setMarkdown([])
+  $socket.off('$new-message', handleNewMessage)
 })
 </script>
 

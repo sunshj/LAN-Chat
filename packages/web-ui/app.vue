@@ -10,24 +10,24 @@ const appStore = useAppStore()
 const fileStore = useFileStore()
 const { $socket } = useNuxtApp()
 
-$socket.on('open', async () => {
+$socket.on('connect', async () => {
   const storageUid = appStore.userInfo.id || 'invalid_uid'
   const userExist = await appStore.fetchUser(storageUid)
 
   if (userExist) {
-    $socket.invoke('$user-online', appStore.userInfo.id)
+    $socket.emit('$user-online', appStore.userInfo.id)
   } else {
     const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
     appStore.setUserInfo(user)
-    $socket.invoke('$user-online', user.id)
+    $socket.emit('$user-online', user.id)
   }
 })
 
-$socket.on('close', () => {
+$socket.on('disconnect', () => {
   appStore.setOnlineUsers([])
 })
 
-$socket.handle('$new-message', msg => {
+$socket.on('$new-message', msg => {
   if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
   appStore.messages[msg.cid].push(msg)
 
@@ -42,7 +42,7 @@ $socket.handle('$new-message', msg => {
   }
 })
 
-$socket.handle('$get-users', async usersId => {
+$socket.on('$get-users', async usersId => {
   const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
   const allUsers = await appStore.fetchUsers()
   appStore.setUsers(allUsers)
@@ -57,6 +57,11 @@ $socket.handle('$get-users', async usersId => {
 
 onBeforeMount(() => {
   appStore.cleanUselessChat()
+})
+
+onBeforeUnmount(() => {
+  $socket.off('$new-message')
+  $socket.off('$get-users')
 })
 </script>
 

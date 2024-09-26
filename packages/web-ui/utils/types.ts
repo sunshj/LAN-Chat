@@ -11,7 +11,7 @@ export interface FileStatus {
   download: boolean
 }
 
-export interface MarkdownParse {
+export interface ParsedMarkdown {
   id: string
   value: string
   error?: string

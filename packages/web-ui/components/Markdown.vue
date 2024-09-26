@@ -48,41 +48,30 @@ watchEffect(() => {
         }
       })
 
-      $mdWorker.postMessage(createWorkerMessage('markdownParse', toRaw(fileStore.markdown)))
+      // $mdWorker.postMessage(createWorkerMessage('markdownParse', toRaw(fileStore.markdown)))
+      $mdWorker.invoke('parse-markdown', toRaw(fileStore.markdown))
     })
   }
 })
 
-function handleMarkdownParseReply(event: MessageEvent) {
-  const { type, payload } = extractWorkerData(event)
+$mdWorker.handle('parse-markdown-reply', payload => {
+  if (mdRef.value && mdRef.value.dataset.render) return
 
-  if (type === 'markdownParseReply') {
-    if (mdRef.value && mdRef.value.dataset.render) return
-
-    const data = payload.find(v => v.id === props.id)
-    if (data?.error) errorMsg.value = data.error
-    if (data?.value) {
-      output.value = data.value
-      fileStore.setMarkdown(md => md.filter(v => v.id !== props.id))
-      mdRef.value?.setAttribute('data-render', 'true')
-    }
-    emit('loaded')
-    isLoading.value = false
+  const data = payload.find(v => v.id === props.id)
+  if (data?.error) errorMsg.value = data.error
+  if (data?.value) {
+    output.value = data.value
+    fileStore.setMarkdown(md => md.filter(v => v.id !== props.id))
+    mdRef.value?.setAttribute('data-render', 'true')
   }
-}
-
-onMounted(() => {
-  $mdWorker.addEventListener('message', handleMarkdownParseReply)
+  emit('loaded')
+  isLoading.value = false
 })
 
 onUpdated(() => {
   document.querySelectorAll('.md-output a').forEach(el => {
     el.setAttribute('target', '_blank')
   })
-})
-
-onBeforeUnmount(() => {
-  $mdWorker.removeEventListener('message', handleMarkdownParseReply)
 })
 </script>
 

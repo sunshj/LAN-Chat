@@ -34,6 +34,6 @@ const editable = ref(false)
 async function saveProfile() {
   editable.value = false
   await appStore.updateUser(appStore.userInfo)
-  $socket.invoke('$get-users')
+  $socket.emit('$get-users')
 }
 </script>

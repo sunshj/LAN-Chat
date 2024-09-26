@@ -1,75 +1,42 @@
-import { WebSocket, WebSocketServer } from 'ws'
-import {
-  defineWsMessageHandler,
-  type WebSocketClientToServerMessage,
-  type WebSocketServerToClientMessage
-} from './client'
+import { Server } from 'socket.io'
+import type { WebSocketServer } from './types'
 import type http from 'node:http'
 
-declare module 'ws' {
-  export interface WebSocketServer {
-    broadcast: (data: string) => void
-  }
-  export interface WebSocket {
-    userId?: string
-  }
-}
+export function createWSServer(server: http.Server) {
+  const io: WebSocketServer = new Server(server, {
+    transports: ['websocket'],
+    maxHttpBufferSize: 1e8
+  })
 
-export function createWsServer(server: http.Server) {
-  const wss = new WebSocketServer({ server, maxPayload: 1e8 })
+  io.on('connection', socket => {
+    const getConnectionUsersId = async () => {
+      const connections = await io.fetchSockets()
+      return connections.map(v => v.data.userId).filter(Boolean)
+    }
 
-  const { createWsMessage, parseWsMessage } = defineWsMessageHandler<
-    WebSocketServerToClientMessage,
-    WebSocketClientToServerMessage
-  >()
+    socket.on('$user-online', async userId => {
+      socket.data.userId = userId
 
-  function broadcast(data: string) {
-    wss.clients.forEach((ws: WebSocket) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(data)
-      }
+      io.emit('$get-users', await getConnectionUsersId())
     })
-  }
 
-  function getConnectionUsersId() {
-    return [...wss.clients].map((v: WebSocket) => v.userId!).filter(Boolean)
-  }
+    socket.on('$get-users', async () => {
+      io.emit('$get-users', await getConnectionUsersId())
+    })
 
-  wss.on('connection', (ws: WebSocket) => {
-    ws.on('message', rawData => {
-      if (rawData.toString() === 'ping') ws.send('pong')
+    socket.on('disconnect', async () => {
+      io.emit('$get-users', await getConnectionUsersId())
+    })
 
-      const { type, payload } = parseWsMessage(rawData)
-
-      switch (type) {
-        case '$user-online':
-          ws.userId = payload
-          broadcast(createWsMessage('$get-users', getConnectionUsersId()))
-          break
-
-        case '$get-users':
-          broadcast(createWsMessage('$get-users', getConnectionUsersId()))
-          break
-
-        case '$new-message': {
-          const { receiver } = payload
-          wss.clients.forEach((_ws: WebSocket) => {
-            if (_ws.userId === receiver) {
-              _ws.send(createWsMessage('$new-message', payload))
-            }
-          })
-          break
+    socket.on('$new-message', msg => {
+      const receiverId = msg.receiver
+      io.sockets.sockets.forEach(sock => {
+        if (sock.data.userId === receiverId) {
+          sock.emit('$new-message', msg)
         }
-
-        default:
-          break
-      }
-    })
-
-    ws.on('close', () => {
-      broadcast(createWsMessage('$get-users', getConnectionUsersId()))
+      })
     })
   })
 
-  return Object.assign(wss, { broadcast })
+  return io
 }
