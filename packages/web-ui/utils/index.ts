@@ -1,6 +1,9 @@
 import axios from 'axios'
 import parser from 'ua-parser-js'
 
+export { WorkerClient } from './worker/client'
+export { WorkerServer } from './worker/server'
+
 export function getDeviceName(ua: string) {
   const { os, browser } = parser(ua)
   const osName = os.name?.replace('macOS', 'Mac').replace('Windows', 'Win') ?? ''

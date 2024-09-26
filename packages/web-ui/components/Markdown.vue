@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-const { $mdWorker } = useNuxtApp()
+const { $worker } = useNuxtApp()
 
 const props = defineProps<{
   id: string
@@ -48,13 +48,12 @@ watchEffect(() => {
         }
       })
 
-      // $mdWorker.postMessage(createWorkerMessage('markdownParse', toRaw(fileStore.markdown)))
-      $mdWorker.invoke('parse-markdown', toRaw(fileStore.markdown))
+      $worker.emit('parse-markdown', toRaw(fileStore.markdown))
     })
   }
 })
 
-$mdWorker.handle('parse-markdown-reply', payload => {
+const cleanUp = $worker.on('parse-markdown-reply', payload => {
   if (mdRef.value && mdRef.value.dataset.render) return
 
   const data = payload.find(v => v.id === props.id)
@@ -72,6 +71,10 @@ onUpdated(() => {
   document.querySelectorAll('.md-output a').forEach(el => {
     el.setAttribute('target', '_blank')
   })
+})
+
+onBeforeUnmount(() => {
+  cleanUp()
 })
 </script>
 

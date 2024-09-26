@@ -71,7 +71,7 @@ const route = useRoute()
 const appStore = useAppStore()
 const fileStore = useFileStore()
 
-const { $contextmenu, $fileWorker, $socket } = useNuxtApp()
+const { $contextmenu, $worker, $socket } = useNuxtApp()
 
 const message = ref('')
 
@@ -242,7 +242,7 @@ onMounted(() => {
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
     if (fileMessages.length > 0) {
-      $fileWorker.invoke(
+      $worker.emit(
         'check-file',
         fileMessages.map(v => v.content)
       )

@@ -1,14 +1,11 @@
-import FileWorker from '@/worker/file.worker?worker'
-import MdWorker from '@/worker/md.worker?worker'
+import FileWorker from '@/worker?worker'
 
 export default defineNuxtPlugin(() => {
-  const fileWorker = new WorkerClient(new FileWorker())
-  const mdWorker = new WorkerClient(new MdWorker())
+  const worker = new WorkerClient(new FileWorker())
 
   return {
     provide: {
-      fileWorker,
-      mdWorker
+      worker
     }
   }
 })

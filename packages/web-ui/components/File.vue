@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-const { $fileWorker } = useNuxtApp()
+const { $worker } = useNuxtApp()
 const fileStore = useFileStore()
 
 const props = defineProps<{
@@ -59,7 +59,7 @@ async function preview() {
   }
 }
 
-const cleanUp = $fileWorker.handle('check-file-reply', data => {
+const cleanUp = $worker.on('check-file-reply', data => {
   fileStore.setFileStatus(data)
 })
 
