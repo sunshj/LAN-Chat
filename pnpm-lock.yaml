@@ -243,6 +243,9 @@ importers:
       vue-router:
         specifier: 4.3.3
         version: 4.3.3(vue@3.4.4)
+      worker-emitter:
+        specifier: ^0.1.1
+        version: 0.1.1
     devDependencies:
       '@element-plus/nuxt':
         specifier: 1.0.9
@@ -13183,6 +13186,10 @@ packages:
   /word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
+
+  /worker-emitter@0.1.1:
+    resolution: {integrity: sha512-7GykkvPq9/Kzr/ZC8vMDzavbVpLZjPfD5aHZuqQ9Yt5zrVXAlQE8wk/75VzuczrKJR6pU8BL9EmISWGX/gQbOg==}
+    dev: false
 
   /wrap-ansi@6.2.0:
     resolution: {integrity: sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==}

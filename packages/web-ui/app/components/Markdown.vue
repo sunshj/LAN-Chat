@@ -53,7 +53,7 @@ watchEffect(() => {
   }
 })
 
-const cleanUp = $worker.on('parse-markdown-reply', payload => {
+function handleParseMarkdownReply(payload: ParsedMarkdown[]) {
   if (mdRef.value && mdRef.value.dataset.render) return
 
   const data = payload.find(v => v.id === props.id)
@@ -65,7 +65,9 @@ const cleanUp = $worker.on('parse-markdown-reply', payload => {
   }
   emit('loaded')
   isLoading.value = false
-})
+}
+
+$worker.on('parse-markdown-reply', handleParseMarkdownReply)
 
 onUpdated(() => {
   document.querySelectorAll('.md-output a').forEach(el => {
@@ -74,7 +76,7 @@ onUpdated(() => {
 })
 
 onBeforeUnmount(() => {
-  cleanUp()
+  $worker.off('parse-markdown-reply', handleParseMarkdownReply)
 })
 </script>
 

@@ -16,3 +16,13 @@ export interface ParsedMarkdown {
   value: string
   error?: string
 }
+
+export type ClientEventsMap = {
+  'check-file': string[]
+  'parse-markdown': ParsedMarkdown[]
+}
+
+export type WorkerEventsMap = {
+  'check-file-reply': FileStatus[]
+  'parse-markdown-reply': ParsedMarkdown[]
+}

@@ -4,7 +4,9 @@ import { bundledLanguages } from 'shiki/bundle/web'
 import { createHighlighterCore } from 'shiki/core'
 import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'
 import loadWasm from 'shiki/wasm'
-import { formatFileUrl, WorkerServer } from './utils'
+import { WorkerEmitter } from 'worker-emitter'
+import { formatFileUrl } from './utils'
+import type { ClientEventsMap, WorkerEventsMap } from './utils/types'
 
 async function markdownParser(id: string, value: string) {
   const highlighter = await createHighlighterCore({
@@ -52,15 +54,15 @@ async function checkFileStatus(file: string) {
   }
 }
 
-const server = new WorkerServer(self)
+const worker = new WorkerEmitter<WorkerEventsMap, ClientEventsMap>(self)
 
-server.on('check-file', async payload => {
+worker.on('check-file', async payload => {
   const promises = payload.map(v => checkFileStatus(v))
   const result = await Promise.all(promises)
-  server.emit('check-file-reply', result)
+  worker.emit('check-file-reply', result)
 })
 
-server.on('parse-markdown', async payload => {
+worker.on('parse-markdown', async payload => {
   const promises = payload.map(({ id, value }) => markdownParser(id, value))
   const data = await Promise.allSettled(promises)
 
@@ -69,5 +71,5 @@ server.on('parse-markdown', async payload => {
     return { ...payload[index]!, error: '无法解析为 Markdown' }
   })
 
-  server.emit('parse-markdown-reply', result)
+  worker.emit('parse-markdown-reply', result)
 })

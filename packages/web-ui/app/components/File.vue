@@ -59,11 +59,13 @@ async function preview() {
   }
 }
 
-const cleanUp = $worker.on('check-file-reply', data => {
+function handleCheckFileReply(data: FileStatus[]) {
   fileStore.setFileStatus(data)
-})
+}
+
+$worker.on('check-file-reply', handleCheckFileReply)
 
 onBeforeUnmount(() => {
-  cleanUp()
+  $worker.off('check-file-reply', handleCheckFileReply)
 })
 </script>
