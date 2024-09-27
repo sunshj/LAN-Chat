@@ -24,7 +24,7 @@
     "vue-aplayer-next": "1.0.1",
     "vue-boring-avatars": "1.4.0",
     "vue-router": "4.3.3",
-    "worker-emitter": "^0.1.1"
+    "worker-emitter": "^0.2.0"
   },
   "devDependencies": {
     "@element-plus/nuxt": "1.0.9",
