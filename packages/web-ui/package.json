@@ -13,6 +13,7 @@
     "lan-chat-server": "workspace:*",
     "marked": "13.0.0",
     "marked-shiki": "1.1.1",
+    "mevem": "^0.1.0",
     "music-metadata": "^10.5.0",
     "nuxt": "3.7.3",
     "pinia": "2.2.2",
@@ -23,8 +24,7 @@
     "ua-parser-js": "1.0.38",
     "vue-aplayer-next": "1.0.1",
     "vue-boring-avatars": "1.4.0",
-    "vue-router": "4.3.3",
-    "worker-emitter": "^0.2.0"
+    "vue-router": "4.3.3"
   },
   "devDependencies": {
     "@element-plus/nuxt": "1.0.9",

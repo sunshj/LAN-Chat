@@ -1,10 +1,10 @@
 import { Marked } from 'marked'
 import markedShiki from 'marked-shiki'
+import MessageEventEmitter from 'mevem'
 import { bundledLanguages } from 'shiki/bundle/web'
 import { createHighlighterCore } from 'shiki/core'
 import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'
 import loadWasm from 'shiki/wasm'
-import { WorkerEmitter } from 'worker-emitter'
 import { formatFileUrl } from './utils'
 import type { ClientEventsMap, WorkerEventsMap } from './utils/types'
 
@@ -54,7 +54,11 @@ async function checkFileStatus(file: string) {
   }
 }
 
-const worker = new WorkerEmitter<WorkerEventsMap, ClientEventsMap>(self)
+const worker = new MessageEventEmitter<WorkerEventsMap, ClientEventsMap>({
+  handle: fn => self.addEventListener('message', fn),
+  invoke: data => self.postMessage(data),
+  deserialize: ({ data }) => data
+})
 
 worker.on('check-file', async payload => {
   const promises = payload.map(v => checkFileStatus(v))

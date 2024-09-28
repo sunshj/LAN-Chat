@@ -210,6 +210,9 @@ importers:
       marked-shiki:
         specifier: 1.1.1
         version: 1.1.1(marked@13.0.0)(shiki@1.18.0)
+      mevem:
+        specifier: ^0.1.0
+        version: 0.1.0
       music-metadata:
         specifier: ^10.5.0
         version: 10.5.0
@@ -243,9 +246,6 @@ importers:
       vue-router:
         specifier: 4.3.3
         version: 4.3.3(vue@3.4.4)
-      worker-emitter:
-        specifier: ^0.2.0
-        version: 0.2.0
     devDependencies:
       '@element-plus/nuxt':
         specifier: 1.0.9
@@ -9264,6 +9264,10 @@ packages:
     resolution: {integrity: sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w==}
     dev: true
 
+  /mevem@0.1.0:
+    resolution: {integrity: sha512-R2VBSdeRdK8xOsMbMBeh3L/2r1Yd3Fchm9K3TZt1OG3aFGjljHVbjZD5w9kEvxziy1XAoio6t9GRN2E9Lxwp5w==}
+    dev: false
+
   /micromark-core-commonmark@2.0.1:
     resolution: {integrity: sha512-CUQyKr1e///ZODyD1U3xit6zXwy1a8q2a1S1HKtIlmgvurrEpaw/Y9y6KSIbF8P59cn/NjzHyO+Q2fAyYLQrAA==}
     dependencies:
@@ -13186,10 +13190,6 @@ packages:
   /word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
-
-  /worker-emitter@0.2.0:
-    resolution: {integrity: sha512-/RDufwzkdX/YgXCO60eDiNqK05yZo0cu8CUt7lYX9o14uqxugyWhzF353XjLTJYdUvrYRXes3MMI+WkCHT1i/A==}
-    dev: false
 
   /wrap-ansi@6.2.0:
     resolution: {integrity: sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==}

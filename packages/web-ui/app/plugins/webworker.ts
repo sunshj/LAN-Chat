@@ -1,8 +1,14 @@
-import { WorkerEmitter } from 'worker-emitter'
+import MessageEventEmitter from 'mevem'
 import FileWorker from '../worker?worker'
 
 export default defineNuxtPlugin(() => {
-  const worker = new WorkerEmitter<ClientEventsMap, WorkerEventsMap>(new FileWorker())
+  const fileWorker = new FileWorker()
+
+  const worker = new MessageEventEmitter<ClientEventsMap, WorkerEventsMap>({
+    handle: fn => fileWorker.addEventListener('message', fn),
+    invoke: data => fileWorker.postMessage(data),
+    deserialize: ({ data }) => data
+  })
 
   return {
     provide: {
