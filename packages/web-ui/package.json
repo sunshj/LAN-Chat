@@ -13,7 +13,7 @@
     "lan-chat-server": "workspace:*",
     "marked": "13.0.0",
     "marked-shiki": "1.1.1",
-    "mevem": "^0.1.0",
+    "mevem": "^0.2.1",
     "music-metadata": "^10.5.0",
     "nuxt": "3.7.3",
     "pinia": "2.2.2",

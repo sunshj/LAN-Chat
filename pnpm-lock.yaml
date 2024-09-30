@@ -211,8 +211,8 @@ importers:
         specifier: 1.1.1
         version: 1.1.1(marked@13.0.0)(shiki@1.18.0)
       mevem:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.1
+        version: 0.2.1
       music-metadata:
         specifier: ^10.5.0
         version: 10.5.0
@@ -9264,8 +9264,8 @@ packages:
     resolution: {integrity: sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w==}
     dev: true
 
-  /mevem@0.1.0:
-    resolution: {integrity: sha512-R2VBSdeRdK8xOsMbMBeh3L/2r1Yd3Fchm9K3TZt1OG3aFGjljHVbjZD5w9kEvxziy1XAoio6t9GRN2E9Lxwp5w==}
+  /mevem@0.2.1:
+    resolution: {integrity: sha512-cUiElOkp3+ThDfq9tVhHEQT92QR+gmC68sXkNRTet2WS3jgK0oDj74BQbF+Ep5m7lXCr+3rM+O776iSU18/l5A==}
     dev: false
 
   /micromark-core-commonmark@2.0.1:
