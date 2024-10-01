@@ -1,5 +1,5 @@
 import Store from 'electron-store'
-import { getResPath } from './utils'
+import { getNetworksAddr, getResPath, isEmptyObj } from './utils'
 import type { StoreHandlers } from 'lan-chat-server'
 
 interface User {
@@ -12,6 +12,12 @@ export const store = new Store<{
   networks: Record<string, number>
   quitApp: 'quit' | 'minimize' | 'none'
   quitAppTipChecked: boolean
+
+  settings: {
+    uploadsDir: string
+    notification: boolean
+    autoCheckUpgrade: boolean
+  }
 }>({
   name: 'stores',
   cwd: getResPath(),
@@ -19,7 +25,12 @@ export const store = new Store<{
     users: [],
     networks: {},
     quitApp: 'none',
-    quitAppTipChecked: false
+    quitAppTipChecked: false,
+    settings: {
+      uploadsDir: '',
+      notification: true,
+      autoCheckUpgrade: false
+    }
   }
 })
 
@@ -36,11 +47,18 @@ export const storeHandlers: StoreHandlers = {
 
 export const networkStore = {
   get value() {
-    const networks = store.get('networks', {})
-    return Object.entries(networks)
+    if (isEmptyObj(store.get('networks'))) {
+      store.set(
+        'networks',
+        getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
+      )
+    }
+
+    return Object.entries(store.get('networks'))
       .sort((a, b) => b[1] - a[1])
       .map(([ip]) => ip)
   },
+
   incr(ip: string) {
     const count = store.get('networks', {})[ip] ?? 0
     store.set('networks', { ...store.get('networks', {}), [ip]: count + 1 })

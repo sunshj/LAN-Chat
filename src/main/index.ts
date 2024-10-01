@@ -2,10 +2,11 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, Menu, shell, Tray } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from 'electron'
 import { ipcHandler } from './ipc'
 import { createMenu, createTrayMenu } from './menu'
 import { store } from './store'
+import { checkForUpgrade } from './utils'
 
 const currentDirname = dirname(fileURLToPath(import.meta.url))
 
@@ -16,6 +17,7 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 500,
     height: 600,
+    resizable: false,
     show: false,
     autoHideMenuBar: false,
     icon,
@@ -29,6 +31,9 @@ function createWindow(): void {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+  ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
+  ipcMain.handle('check-for-upgrade', () => checkForUpgrade(mainWindow))
 
   Menu.setApplicationMenu(createMenu(mainWindow))
 

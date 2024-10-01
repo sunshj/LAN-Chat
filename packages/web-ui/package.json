@@ -23,8 +23,7 @@
     "socket.io-client": "4.7.5",
     "ua-parser-js": "1.0.38",
     "vue-aplayer-next": "1.0.1",
-    "vue-boring-avatars": "1.4.0",
-    "vue-router": "4.3.3"
+    "vue-boring-avatars": "1.4.0"
   },
   "devDependencies": {
     "@element-plus/nuxt": "1.0.9",

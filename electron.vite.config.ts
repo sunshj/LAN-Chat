@@ -5,6 +5,8 @@ import unocss from 'unocss/vite'
 import autoImports from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import components from 'unplugin-vue-components/vite'
+import { VueRouterAutoImports } from 'unplugin-vue-router'
+import VueRouter from 'unplugin-vue-router/vite'
 
 export default defineConfig({
   main: {
@@ -20,12 +22,20 @@ export default defineConfig({
       }
     },
     plugins: [
+      VueRouter({
+        routesFolder: './src/renderer/src/pages',
+        dts: './src/renderer/types/router.d.ts'
+      }),
       vue(),
       autoImports({
-        imports: ['vue', '@vueuse/core'],
+        dts: './types/imports.d.ts',
+        imports: ['vue', '@vueuse/core', VueRouterAutoImports, 'pinia'],
+        dirs: ['./src/stores'],
         resolvers: [ElementPlusResolver()]
       }),
       components({
+        dts: './types/components.d.ts',
+        directoryAsNamespace: true,
         resolvers: [ElementPlusResolver()]
       }),
       unocss()

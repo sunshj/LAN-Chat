@@ -10,7 +10,8 @@ import {
   dialog,
   Notification,
   type BrowserWindow,
-  type NotificationConstructorOptions
+  type NotificationConstructorOptions,
+  type OpenDialogOptions
 } from 'electron'
 
 export function $notify(
@@ -73,15 +74,17 @@ export async function fetchReleases() {
   return res
 }
 
-export async function checkForUpgrade(win: BrowserWindow) {
+export async function checkForUpgrade(win: BrowserWindow, showMsgWhenLatestVersion = false) {
   const [latestRelease] = await fetchReleases()
   if (latestRelease.name === app.getVersion()) {
-    dialog.showMessageBoxSync({
-      title: 'LAN Chat',
-      message: '当前已是最新版本',
-      type: 'info',
-      buttons: ['OK']
-    })
+    if (showMsgWhenLatestVersion) {
+      dialog.showMessageBoxSync({
+        title: 'LAN Chat',
+        message: '当前已是最新版本',
+        type: 'info',
+        buttons: ['OK']
+      })
+    }
     return
   }
   dialog
@@ -128,4 +131,12 @@ export async function upgradeApp(url: string, onProgress?: (val: number) => void
     app.exit()
   }, 100)
   exec(`start "" "${tempPath}"`)
+}
+
+export async function openFile(options: OpenDialogOptions) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(options)
+  if (!canceled) {
+    return filePaths[0]
+  }
+  return null
 }

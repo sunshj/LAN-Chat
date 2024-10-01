@@ -10,9 +10,7 @@
   },
   "include": [
     "src/preload/index.d.ts",
-    "src/renderer/auto-imports.d.ts",
-    "src/renderer/components.d.ts",
-    "src/renderer/src/env.d.ts",
+    "src/renderer/types/*.d.ts",
     "src/renderer/src/**/*.vue",
     "src/renderer/src/**/*.ts"
   ]

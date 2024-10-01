@@ -3,13 +3,22 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 
 // Custom APIs for renderer
+/// sorted
 export const api = {
-  startServer: (data: { host: string; port: number }) => ipcRenderer.invoke('start-server', data),
-  stopServer: () => ipcRenderer.invoke('stop-server'),
-  getNetworks: () => ipcRenderer.invoke('get-networks'),
-  open: (url: string) => ipcRenderer.invoke('open-url', url),
+  checkForUpgrade: () => ipcRenderer.invoke('check-for-upgrade'),
+  cleanStores: () => ipcRenderer.invoke('clean-stores'),
+  cleanUploads: () => ipcRenderer.invoke('clean-uploads-dir'),
   fetchReleases: () => ipcRenderer.invoke('fetch-releases'),
-  getVersion: () => ipcRenderer.invoke('get-version')
+  getNetworks: () => ipcRenderer.invoke('get-networks'),
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  getVersion: () => ipcRenderer.invoke('get-version'),
+  open: (url: string) => ipcRenderer.invoke('open-url', url),
+  openDevtools: () => ipcRenderer.invoke('open-devtools'),
+  openUploadsDir: () => ipcRenderer.invoke('open-uploads-dir'),
+  resetSettings: () => ipcRenderer.invoke('reset-settings'),
+  saveSettings: (settings: any) => ipcRenderer.invoke('save-settings', settings),
+  startServer: (data: { host: string; port: number }) => ipcRenderer.invoke('start-server', data),
+  stopServer: () => ipcRenderer.invoke('stop-server')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

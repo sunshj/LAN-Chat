@@ -1,10 +1,8 @@
-import fs from 'node:fs'
 import os from 'node:os'
-import path from 'node:path'
 import process from 'node:process'
 import { app, dialog, Menu, shell, type BrowserWindow } from 'electron'
 import { store } from './store'
-import { checkForUpgrade, getResPath } from './utils'
+import { checkForUpgrade } from './utils'
 
 export function createMenu(mainWindow: BrowserWindow) {
   return Menu.buildFromTemplate([
@@ -24,77 +22,6 @@ export function createMenu(mainWindow: BrowserWindow) {
               shell.openPath(store.path)
             }
           }
-        },
-        {
-          label: '清空数据',
-          click: () => {
-            const total = store.get('users', []).length
-            if (total === 0) {
-              dialog.showMessageBox({
-                title: 'LAN Chat',
-                type: 'info',
-                message: '空空如也'
-              })
-              return
-            }
-            dialog
-              .showMessageBox(mainWindow, {
-                title: 'LAN Chat',
-                type: 'warning',
-                message: '确定要清空数据吗？',
-                detail: `共计${total}条数据，清空后所有数据将无法恢复。`,
-                buttons: ['取消', '确定']
-              })
-              .then(({ response }) => {
-                if (response === 1) {
-                  store.clear()
-                  dialog.showMessageBox({
-                    title: 'LAN Chat',
-                    type: 'info',
-                    message: `清空了${total}条数据`
-                  })
-                }
-              })
-          }
-        },
-        {
-          label: '清空文件',
-          click: () => {
-            const uploadsDir = path.join(getResPath(), 'uploads')
-
-            const files = fs.readdirSync(uploadsDir)
-            const aliveFiles = ['.gitkeep', 'THIS_FILE_SHOULD_NOT_BE_DELETED']
-            const safeFiles = files.filter(file => !aliveFiles.includes(file))
-            if (safeFiles.length === 0) {
-              dialog.showMessageBox({
-                title: 'LAN Chat',
-                type: 'info',
-                message: '没有需要清理的文件'
-              })
-              return
-            }
-
-            dialog
-              .showMessageBox({
-                message: '清理文件',
-                type: 'question',
-                buttons: ['取消', '确定'],
-                title: 'LAN Chat',
-                detail: `共计${safeFiles.length}个文件，确定要清理吗？`
-              })
-              .then(({ response }) => {
-                if (response === 1) {
-                  safeFiles.forEach(file => {
-                    fs.unlinkSync(path.join(uploadsDir, file))
-                  })
-                  dialog.showMessageBox({
-                    title: 'LAN Chat',
-                    type: 'info',
-                    message: `清理完成，共删除${safeFiles.length}个文件`
-                  })
-                }
-              })
-          }
         }
       ]
     },
@@ -103,7 +30,7 @@ export function createMenu(mainWindow: BrowserWindow) {
       submenu: [
         {
           label: '检查更新',
-          click: () => checkForUpgrade(mainWindow)
+          click: () => checkForUpgrade(mainWindow, true)
         },
         {
           label: '关于',
