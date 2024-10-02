@@ -23,6 +23,7 @@ export default defineConfig({
     },
     plugins: [
       VueRouter({
+        importMode: 'sync',
         routesFolder: './src/renderer/src/pages',
         dts: './src/renderer/types/router.d.ts'
       }),
