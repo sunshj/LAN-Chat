@@ -25,7 +25,7 @@ export const useAppStore = defineStore('app', () => {
 
   const settings = ref({
     uploadsDir: '',
-    notification: false,
+    notificationAfterStartServer: false,
     autoCheckUpgrade: false
   })
 

@@ -1,5 +1,7 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import process from 'node:process'
 import { app, dialog, ipcMain, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
 import { networkStore, store, storeHandlers } from './store'
@@ -15,7 +17,7 @@ function getSettings() {
 
 export function ipcHandler() {
   ipcMain.handle('start-server', (_, { host, port }) => {
-    const { notification, uploadsDir } = getSettings()
+    const { notificationAfterStartServer, uploadsDir } = getSettings()
     return startServer({
       host,
       port,
@@ -25,7 +27,7 @@ export function ipcHandler() {
       onListening(host) {
         networkStore.incr(host)
 
-        if (notification) {
+        if (notificationAfterStartServer) {
           const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)
           notify.addListener('click', () => {
             shell.openExternal(`http://${host}:${port}`)
@@ -91,5 +93,32 @@ export function ipcHandler() {
   ipcMain.handle('reset-settings', () => {
     store.reset('settings')
     return getSettings()
+  })
+
+  ipcMain.handle('open-stores-data', () => {
+    if (import.meta.env.DEV) {
+      store.openInEditor()
+    } else {
+      shell.openPath(store.path)
+    }
+  })
+
+  ipcMain.handle('show-version-data', () => {
+    const isPortable = process.env.PORTABLE_EXECUTABLE_DIR !== undefined
+    const info = {
+      版本: app.getVersion() + (isPortable ? ' (portable)' : ' (setup)'),
+      Electron: process.versions.electron,
+      Chromium: process.versions.chrome,
+      'Node.js': process.versions.node,
+      OS: `${os.type()} ${os.arch()} ${os.release()}`
+    }
+    dialog.showMessageBox({
+      title: '关于 LAN Chat',
+      type: 'info',
+      message: 'LAN Chat',
+      detail: Object.entries(info)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join('\n')
+    })
   })
 }

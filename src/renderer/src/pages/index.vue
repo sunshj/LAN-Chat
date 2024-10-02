@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full flex flex-col gap-2 border border-1px p-2">
+  <div class="flex flex-col gap-2 p-2">
     <ElCard shadow="never">
       <ElForm :model="appStore.server" label-width="auto" class="max-w-full w-full">
         <div class="w-full flex justify-between">

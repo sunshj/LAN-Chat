@@ -12,6 +12,6 @@ export default defineConfig([
     }
   },
   {
-    ignores: ['**/out', '**/resources']
+    ignores: ['**/out', '**/resources', 'src/renderer/types']
   }
 ])

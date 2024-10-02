@@ -15,7 +15,7 @@ export const store = new Store<{
 
   settings: {
     uploadsDir: string
-    notification: boolean
+    notificationAfterStartServer: boolean
     autoCheckUpgrade: boolean
   }
 }>({
@@ -28,7 +28,7 @@ export const store = new Store<{
     quitAppTipChecked: false,
     settings: {
       uploadsDir: '',
-      notification: true,
+      notificationAfterStartServer: true,
       autoCheckUpgrade: false
     }
   }

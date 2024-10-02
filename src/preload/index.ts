@@ -5,18 +5,21 @@ import { contextBridge, ipcRenderer } from 'electron'
 // Custom APIs for renderer
 /// sorted
 export const api = {
-  checkForUpgrade: () => ipcRenderer.invoke('check-for-upgrade'),
+  checkForUpgrade: (show: boolean) => ipcRenderer.invoke('check-for-upgrade', show),
   cleanStores: () => ipcRenderer.invoke('clean-stores'),
   cleanUploads: () => ipcRenderer.invoke('clean-uploads-dir'),
+  exitApp: () => ipcRenderer.invoke('exit-app'),
   fetchReleases: () => ipcRenderer.invoke('fetch-releases'),
   getNetworks: () => ipcRenderer.invoke('get-networks'),
   getSettings: () => ipcRenderer.invoke('get-settings'),
   getVersion: () => ipcRenderer.invoke('get-version'),
   open: (url: string) => ipcRenderer.invoke('open-url', url),
   openDevtools: () => ipcRenderer.invoke('open-devtools'),
+  openStoresData: () => ipcRenderer.invoke('open-stores-data'),
   openUploadsDir: () => ipcRenderer.invoke('open-uploads-dir'),
   resetSettings: () => ipcRenderer.invoke('reset-settings'),
   saveSettings: (settings: any) => ipcRenderer.invoke('save-settings', settings),
+  showVersionData: () => ipcRenderer.invoke('show-version-data'),
   startServer: (data: { host: string; port: number }) => ipcRenderer.invoke('start-server', data),
   stopServer: () => ipcRenderer.invoke('stop-server')
 }

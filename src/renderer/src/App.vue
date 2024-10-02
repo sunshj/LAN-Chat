@@ -1,6 +1,8 @@
 <template>
   <ElConfigProvider>
-    <RouterView />
+    <div class="h-90% w-full overflow-y-auto">
+      <RouterView />
+    </div>
   </ElConfigProvider>
 
   <footer class="fixed bottom-0 left-0 w-full p-2 text-center">
@@ -50,5 +52,24 @@ body,
   height: 100%;
   width: 100%;
   background-color: #f3f4f5;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #c0c4cc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #909399;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f3f4f5;
+  border-radius: 4px;
 }
 </style>

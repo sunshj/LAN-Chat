@@ -2,9 +2,9 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell, Tray } from 'electron'
 import { ipcHandler } from './ipc'
-import { createMenu, createTrayMenu } from './menu'
+import { createTrayMenu } from './menu'
 import { store } from './store'
 import { checkForUpgrade } from './utils'
 
@@ -19,7 +19,7 @@ function createWindow(): void {
     height: 600,
     resizable: false,
     show: false,
-    autoHideMenuBar: false,
+    autoHideMenuBar: true,
     icon,
     webPreferences: {
       devTools: true,
@@ -33,9 +33,8 @@ function createWindow(): void {
   })
 
   ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
-  ipcMain.handle('check-for-upgrade', () => checkForUpgrade(mainWindow))
-
-  Menu.setApplicationMenu(createMenu(mainWindow))
+  ipcMain.handle('check-for-upgrade', (_, show) => checkForUpgrade(mainWindow, show))
+  ipcMain.handle('exit-app', () => mainWindow.destroy())
 
   mainWindow.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url)
