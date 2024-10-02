@@ -1,5 +1,3 @@
-import process from 'node:process'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
@@ -18,12 +16,6 @@ export default defineNuxtConfig({
     payloadExtraction: false
   },
 
-  runtimeConfig: {
-    public: {
-      wsUrl: process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:3000' : '/'
-    }
-  },
-
   modules: [
     '@unocss/nuxt',
     '@pinia/nuxt',
@@ -31,6 +23,22 @@ export default defineNuxtConfig({
     '@element-plus/nuxt',
     '@vueuse/nuxt'
   ],
+
+  $development: {
+    runtimeConfig: {
+      public: {
+        wsUrl: 'ws://127.0.0.1:3000'
+      }
+    }
+  },
+
+  $production: {
+    runtimeConfig: {
+      public: {
+        wsUrl: '/'
+      }
+    }
+  },
 
   devServer: {
     port: 8080,
