@@ -16,20 +16,3 @@ export function isMarkdownValue(value: string) {
 export function generateMarkdownCodeBlock(language: string, code: string) {
   return `\`\`\`${language}\n${code}\n\`\`\``
 }
-
-export async function getMarkdownPlainText(value: string) {
-  const htmlString = await marked(value)
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(htmlString, 'text/html')
-  const walker = document.createTreeWalker(doc, NodeFilter.SHOW_TEXT)
-
-  const textList = []
-  let currentNode = walker.currentNode
-
-  while (currentNode) {
-    textList.push(currentNode.textContent)
-    currentNode = walker.nextNode()!
-  }
-
-  return textList.filter(Boolean).join('')
-}

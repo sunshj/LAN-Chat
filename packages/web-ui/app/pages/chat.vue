@@ -136,13 +136,7 @@ const { copy, copied } = useClipboard({
 
 async function copyText(content?: string) {
   if (!content) return
-
-  if (isMarkdownValue(content)) {
-    const text = await getMarkdownPlainText(content)
-    await copy(text)
-  } else {
-    await copy(content)
-  }
+  await copy(content)
   if (copied.value) {
     ElMessage.success('Copied')
   } else {

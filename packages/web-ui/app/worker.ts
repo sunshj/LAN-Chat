@@ -7,22 +7,22 @@ import type { ClientEventsMap, WorkerEventsMap } from './utils/types'
 
 const marked = new Marked()
 
-const highlighter = await getSingletonHighlighter({
+getSingletonHighlighter({
   langs: Object.values(bundledLanguages),
   themes: ['github-light-default']
+}).then(highlighter => {
+  marked.use(
+    markedShiki({
+      highlight(code, lang, props) {
+        return highlighter.codeToHtml(code, {
+          lang,
+          theme: 'github-light-default',
+          meta: { __raw: props.join(' '), 'data-lang': lang }
+        })
+      }
+    })
+  )
 })
-
-marked.use(
-  markedShiki({
-    highlight(code, lang, props) {
-      return highlighter.codeToHtml(code, {
-        lang,
-        theme: 'github-light-default',
-        meta: { __raw: props.join(' '), 'data-lang': lang }
-      })
-    }
-  })
-)
 
 async function markdownParser(id: string, value: string) {
   const html = await marked.parse(value)
