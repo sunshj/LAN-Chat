@@ -1,33 +1,30 @@
 import { Marked } from 'marked'
 import markedShiki from 'marked-shiki'
 import MessageEventEmitter from 'mevem'
-import { bundledLanguages } from 'shiki/bundle/web'
-import { createHighlighterCore } from 'shiki/core'
-import githubLightDefaultTheme from 'shiki/themes/github-light-default.mjs'
-import loadWasm from 'shiki/wasm'
+import { bundledLanguages, getSingletonHighlighter } from 'shiki'
 import { formatFileUrl } from './utils'
 import type { ClientEventsMap, WorkerEventsMap } from './utils/types'
 
-async function markdownParser(id: string, value: string) {
-  const highlighter = await createHighlighterCore({
-    langs: Object.values(bundledLanguages),
-    themes: [githubLightDefaultTheme],
-    loadWasm
+const marked = new Marked()
+
+const highlighter = await getSingletonHighlighter({
+  langs: Object.values(bundledLanguages),
+  themes: ['github-light-default']
+})
+
+marked.use(
+  markedShiki({
+    highlight(code, lang, props) {
+      return highlighter.codeToHtml(code, {
+        lang,
+        theme: 'github-light-default',
+        meta: { __raw: props.join(' '), 'data-lang': lang }
+      })
+    }
   })
+)
 
-  const marked = new Marked()
-
-  marked.use(
-    markedShiki({
-      highlight(code, lang, props) {
-        return highlighter.codeToHtml(code, {
-          lang,
-          theme: 'github-light-default',
-          meta: { __raw: props.join(' '), 'data-lang': lang }
-        })
-      }
-    })
-  )
+async function markdownParser(id: string, value: string) {
   const html = await marked.parse(value)
 
   return {
@@ -72,7 +69,7 @@ worker.on('parse-markdown', async payload => {
 
   const result = data.map((item, index) => {
     if (item.status === 'fulfilled') return item.value
-    return { ...payload[index]!, error: '无法解析为 Markdown' }
+    return { ...payload[index]!, error: 'Parse markdown failed' }
   })
 
   worker.emit('parse-markdown-reply', result)

@@ -1,5 +1,5 @@
 <template>
-  <div ref="mdRef" class="md-output relative" v-html="output" />
+  <div ref="mdRef" class="md-output relative" @click.stop="handleClick" v-html="output" />
   <div
     v-if="isLoading"
     :class="[
@@ -33,6 +33,8 @@ const output = ref(props.value)
 const errorMsg = ref('')
 const isLoading = ref(false)
 
+const { copy } = useClipboard({ legacy: true })
+
 const mdRef = ref<HTMLDivElement | null>(null)
 
 watchEffect(() => {
@@ -53,7 +55,7 @@ watchEffect(() => {
   }
 })
 
-function handleParseMarkdownReply(payload: ParsedMarkdown[]) {
+const unregisterParseMarkdownReply = $worker.on('parse-markdown-reply', payload => {
   if (mdRef.value && mdRef.value.dataset.render) return
 
   const data = payload.find(v => v.id === props.id)
@@ -65,9 +67,15 @@ function handleParseMarkdownReply(payload: ParsedMarkdown[]) {
   }
   emit('loaded')
   isLoading.value = false
-}
+})
 
-$worker.on('parse-markdown-reply', handleParseMarkdownReply)
+async function handleClick(e: Event) {
+  const target = e.target as HTMLDivElement
+  if ('lang' in target.dataset) {
+    await copy(target.textContent!)
+    ElMessage.success('Copied!')
+  }
+}
 
 onUpdated(() => {
   document.querySelectorAll('.md-output a').forEach(el => {
@@ -76,7 +84,7 @@ onUpdated(() => {
 })
 
 onBeforeUnmount(() => {
-  $worker.off('parse-markdown-reply', handleParseMarkdownReply)
+  unregisterParseMarkdownReply()
 })
 </script>
 
@@ -108,20 +116,28 @@ pre.shiki {
   border-radius: 4px;
   overflow-x: auto;
   margin: 6px 0;
+  position: relative;
+  pointer-events: none;
 }
 
-pre.shiki:hover::before {
+pre.shiki::before {
   content: attr(data-lang);
+  pointer-events: auto;
+  cursor: pointer;
   position: absolute;
   top: 0;
   right: 0;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   text-transform: uppercase;
-  color: white;
+  color: #64778b;
+  opacity: 0.2;
   padding: 4px;
-  border-bottom-left-radius: 4px;
-  background-color: #0006;
   font-weight: bolder;
+  z-index: 99;
+}
+
+pre.shiki:hover::before {
+  content: 'Copy';
 }
 </style>
