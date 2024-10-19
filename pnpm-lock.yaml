@@ -71,8 +71,8 @@ importers:
         specifier: 2.1.0
         version: 2.1.0(eslint@9.10.0)(typescript@5.3.3)
       '@sunshj/prettier-config':
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.0.1
+        version: 1.0.1
       '@types/node':
         specifier: 18.19.9
         version: 18.19.9
@@ -3125,8 +3125,8 @@ packages:
       - typescript
     dev: true
 
-  /@sunshj/prettier-config@1.0.0:
-    resolution: {integrity: sha512-14Eq3U2TFx/pNZ8dasZ6fpWjajbGKyoa/8g/Xr6xy6tsd8yWCfgtwHfc3/aQSashs5qG8fncnmqFZ3AYXgntLg==}
+  /@sunshj/prettier-config@1.0.1:
+    resolution: {integrity: sha512-C8Wlmrdza07BGl5UeF15Jdcuq+65Ou/Gklr/0SRwv2yy5qHykHjteZGaBVCE+mcx8xOkaj0quNYSJXAMcBgzuQ==}
     dev: true
 
   /@sxzz/popperjs-es@2.11.7:
