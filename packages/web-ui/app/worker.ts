@@ -69,7 +69,7 @@ worker.on('parse-markdown', async payload => {
 
   const result = data.map((item, index) => {
     if (item.status === 'fulfilled') return item.value
-    return { ...payload[index]!, error: 'Parse markdown failed' }
+    return { ...payload[index]!, error: 'parse markdown failed' }
   })
 
   worker.emit('parse-markdown-reply', result)

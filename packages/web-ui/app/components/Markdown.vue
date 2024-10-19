@@ -90,27 +90,35 @@ onBeforeUnmount(() => {
 
 <style>
 .md-output {
-  line-height: 24px;
+  line-height: 2em;
 }
 
-.md-output h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  line-height: 1.5em;
+.md-output table,
+th,
+td {
+  border: 1px solid #585865;
+  border-collapse: collapse;
+  padding: 2px;
 }
 
 .md-output li {
   list-style-position: inside;
 }
 
-.md-output pre {
+.md-output code:not(pre code) {
   font-size: 14px;
+  box-sizing: border-box;
+  padding: 2px;
+  color: #585865;
+  word-wrap: break-word;
+  background: #0066cc26;
+  border: 1px solid #2994ff;
+  border-radius: 4px;
 }
 
-pre.shiki {
+.md-output pre {
+  font-size: 14px;
+  line-height: 1.5em;
   background-color: #f2f3f4 !important;
   padding: 6px;
   border-radius: 4px;
@@ -120,7 +128,7 @@ pre.shiki {
   pointer-events: none;
 }
 
-pre.shiki::before {
+.md-output pre.shiki::before {
   content: attr(data-lang);
   pointer-events: auto;
   cursor: pointer;
@@ -137,7 +145,7 @@ pre.shiki::before {
   z-index: 99;
 }
 
-pre.shiki:hover::before {
+.md-output pre.shiki:hover::before {
   content: 'Copy';
 }
 </style>
