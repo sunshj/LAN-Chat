@@ -16,8 +16,8 @@ import {
 } from 'h3'
 import { readFiles } from 'h3-formidable'
 import { lookup } from 'mrmime'
-import { z } from 'zod'
-import { toUserStore, type StoreHandlers } from './store'
+import { messageSchema, userSchema } from './schema'
+import { toGroupChatMessageStore, toUserStore, type StoreHandlers } from './store'
 
 export interface CreateServerOptions {
   uiDir: string
@@ -27,6 +27,7 @@ export interface CreateServerOptions {
 
 export function createHostServer(options: CreateServerOptions) {
   const userStore = toUserStore(options.storeHandlers)
+  const groupChatStore = toGroupChatMessageStore(options.storeHandlers)
 
   const app = createApp()
   const router = createRouter()
@@ -69,36 +70,32 @@ export function createHostServer(options: CreateServerOptions) {
 
   router.get(
     '/api/users',
-    eventHandler(() => {
+    eventHandler(async () => {
       return {
-        data: userStore.findMany()
+        data: await userStore.findMany()
       }
     })
   )
 
   router.get(
     '/api/user/:id',
-    eventHandler(event => {
+    eventHandler(async event => {
       const uid = getRouterParam(event, 'id')!
       return {
-        data: userStore.findOne(uid)
+        data: await userStore.findOne(uid)
       }
     })
   )
-
-  const userSchema = z.object({
-    username: z.string({ message: 'username is required' }).min(1)
-  })
 
   router.put(
     '/api/user/:id',
     eventHandler(async event => {
       const uid = getRouterParam(event, 'id') as string
       const { username } = await readValidatedBody(event, userSchema.parse)
-      const user = userStore.findOne(uid)
+      const user = await userStore.findOne(uid)
       if (!user) throw createError('user not found')
       return {
-        data: userStore.mutation(uid, { username })
+        data: await userStore.mutation(uid, { username })
       }
     })
   )
@@ -109,7 +106,40 @@ export function createHostServer(options: CreateServerOptions) {
       const id = createId()
       const { username } = await readValidatedBody(event, userSchema.parse)
       return {
-        data: userStore.mutation(id, { username })
+        data: await userStore.mutation(id, { username })
+      }
+    })
+  )
+
+  router.get(
+    '/api/group_chat/messages',
+    eventHandler(async () => {
+      return {
+        data: await groupChatStore.findMany()
+      }
+    })
+  )
+
+  router.get(
+    '/api/group_chat/message/:mid',
+    eventHandler(async event => {
+      const mid = getRouterParam(event, 'mid') as string
+      return {
+        data: await groupChatStore.findOne(mid)
+      }
+    })
+  )
+
+  router.post(
+    '/api/group_chat/message',
+    eventHandler(async event => {
+      const { error, data: msg } = await readValidatedBody(event, messageSchema.safeParseAsync)
+      if (error) {
+        throw createError({ statusCode: 400, statusMessage: error.errors[0].message })
+      }
+
+      return {
+        data: await groupChatStore.create(msg)
       }
     })
   )

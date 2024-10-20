@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { defineCommand, runMain } from 'citty'
-import { startServer, stopServer } from 'lan-chat-server'
+import { defaultStore, startServer, stopServer } from 'lan-chat-server'
 import { version as pkgVersion } from '../package.json'
 import { storeHandlers, storePath } from './store'
 
@@ -60,7 +60,7 @@ const main = defineCommand({
     }
 
     if (!existsSync(storePath)) {
-      writeFileSync(storePath, JSON.stringify({ users: [] }))
+      writeFileSync(storePath, JSON.stringify(defaultStore, null, 2))
     }
 
     if (!existsSync(uploadsDir)) {

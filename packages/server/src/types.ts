@@ -1,6 +1,8 @@
 import type { FileJSON } from 'formidable'
 import type { Server } from 'socket.io'
 
+export type Awaitable<T> = T | Promise<T>
+
 export type UploadedFile = FileJSON
 
 export interface User {
@@ -8,7 +10,7 @@ export interface User {
   username: string
 }
 
-export type MessageType = 'text' | 'image' | 'video' | 'audio' | 'file'
+export type MessageType = 'video' | 'audio' | 'image' | 'file' | 'text'
 
 export interface MessagePayload {
   /** video payload */
