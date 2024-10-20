@@ -61,6 +61,7 @@ async function handleGetUsers(usersId: string[]) {
 
 $socket.on('connect', onConnect)
 $socket.on('$new-message', handleNewMessage)
+$socket.on('$new-group-message', handleNewMessage)
 $socket.on('$get-users', handleGetUsers)
 $socket.on('disconnect', onDisconnect)
 
@@ -68,6 +69,7 @@ onBeforeUnmount(() => {
   $socket.off('connect', onConnect)
   $socket.off('disconnect', onDisconnect)
   $socket.off('$new-message', handleNewMessage)
+  $socket.off('$new-group-message', handleNewMessage)
   $socket.off('$get-users', handleGetUsers)
 })
 </script>

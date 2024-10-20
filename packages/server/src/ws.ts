@@ -36,6 +36,10 @@ export function createWSServer(server: http.Server) {
         }
       })
     })
+
+    socket.on('$new-group-message', msg => {
+      socket.broadcast.emit('$new-group-message', msg)
+    })
   })
 
   return io

@@ -5,6 +5,7 @@
         <IconArrowLeft class="mr-2 cursor-pointer" />
       </NuxtLink>
       <ElBadge
+        v-if="!isGroupChat"
         is-dot
         :type="props.online ? 'success' : 'danger'"
         :offset="[-5, 5]"
@@ -13,7 +14,9 @@
       >
         <Avatar :id="appStore.currentChatUser.id" :size="30" />
       </ElBadge>
+
       <div>{{ appStore.currentChatUser.username }}</div>
+      <div v-if="isGroupChat">( {{ appStore.onlineUsers.length + 1 }} 人在线 )</div>
     </div>
   </header>
 </template>
@@ -24,4 +27,6 @@ const props = defineProps<{
 }>()
 
 const appStore = useAppStore()
+
+const isGroupChat = computed(() => appStore.currentChatUser.id === GROUP_CHAT_ID)
 </script>

@@ -43,12 +43,14 @@ export interface ServerToClientEvents {
   message: (msg: string) => void
   '$get-users': (usersId: string[]) => void
   '$new-message': (message: Message) => void
+  '$new-group-message': (message: Message) => void
 }
 
 export interface ClientToServerEvents {
   '$user-online': (userId: string) => void
   '$get-users': () => void
   '$new-message': (message: Message) => void
+  '$new-group-message': (message: Message) => void
 }
 
 interface SocketData {

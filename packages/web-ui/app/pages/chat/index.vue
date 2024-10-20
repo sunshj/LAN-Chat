@@ -1,6 +1,6 @@
 <template>
   <div class="h-full flex flex-col">
-    <ChatHeader :online="currentChatIsOnline" />
+    <ChatHeader :online="appStore.currentChatIsOnline" />
     <main
       id="mainContainer"
       class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto"
@@ -54,7 +54,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatTimeAgo } from '@vueuse/core'
 import { useZIndex, type UploadFile, type UploadProgressEvent } from 'element-plus'
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
@@ -109,7 +108,7 @@ function handleContextMenu(e: MouseEvent, mid: string) {
         label: '下载',
         hidden: !['image', 'audio', 'video'].includes(currentSelectMessage.value!.type),
         onClick() {
-          download(currentSelectMessage.value!)
+          downloadMsgFile(currentSelectMessage.value!)
         }
       },
       {
@@ -136,12 +135,6 @@ async function copyText(content?: string) {
   }
 }
 
-function download(msg: Message) {
-  const url = formatFileUrl(msg.content)
-  const filename = getOriginalFilename(msg.content)
-  downloadFile(url, filename)
-}
-
 function confirmDeleteMessage() {
   ElMessageBox.confirm('确定要删除这条消息吗？', '提示', {
     type: 'warning',
@@ -154,13 +147,9 @@ function confirmDeleteMessage() {
   })
 }
 
-const currentChatIsOnline = computed(() => {
-  return appStore.onlineUsers.map(u => u.id).includes(appStore.currentChatUser.id)
-})
-
 const sendMessage = useThrottleFn(() => {
   if (!message.value.trim()) return
-  if (!currentChatIsOnline.value) return ElMessage.error('当前用户不在线，无法发送消息')
+  if (!appStore.currentChatIsOnline) return ElMessage.error('当前用户不在线，无法发送消息')
   const msg = appStore.addMessage(message.value)
   $socket.emit('$new-message', msg)
 
@@ -172,7 +161,7 @@ const sendMessage = useThrottleFn(() => {
 }, 2000)
 
 function onBeforeUpload() {
-  if (!currentChatIsOnline.value) {
+  if (!appStore.currentChatIsOnline) {
     ElMessage.error('当前用户不在线，无法发送文件')
     return false
   }
@@ -216,7 +205,9 @@ $socket.on('$new-message', handleNewMessage)
 
 onBeforeMount(() => {
   appStore.setInitialScrolled(false)
+})
 
+onMounted(() => {
   const uid = route.query.uid as string
   if (!uid || !appStore.validateUid(uid)) {
     appStore.clearCurrentChatUser()
@@ -224,9 +215,7 @@ onBeforeMount(() => {
     return
   }
   appStore.setCurrentChatUser(uid)
-})
 
-onMounted(() => {
   if (appStore.currentChatMessages.length > 0) {
     appStore.setMessagesAsRead()
 
@@ -254,45 +243,6 @@ onBeforeUnmount(() => {
   $socket.off('$new-message', handleNewMessage)
 })
 </script>
-
-<style scoped>
-.message {
-  position: relative;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: white;
-  word-break: break-all;
-  box-shadow: 0 0 1px #f2f3f4;
-  max-width: 100%;
-}
-
-.message::before {
-  position: absolute;
-  top: 0;
-  content: '';
-  border: 10px solid transparent;
-  border-top: 10px solid white;
-}
-
-.message.sender {
-  background-color: #dcf8c6;
-  border-top-right-radius: 0;
-}
-
-.message.sender::before {
-  border-top-color: #dcf8c6;
-  right: -10px;
-}
-
-.message.receiver {
-  border-top-left-radius: 0;
-}
-
-.message.receiver::before {
-  left: -10px;
-}
-</style>
 
 <style>
 .chat-drawer .el-drawer__body {

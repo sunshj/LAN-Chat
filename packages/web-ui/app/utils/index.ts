@@ -1,6 +1,8 @@
 import axios from 'axios'
 import parser from 'ua-parser-js'
 
+export const GROUP_CHAT_ID = 'group'
+
 export function getDeviceName(ua: string) {
   const { os, browser } = parser(ua)
   const osName = os.name?.replace('macOS', 'Mac').replace('Windows', 'Win') ?? ''
@@ -41,6 +43,12 @@ export function downloadFile(url: string, filename: string) {
   a.href = url
   a.download = filename
   a.click()
+}
+
+export function downloadMsgFile(msg: Message) {
+  const url = formatFileUrl(msg.content)
+  const filename = getOriginalFilename(msg.content)
+  downloadFile(url, filename)
 }
 
 export async function uploadFile(file: File, onProgress?: (e: any) => void) {

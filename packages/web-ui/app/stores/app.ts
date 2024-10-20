@@ -88,11 +88,16 @@ export const useAppStore = defineStore(
       })
     }
 
+    const currentChatIsOnline = computed(() => {
+      return onlineUsers.value.map(u => u.id).includes(currentChatUser.value.id)
+    })
+
     function validateUid(uid: string) {
       return users.value.some(user => user.id === uid)
     }
 
     function generateChatId(userId: string) {
+      if (userId === GROUP_CHAT_ID) return userId
       return [userId, userInfo.value.id].sort().join('-')
     }
 
@@ -128,7 +133,7 @@ export const useAppStore = defineStore(
     }
 
     function cleanUselessChat() {
-      const userIds = users.value.map(user => user.id)
+      const userIds = users.value.map(user => user.id).filter(id => id !== GROUP_CHAT_ID)
       Object.keys(messages.value).forEach(cid => {
         if (!userIds.some(userId => generateChatId(userId) === cid)) {
           Reflect.deleteProperty(messages.value, cid)
@@ -185,6 +190,7 @@ export const useAppStore = defineStore(
       currentChatUser,
       setCurrentChatUser,
       clearCurrentChatUser,
+      currentChatIsOnline,
       currentChatId,
       generateChatId,
       messages,

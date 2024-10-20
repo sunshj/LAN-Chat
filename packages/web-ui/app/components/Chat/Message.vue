@@ -1,14 +1,25 @@
 <template>
-  <div :class="props.msg.sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'">
-    <div
-      :class="['message', props.msg.sender === appStore.userInfo.id ? 'sender' : 'receiver']"
-      @contextmenu.prevent="$emit('contextmenu', $event, props.msg.mid)"
-      @click.stop
-    >
-      <ChatPreviewer :message="props.msg" @loaded="$emit('loaded')" />
-      <p class="relative block w-full text-end text-xs text-[#777]">
-        {{ formatTimeAgo(new Date(props.msg.time)) }}
-      </p>
+  <div :class="props.msg.sender === appStore.userInfo.id ? 'flex justify-end' : 'flex gap-4'">
+    <Avatar
+      v-if="isGroupChat && props.msg.sender !== appStore.userInfo.id"
+      :id="props.msg.sender"
+      :size="35"
+      @click="gotoPrivateChat()"
+    />
+
+    <div class="flex flex-col gap-1">
+      <div class="text-xs text-[#777]">{{ senderName }}</div>
+
+      <div
+        :class="['message', props.msg.sender === appStore.userInfo.id ? 'sender' : 'receiver']"
+        @contextmenu.prevent="$emit('contextmenu', $event, props.msg.mid)"
+        @click.stop
+      >
+        <ChatPreviewer :message="props.msg" @loaded="$emit('loaded')" />
+        <p class="relative block w-full text-end text-xs text-[#777]">
+          {{ formatTimeAgo(new Date(props.msg.time)) }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -17,6 +28,7 @@
 import { formatTimeAgo } from '@vueuse/core'
 
 const appStore = useAppStore()
+const router = useRouter()
 
 const props = defineProps<{
   msg: Message
@@ -26,6 +38,22 @@ defineEmits<{
   loaded: []
   contextmenu: [event: MouseEvent, mid: string]
 }>()
+
+const isGroupChat = computed(() => appStore.currentChatUser.id === GROUP_CHAT_ID)
+
+const senderName = computed(() => {
+  if (props.msg.sender === appStore.userInfo.id) return
+  return appStore.users.find(user => user.id === props.msg.sender)?.username
+})
+
+function gotoPrivateChat() {
+  router.push({
+    path: '/chat',
+    query: {
+      uid: props.msg.sender
+    }
+  })
+}
 </script>
 
 <style scoped>
