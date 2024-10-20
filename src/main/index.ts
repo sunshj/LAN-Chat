@@ -6,7 +6,7 @@ import { app, BrowserWindow, dialog, ipcMain, shell, Tray } from 'electron'
 import { ipcHandler } from './ipc'
 import { createTrayMenu } from './menu'
 import { store } from './store'
-import { checkForUpgrade } from './utils'
+import { checkForUpgrade, getSettings } from './utils'
 
 const currentDirname = dirname(fileURLToPath(import.meta.url))
 
@@ -35,6 +35,10 @@ function createWindow(): void {
   ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
   ipcMain.handle('check-for-upgrade', (_, show) => checkForUpgrade(mainWindow, show))
   ipcMain.handle('exit-app', () => mainWindow.destroy())
+
+  if (getSettings().autoCheckUpgrade) {
+    checkForUpgrade(mainWindow)
+  }
 
   mainWindow.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url)

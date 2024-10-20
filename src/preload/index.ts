@@ -5,7 +5,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 // Custom APIs for renderer
 /// sorted
 export const api = {
-  checkForUpgrade: (show: boolean) => ipcRenderer.invoke('check-for-upgrade', show),
+  checkForUpgrade: (show?: boolean) => ipcRenderer.invoke('check-for-upgrade', show),
   cleanStores: () => ipcRenderer.invoke('clean-stores'),
   cleanUploads: () => ipcRenderer.invoke('clean-uploads-dir'),
   exitApp: () => ipcRenderer.invoke('exit-app'),

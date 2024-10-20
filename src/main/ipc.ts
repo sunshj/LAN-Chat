@@ -5,15 +5,7 @@ import process from 'node:process'
 import { app, dialog, ipcMain, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
 import { networkStore, store, storeHandlers } from './store'
-import { $notify, fetchReleases, getResPath, openFile } from './utils'
-
-function getSettings() {
-  const settings = store.get('settings')
-  return {
-    ...settings,
-    uploadsDir: settings.uploadsDir || path.join(getResPath(), 'uploads')
-  }
-}
+import { $notify, fetchReleases, getResPath, getSettings, openFile } from './utils'
 
 export function ipcHandler() {
   ipcMain.handle('start-server', (_, { host, port }) => {

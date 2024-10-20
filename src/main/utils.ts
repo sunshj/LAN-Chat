@@ -13,6 +13,7 @@ import {
   type NotificationConstructorOptions,
   type OpenDialogOptions
 } from 'electron'
+import { store } from './store'
 
 export function $notify(
   title: string,
@@ -139,4 +140,12 @@ export async function openFile(options: OpenDialogOptions) {
     return filePaths[0]
   }
   return null
+}
+
+export function getSettings() {
+  const settings = store.get('settings')
+  return {
+    ...settings,
+    uploadsDir: settings.uploadsDir || path.join(getResPath(), 'uploads')
+  }
 }
