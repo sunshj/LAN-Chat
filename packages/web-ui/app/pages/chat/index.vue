@@ -68,6 +68,7 @@ import { useZIndex, type UploadFile, type UploadProgressEvent } from 'element-pl
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
 const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const fileStore = useFileStore()
 
@@ -224,12 +225,17 @@ $socket.on('$new-message', handleNewMessage)
 
 onBeforeMount(() => {
   appStore.setInitialScrolled(false)
+
+  const uid = route.query.uid as string
+  if (!uid || !appStore.validateUid(uid)) {
+    appStore.clearCurrentChatUser()
+    router.push('/')
+    return
+  }
+  appStore.setCurrentChatUser(uid)
 })
 
 onMounted(() => {
-  const uid = route.query.uid as string
-  if (uid) appStore.setCurrentChatUser(uid)
-
   if (appStore.currentChatMessages.length > 0) {
     appStore.setMessagesAsRead()
 

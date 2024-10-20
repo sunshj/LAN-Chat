@@ -88,6 +88,10 @@ export const useAppStore = defineStore(
       })
     }
 
+    function validateUid(uid: string) {
+      return users.value.some(user => user.id === uid)
+    }
+
     function generateChatId(userId: string) {
       return [userId, userInfo.value.id].sort().join('-')
     }
@@ -191,7 +195,8 @@ export const useAppStore = defineStore(
       deleteMessage,
       setMessagesAsRead,
       cleanUselessChat,
-      unreadMessagesCount
+      unreadMessagesCount,
+      validateUid
     }
   },
   {
