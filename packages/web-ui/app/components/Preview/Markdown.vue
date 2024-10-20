@@ -1,5 +1,5 @@
 <template>
-  <div ref="mdRef" class="md-output relative" @click.stop="handleClick" v-html="output" />
+  <div ref="mdRef" class="md-output" v-html="output" />
   <div
     v-if="isLoading"
     :class="[
@@ -67,14 +67,47 @@ const unregisterParseMarkdownReply = $worker.on('parse-markdown-reply', payload 
   }
   emit('loaded')
   isLoading.value = false
+  nextTick(renderCodeCopyButton)
 })
 
-async function handleClick(e: Event) {
-  const target = e.target as HTMLDivElement
-  if ('lang' in target.dataset) {
-    await copy(target.textContent!)
-    ElMessage.success('Copied!')
-  }
+function renderCodeCopyButton() {
+  if (!mdRef.value) return
+
+  mdRef.value.querySelectorAll('pre[data-lang]').forEach(el => {
+    const lang = (el.dataset.lang as string).toUpperCase()
+
+    const copyBtn = document.createElement('span')
+    const copyBtnStyle = {
+      position: 'absolute',
+      inset: '0 0 auto auto',
+      padding: '4px',
+      color: '#64778b',
+      opacity: '0.2',
+      fontSize: '16px',
+      fontWeight: 'bolder',
+      cursor: 'pointer'
+    }
+
+    Object.assign(copyBtn.style, copyBtnStyle)
+
+    copyBtn.textContent = lang
+    copyBtn.addEventListener('click', () => {
+      copy(el.textContent!)
+      ElMessage.success('Copied!')
+    })
+
+    copyBtn.addEventListener('mouseenter', () => {
+      copyBtn.textContent = 'Copy'
+      copyBtn.style.opacity = '0.8'
+    })
+
+    copyBtn.addEventListener('mouseleave', () => {
+      copyBtn.textContent = lang
+      copyBtn.style.opacity = copyBtnStyle.opacity
+    })
+
+    el.append(copyBtn)
+  })
 }
 
 onUpdated(() => {
@@ -125,27 +158,5 @@ td {
   overflow-x: auto;
   margin: 6px 0;
   position: relative;
-  pointer-events: none;
-}
-
-.md-output pre.shiki::before {
-  content: attr(data-lang);
-  pointer-events: auto;
-  cursor: pointer;
-  position: absolute;
-  top: 0;
-  right: 0;
-  text-align: center;
-  font-size: 16px;
-  text-transform: uppercase;
-  color: #64778b;
-  opacity: 0.2;
-  padding: 4px;
-  font-weight: bolder;
-  z-index: 99;
-}
-
-.md-output pre.shiki:hover::before {
-  content: 'Copy';
 }
 </style>
