@@ -1,10 +1,6 @@
 <template>
-  <ElContainer class="h-full">
-    <ElHeader class="h-15 flex items-center justify-between bg-gray-100 px-4">
-      <div>LAN Chat</div>
-
-      <Avatar :id="appStore.userInfo.id" :size="40" @click="gotoProfile()" />
-    </ElHeader>
+  <ElContainer class="h-full" direction="vertical">
+    <AppHeader @show-profile="showProfile" />
 
     <main class="flex flex-wrap gap-2 p-2">
       <div
@@ -48,7 +44,7 @@ function gotoChat(user: User) {
   })
 }
 
-function gotoProfile() {
+function showProfile() {
   profileDrawerVisible.value = true
 }
 

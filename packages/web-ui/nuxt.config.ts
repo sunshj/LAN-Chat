@@ -1,4 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import { execSync } from 'node:child_process'
+
 export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: false },
@@ -23,6 +24,14 @@ export default defineNuxtConfig({
     '@element-plus/nuxt',
     '@vueuse/nuxt'
   ],
+
+  runtimeConfig: {
+    public: {
+      buildTime: Date.now(),
+      gitSha: execSync('git rev-parse HEAD').toString().trim(),
+      repoUrl: 'https://github.com/sunshj/LAN-Chat'
+    }
+  },
 
   $development: {
     runtimeConfig: {

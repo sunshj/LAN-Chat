@@ -1,12 +1,12 @@
 <template>
-  <ElDrawer v-model="visible" direction="btt" size="100%">
+  <ElDrawer v-model="visible" direction="btt" size="100%" @close="onDrawerClose">
     <div class="h-full w-full flex flex-col items-center gap-2 p-2">
       <Avatar :id="appStore.userInfo.id" />
 
       <div v-if="editable" class="flex items-center gap-2">
         <ElInput
+          ref="inputRef"
           v-model="appStore.userInfo.username"
-          autofocus
           size="small"
           placeholder="Username"
           @keydown.enter="saveProfile()"
@@ -29,7 +29,21 @@ const visible = defineModel<boolean>({
   default: false,
   required: true
 })
+
+const inputRef = ref<HTMLInputElement | null>(null)
 const editable = ref(false)
+
+watch(editable, val => {
+  if (val) {
+    nextTick(() => {
+      inputRef.value?.focus()
+    })
+  }
+})
+
+function onDrawerClose() {
+  editable.value = false
+}
 
 async function saveProfile() {
   editable.value = false
