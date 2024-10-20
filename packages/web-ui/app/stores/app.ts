@@ -133,8 +133,9 @@ export const useAppStore = defineStore(
     }
 
     function cleanUselessChat() {
-      const userIds = users.value.map(user => user.id).filter(id => id !== GROUP_CHAT_ID)
+      const userIds = users.value.map(user => user.id)
       Object.keys(messages.value).forEach(cid => {
+        if (cid === GROUP_CHAT_ID) return
         if (!userIds.some(userId => generateChatId(userId) === cid)) {
           Reflect.deleteProperty(messages.value, cid)
         }
