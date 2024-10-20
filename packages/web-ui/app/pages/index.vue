@@ -5,7 +5,7 @@
     <main class="flex flex-wrap gap-2 p-2">
       <!-- group chat -->
       <div
-        class="relative w-36 flex-center flex-col cursor-pointer gap-2 border border-1px border-amber rounded-xl border-solid p-2 text-sm font-bold uppercase transition hover:scale-105 hover:bg-gray-1"
+        class="relative min-h-30 w-36 flex-center flex-col cursor-pointer gap-2 border border-1px border-amber rounded-xl border-solid p-2 text-sm font-bold uppercase transition hover:scale-105 hover:bg-gray-1"
         @click="gotoGroupChat"
       >
         <ElBadge> Group Chat </ElBadge>

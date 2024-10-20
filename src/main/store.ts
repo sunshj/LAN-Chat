@@ -1,6 +1,6 @@
 import Store from 'electron-store'
 import { getNetworksAddr, getResPath, isEmptyObj } from './utils'
-import type { StoreHandlers } from 'lan-chat-server'
+import type { Message, StoreHandlers } from 'lan-chat-server'
 
 interface User {
   id: string
@@ -8,7 +8,11 @@ interface User {
 }
 
 export const store = new Store<{
+  /** store data */
   users: User[]
+  messages: Message[]
+
+  /** app settings */
   networks: Record<string, number>
   quitApp: 'quit' | 'minimize' | 'none'
   quitAppTipChecked: boolean
@@ -23,6 +27,7 @@ export const store = new Store<{
   cwd: getResPath(),
   defaults: {
     users: [],
+    messages: [],
     networks: {},
     quitApp: 'none',
     quitAppTipChecked: false,
@@ -37,11 +42,13 @@ export const store = new Store<{
 export const storeHandlers: StoreHandlers = {
   get() {
     return {
-      users: store.get('users', [])
+      users: store.get('users', []),
+      messages: store.get('messages', [])
     }
   },
   set(_store) {
     store.set('users', _store.users)
+    store.set('messages', _store.messages)
   }
 }
 
