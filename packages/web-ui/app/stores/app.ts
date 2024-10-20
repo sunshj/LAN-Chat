@@ -174,6 +174,20 @@ export const useAppStore = defineStore(
       )
     })
 
+    async function createGroupMessage(msg: Message) {
+      const { data: res } = await $fetch<{ data: Message }>('/api/group_chat/message', {
+        method: 'POST',
+        body: msg
+      })
+
+      return res
+    }
+
+    async function fetchGroupMessages() {
+      const { data: res } = await $fetch<{ data: Message[] }>('/api/group_chat/messages')
+      messages.value[GROUP_CHAT_ID] = res
+    }
+
     return {
       initialScrolled,
       setInitialScrolled,
@@ -203,7 +217,9 @@ export const useAppStore = defineStore(
       setMessagesAsRead,
       cleanUselessChat,
       unreadMessagesCount,
-      validateUid
+      validateUid,
+      createGroupMessage,
+      fetchGroupMessages
     }
   },
   {

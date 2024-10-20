@@ -150,6 +150,7 @@ const sendMessage = useThrottleFn(() => {
   if (appStore.onlineUsers.length === 0) return ElMessage.error('当前群聊无在线用户，无法发送消息')
   const msg = appStore.addMessage(message.value)
   $socket.emit('$new-group-message', msg)
+  appStore.createGroupMessage(msg)
 
   message.value = ''
 
@@ -187,6 +188,7 @@ async function onUploadSuccess(res: UploadFileResult, file: UploadFile) {
   const msg = appStore.addMessage(newFilename, { type, payload })
   fileStore.fileStatus.push({ file: msg.content, download: true })
   $socket.emit('$new-group-message', msg)
+  appStore.createGroupMessage(msg)
 
   nextTick(() => {
     scrollToBottom()
@@ -204,6 +206,8 @@ $socket.on('$new-group-message', handleNewMessage)
 onBeforeMount(() => {
   appStore.setInitialScrolled(false)
 
+  appStore.fetchGroupMessages()
+
   appStore.setCurrentChatUser({
     id: GROUP_CHAT_ID,
     username: 'Group Chat'
@@ -215,18 +219,17 @@ onMounted(() => {
     appStore.setMessagesAsRead()
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
-    if (fileMessages.length > 0) {
-      $worker.emit(
-        'check-file',
-        fileMessages.map(v => v.content)
-      )
-    }
-
-    nextTick(() => {
-      scrollToBottom()
-      textFieldRef.value?.focus()
-    })
+    if (fileMessages.length === 0) return
+    $worker.emit(
+      'check-file',
+      fileMessages.map(v => v.content)
+    )
   }
+
+  nextTick(() => {
+    scrollToBottom()
+    textFieldRef.value?.focus()
+  })
 })
 
 onBeforeUnmount(() => {

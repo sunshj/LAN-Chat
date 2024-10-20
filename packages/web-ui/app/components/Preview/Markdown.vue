@@ -65,9 +65,13 @@ const unregisterParseMarkdownReply = $worker.on('parse-markdown-reply', payload 
     fileStore.setMarkdown(md => md.filter(v => v.id !== props.id))
     mdRef.value?.setAttribute('data-render', 'true')
   }
+
   emit('loaded')
   isLoading.value = false
-  nextTick(renderCodeCopyButton)
+
+  nextTick(() => {
+    renderCodeCopyButton()
+  })
 })
 
 function renderCodeCopyButton() {
@@ -98,7 +102,7 @@ function renderCodeCopyButton() {
 
     copyBtn.addEventListener('mouseenter', () => {
       copyBtn.textContent = 'Copy'
-      copyBtn.style.opacity = '0.8'
+      copyBtn.style.opacity = '0.6'
     })
 
     copyBtn.addEventListener('mouseleave', () => {

@@ -220,12 +220,11 @@ onMounted(() => {
     appStore.setMessagesAsRead()
 
     const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
-    if (fileMessages.length > 0) {
-      $worker.emit(
-        'check-file',
-        fileMessages.map(v => v.content)
-      )
-    }
+    if (fileMessages.length === 0) return
+    $worker.emit(
+      'check-file',
+      fileMessages.map(v => v.content)
+    )
 
     nextTick(() => {
       scrollToBottom()
