@@ -77,7 +77,7 @@ const unregisterParseMarkdownReply = $worker.on('parse-markdown-reply', payload 
 function renderCodeCopyButton() {
   if (!mdRef.value) return
 
-  mdRef.value.querySelectorAll('pre[data-lang]').forEach(el => {
+  mdRef.value.querySelectorAll<HTMLPreElement>('pre[data-lang]').forEach(el => {
     const lang = (el.dataset.lang as string).toUpperCase()
 
     const copyBtn = document.createElement('span')
