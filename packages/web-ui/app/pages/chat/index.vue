@@ -7,22 +7,13 @@
     >
       <div ref="containerRef" class="relative w-full flex-1 overflow-y-auto bg-gray-2">
         <div class="h-full flex-1 p-10px">
-          <div
+          <ChatMessage
             v-for="msg in appStore.currentChatMessages"
             :key="msg.time"
-            :class="msg.sender === appStore.userInfo.id ? 'flex justify-end' : 'flex'"
-          >
-            <div
-              :class="['message', msg.sender === appStore.userInfo.id ? 'sender' : 'receiver']"
-              @contextmenu.prevent="handleContextMenu($event, msg.mid)"
-              @click.stop
-            >
-              <ChatPreviewer :message="msg" @loaded="scrollToBottom" />
-              <p class="relative block w-full text-end text-xs text-[#777]">
-                {{ formatTimeAgo(new Date(msg.time)) }}
-              </p>
-            </div>
-          </div>
+            :msg
+            @loaded="scrollToBottom"
+            @contextmenu="handleContextMenu"
+          />
         </div>
       </div>
     </main>

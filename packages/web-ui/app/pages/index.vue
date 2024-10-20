@@ -3,6 +3,20 @@
     <AppHeader @show-profile="showProfile" />
 
     <main class="flex flex-wrap gap-2 p-2">
+      <!-- group chat -->
+      <div
+        class="group relative w-36 flex-center flex-col cursor-pointer gap-2 border border-1px border-gray-1 rounded-xl border-solid p-2 text-sm font-bold uppercase transition hover:scale-105 hover:bg-gray-1"
+        @click="gotoGroupChat"
+      >
+        <div
+          class="absolute right-0 top-0 scale-125 px-2 opacity-0 transition hover:text-blue-500 group-hover:opacity-100"
+        >
+          ×
+        </div>
+        <ElBadge> Group Chat </ElBadge>
+      </div>
+
+      <!-- private chat -->
       <div
         v-for="user in appStore.hasChatHistoryOrOnlineUsers"
         :key="user.id"
@@ -42,6 +56,10 @@ function gotoChat(user: User) {
       uid: user.id
     }
   })
+}
+
+function gotoGroupChat() {
+  router.push('/chat/group')
 }
 
 function showProfile() {
