@@ -1,11 +1,13 @@
 <template>
   <div :class="props.msg.sender === appStore.userInfo.id ? 'flex justify-end' : 'flex gap-4'">
-    <Avatar
-      v-if="isGroupChat && props.msg.sender !== appStore.userInfo.id"
-      :id="props.msg.sender"
-      :size="35"
-      @click="gotoPrivateChat()"
-    />
+    <div class="h-10 w-10">
+      <Avatar
+        v-if="isGroupChat && props.msg.sender !== appStore.userInfo.id"
+        :id="props.msg.sender"
+        :size="35"
+        @click="gotoPrivateChat()"
+      />
+    </div>
 
     <div class="flex flex-col gap-1">
       <div class="text-xs text-[#777]">{{ senderName }}</div>
