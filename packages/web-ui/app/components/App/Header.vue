@@ -28,5 +28,5 @@ defineEmits(['showProfile'])
 
 const builtTime = formatTimeAgo(new Date(config.public.buildTime as number))
 const shortenGitSha = (config.public.gitSha as string).slice(0, 5)
-const gitCommitUrl = `${config.public.repoUrl}/${config.public.gitSha}`
+const gitCommitUrl = `${config.public.repoUrl}/commit/${config.public.gitSha}`
 </script>
