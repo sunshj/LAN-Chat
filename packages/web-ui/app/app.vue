@@ -28,7 +28,7 @@ async function onConnect() {
 }
 
 function onDisconnect() {
-  appStore.setOnlineUsers([])
+  appStore.setRawOnlineUsers([])
 }
 
 function handleNewMessage(msg: Message) {
@@ -47,11 +47,10 @@ function handleNewMessage(msg: Message) {
 }
 
 async function handleGetUsers(usersId: string[]) {
-  const remainIds = usersId.filter(id => id !== appStore.userInfo.id)
   const allUsers = await appStore.fetchUsers()
   appStore.setUsers(allUsers)
-  const onlineUsers = allUsers.filter(user => remainIds.includes(user.id))
-  appStore.setOnlineUsers(onlineUsers)
+  const onlineUsers = allUsers.filter(user => usersId.includes(user.id))
+  appStore.setRawOnlineUsers(onlineUsers)
 
   const currentChatUser = onlineUsers.find(user => user.id === appStore.currentChatUser.id)
   if (currentChatUser) {

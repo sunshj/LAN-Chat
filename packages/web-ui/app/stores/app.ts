@@ -30,8 +30,12 @@ export const useAppStore = defineStore(
     }
 
     const users = ref<User[]>([])
+    /** online users */
+    const rawOnlineUsers = ref<User[]>([])
     /** online users(ignore self) */
-    const onlineUsers = ref<User[]>([])
+    const onlineUsers = computed(() => {
+      return rawOnlineUsers.value.filter(user => user.id !== userInfo.value.id)
+    })
 
     /** has chat history or online users(ignore self)  */
     const hasChatHistoryOrOnlineUsers = computed(() => {
@@ -55,8 +59,8 @@ export const useAppStore = defineStore(
       users.value = newUsers
     }
 
-    function setOnlineUsers(newUsers: User[]) {
-      onlineUsers.value = newUsers
+    function setRawOnlineUsers(newUsers: User[]) {
+      rawOnlineUsers.value = newUsers
     }
 
     async function createUser(username: string) {
@@ -196,10 +200,11 @@ export const useAppStore = defineStore(
       fetchUser,
       updateUser,
       users,
+      setUsers,
+      rawOnlineUsers,
+      setRawOnlineUsers,
       onlineUsers,
       hasChatHistoryOrOnlineUsers,
-      setUsers,
-      setOnlineUsers,
       fetchUsers,
       createUser,
       currentChatUser,

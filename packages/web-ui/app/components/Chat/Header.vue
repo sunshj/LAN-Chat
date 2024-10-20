@@ -16,7 +16,7 @@
       </ElBadge>
 
       <div>{{ appStore.currentChatUser.username }}</div>
-      <div v-if="isGroupChat">( {{ appStore.onlineUsers.length + 1 }} 人在线 )</div>
+      <div v-if="isGroupChat">( {{ appStore.rawOnlineUsers.length }} 人在线 )</div>
     </div>
   </header>
 </template>
