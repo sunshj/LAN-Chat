@@ -65,7 +65,7 @@ const textFieldRef = ref<TextFieldExposed | null>(null)
 
 const { scrollToBottom } = useScrollToBottom(containerRef)
 
-const { message, sendMessage, handleContextMenu } = useChatMessage({
+const { message, sendMessage, handleContextMenu, checkFileStatus } = useChatMessage({
   onNewMessage: () => nextTick(scrollToBottom),
   onBeforeSendMessage() {
     if (appStore.currentChatIsOnline) return true
@@ -96,6 +96,8 @@ onMounted(() => {
     return
   }
   appStore.setCurrentChatUser(uid)
+
+  checkFileStatus()
 
   nextTick(() => {
     scrollToBottom()

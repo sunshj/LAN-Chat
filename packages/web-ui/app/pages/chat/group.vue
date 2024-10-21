@@ -63,7 +63,7 @@ const textFieldRef = ref<TextFieldExposed | null>(null)
 
 const { scrollToBottom } = useScrollToBottom(containerRef)
 
-const { message, sendMessage, handleContextMenu } = useChatMessage({
+const { message, sendMessage, handleContextMenu, checkFileStatus } = useChatMessage({
   isGroupChat: true,
   onNewMessage: () => nextTick(scrollToBottom),
   onBeforeSendMessage() {
@@ -90,14 +90,16 @@ function onBeforeUpload() {
 
 onBeforeMount(() => {
   appStore.syncGroupMessages()
+})
 
+onMounted(() => {
   appStore.setCurrentChatUser({
     id: GROUP_CHAT_ID,
     username: 'Group Chat'
   })
-})
 
-onMounted(() => {
+  checkFileStatus()
+
   nextTick(() => {
     scrollToBottom()
     textFieldRef.value?.focus()

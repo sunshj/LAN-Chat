@@ -32,16 +32,18 @@ export function useChatMessage(options: ChatMessageOptions) {
 
   $socket.on(event, options.onNewMessage!)
 
+  function checkFileStatus() {
+    const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
+    if (fileMessages.length === 0) return
+    $worker.emit(
+      'check-file',
+      fileMessages.map(v => v.content)
+    )
+  }
+
   onMounted(() => {
     if (appStore.currentChatMessages.length > 0) {
       appStore.setMessagesAsRead()
-
-      const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
-      if (fileMessages.length === 0) return
-      $worker.emit(
-        'check-file',
-        fileMessages.map(v => v.content)
-      )
     }
   })
 
@@ -117,6 +119,7 @@ export function useChatMessage(options: ChatMessageOptions) {
   return {
     message,
     sendMessage,
+    checkFileStatus,
     handleContextMenu
   }
 }
