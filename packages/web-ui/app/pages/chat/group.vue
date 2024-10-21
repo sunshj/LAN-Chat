@@ -63,11 +63,11 @@ const textFieldRef = ref<TextFieldExposed | null>(null)
 
 const { scrollToBottom } = useScrollToBottom(containerRef)
 
-const { message, sendMessage, handleContextMenu } = useChatMessage('$new-group-message', {
+const { message, sendMessage, handleContextMenu } = useChatMessage({
+  isGroupChat: true,
   onNewMessage: () => nextTick(scrollToBottom),
   onBeforeSendMessage() {
     if (appStore.onlineUsers.length !== 0) return true
-
     ElMessage.error('当前群聊无在线用户，无法发送消息')
     return false
   },

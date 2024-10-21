@@ -4,15 +4,18 @@ import type { Awaitable, ClientToServerEvents, ServerToClientEvents } from 'lan-
 type EventName = keyof ClientToServerEvents & keyof ServerToClientEvents
 
 interface ChatMessageOptions {
+  isGroupChat?: boolean
   onNewMessage: () => void
   onBeforeSendMessage?: () => boolean
   onSendMessage?: (msg: Message) => Awaitable<void>
 }
 
-export function useChatMessage(event: EventName, options: ChatMessageOptions) {
+export function useChatMessage(options: ChatMessageOptions) {
   const appStore = useAppStore()
   const fileStore = useFileStore()
   const { $socket, $contextmenu, $worker } = useNuxtApp()
+
+  const event: EventName = options.isGroupChat ? '$new-group-message' : '$new-message'
 
   const message = ref('')
 
@@ -77,7 +80,7 @@ export function useChatMessage(event: EventName, options: ChatMessageOptions) {
       zIndex: nextZIndex(),
       items: [
         {
-          label: '复制',
+          label: selectedText.value ? '复制选中' : '复制',
           hidden: currentSelectMessage.value?.type !== 'text' && !selectedText.value,
           async onClick() {
             const text = selectedText.value || currentSelectMessage.value?.content
@@ -94,6 +97,7 @@ export function useChatMessage(event: EventName, options: ChatMessageOptions) {
         },
         {
           label: '删除',
+          hidden: options.isGroupChat,
           onClick() {
             ElMessageBox.confirm('确定要删除这条消息吗？', '提示', {
               type: 'warning',

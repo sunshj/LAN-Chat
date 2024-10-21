@@ -59,14 +59,13 @@ import type { TextFieldExposed } from '@/components/TextField.vue'
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
-// const fileStore = useFileStore()
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const textFieldRef = ref<TextFieldExposed | null>(null)
 
 const { scrollToBottom } = useScrollToBottom(containerRef)
 
-const { message, sendMessage, handleContextMenu } = useChatMessage('$new-message', {
+const { message, sendMessage, handleContextMenu } = useChatMessage({
   onNewMessage: () => nextTick(scrollToBottom),
   onBeforeSendMessage() {
     if (appStore.currentChatIsOnline) return true
@@ -98,17 +97,6 @@ onMounted(() => {
   }
   appStore.setCurrentChatUser(uid)
 
-  // if (appStore.currentChatMessages.length > 0) {
-  //   appStore.setMessagesAsRead()
-
-  //   const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
-  //   if (fileMessages.length === 0) return
-  //   $worker.emit(
-  //     'check-file',
-  //     fileMessages.map(v => v.content)
-  //   )
-
-  // }
   nextTick(() => {
     scrollToBottom()
     textFieldRef.value?.focus()
