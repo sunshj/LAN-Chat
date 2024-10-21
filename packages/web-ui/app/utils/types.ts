@@ -19,10 +19,10 @@ export interface ParsedMarkdown {
 
 export type ClientEventsMap = {
   'check-file': (files: string[]) => void
-  'parse-markdown': (payload: ParsedMarkdown[]) => void
+  'parse-markdown': (payload: ParsedMarkdown) => void
 }
 
 export type WorkerEventsMap = {
   'check-file-reply': (result: FileStatus[]) => void
-  'parse-markdown-reply': (result: ParsedMarkdown[]) => void
+  'parse-markdown-reply': (result: ParsedMarkdown) => void
 }

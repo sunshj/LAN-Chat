@@ -1,12 +1,6 @@
 export const useAppStore = defineStore(
   'app',
   () => {
-    const initialScrolled = ref(false)
-
-    function setInitialScrolled(value: boolean) {
-      initialScrolled.value = value
-    }
-
     const userInfo = ref<User>({
       id: '',
       username: ''
@@ -187,14 +181,12 @@ export const useAppStore = defineStore(
       return res
     }
 
-    async function fetchGroupMessages() {
+    async function syncGroupMessages() {
       const { data: res } = await $fetch<{ data: Message[] }>('/api/group_chat/messages')
       messages.value[GROUP_CHAT_ID] = res
     }
 
     return {
-      initialScrolled,
-      setInitialScrolled,
       userInfo,
       setUserInfo,
       fetchUser,
@@ -224,7 +216,7 @@ export const useAppStore = defineStore(
       unreadMessagesCount,
       validateUid,
       createGroupMessage,
-      fetchGroupMessages
+      syncGroupMessages
     }
   },
   {

@@ -24,15 +24,19 @@ getSingletonHighlighter({
   )
 })
 
-async function markdownParser(id: string, value: string) {
-  const html = await marked.parse(value)
-
-  return {
-    id,
-    value: html
+async function parseMarkdown(md: ParsedMarkdown): Promise<ParsedMarkdown> {
+  const { id, value } = md
+  try {
+    const html = await marked.parse(value)
+    return { id, value: html }
+  } catch {
+    return {
+      id,
+      value,
+      error: 'parse markdown failed'
+    }
   }
 }
-
 async function checkFileStatus(file: string) {
   try {
     const response = await fetch(formatFileUrl(file), {
@@ -64,13 +68,7 @@ worker.on('check-file', async payload => {
 })
 
 worker.on('parse-markdown', async payload => {
-  const promises = payload.map(({ id, value }) => markdownParser(id, value))
-  const data = await Promise.allSettled(promises)
-
-  const result = data.map((item, index) => {
-    if (item.status === 'fulfilled') return item.value
-    return { ...payload[index]!, error: 'parse markdown failed' }
-  })
+  const result = await parseMarkdown(payload)
 
   worker.emit('parse-markdown-reply', result)
 })

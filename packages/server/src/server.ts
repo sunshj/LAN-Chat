@@ -16,7 +16,7 @@ import {
 } from 'h3'
 import { readFiles } from 'h3-formidable'
 import { lookup } from 'mrmime'
-import { messageSchema, userSchema } from './schema'
+import { extractZodError, messageSchema, userSchema } from './schema'
 import { toGroupChatMessageStore, toUserStore, type StoreHandlers } from './store'
 
 export interface CreateServerOptions {
@@ -135,7 +135,7 @@ export function createHostServer(options: CreateServerOptions) {
     eventHandler(async event => {
       const { error, data: msg } = await readValidatedBody(event, messageSchema.safeParseAsync)
       if (error) {
-        throw createError({ statusCode: 400, statusMessage: error.errors[0].message })
+        throw createError({ statusCode: 400, message: extractZodError(error) })
       }
 
       return {

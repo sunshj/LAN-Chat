@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { extractZodError, serverSchema } from './schema'
 import { createHostServer, type CreateServerOptions } from './server'
 import { createWSServer } from './ws'
 import type { WebSocketServer } from './types'
@@ -21,21 +21,11 @@ function cleanUp() {
   server?.close()
 }
 
-const schema = z.object({
-  port: z
-    .number()
-    .int()
-    .min(1)
-    .max(65535)
-    .refine(n => n !== 443, 'Port 443 is not allowed'),
-  host: z.string().min(1).ip({ version: 'v4' }).or(z.literal('localhost'))
-})
-
 export async function startServer(options: StartServerOptions) {
   const { host, port, uiDir, uploadsDir, onListening, storeHandlers } = options
 
-  const { error, data } = schema.safeParse({ host, port })
-  if (error) throw new Error(error.errors.map(e => e.message).join(', '))
+  const { error, data } = serverSchema.safeParse({ host, port })
+  if (error) throw new Error(extractZodError(error))
 
   cleanUp()
 

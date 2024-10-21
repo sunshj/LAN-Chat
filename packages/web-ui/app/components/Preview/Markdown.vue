@@ -26,8 +26,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['loaded'])
-const appStore = useAppStore()
-const fileStore = useFileStore()
 
 const output = ref(props.value)
 const errorMsg = ref('')
@@ -37,32 +35,23 @@ const { copy } = useClipboard({ legacy: true })
 
 const mdRef = ref<HTMLDivElement | null>(null)
 
-watchEffect(() => {
-  if (!props.value) return
-  isLoading.value = true
-
-  if (appStore.initialScrolled) {
-    useIntersectionObserver(mdRef, (entries, el) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !(entry.target as HTMLDivElement).dataset.render) {
-          fileStore.setMarkdown(md => md.concat({ id: props.id, value: props.value }))
-          el.unobserve(entry.target)
-        }
-      })
-
-      $worker.emit('parse-markdown', toRaw(fileStore.markdown))
-    })
-  }
+const observer = useIntersectionObserver(mdRef, (entries, el) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !(entry.target as HTMLDivElement).dataset.render) {
+      isLoading.value = true
+      $worker.emit('parse-markdown', { id: props.id, value: props.value })
+      el.unobserve(entry.target)
+    }
+  })
 })
 
 const unregisterParseMarkdownReply = $worker.on('parse-markdown-reply', payload => {
+  if (props.id !== payload.id) return
   if (mdRef.value && mdRef.value.dataset.render) return
 
-  const data = payload.find(v => v.id === props.id)
-  if (data?.error) errorMsg.value = data.error
-  if (data?.value) {
-    output.value = data.value
-    fileStore.setMarkdown(md => md.filter(v => v.id !== props.id))
+  if (payload?.error) errorMsg.value = payload.error
+  if (payload?.value) {
+    output.value = payload.value
     mdRef.value?.setAttribute('data-render', 'true')
   }
 
@@ -96,13 +85,13 @@ function renderCodeCopyButton() {
 
     copyBtn.textContent = lang
     copyBtn.addEventListener('click', () => {
-      copy(el.textContent!)
+      copy(el.querySelector('code')!.textContent!)
       ElMessage.success('Copied!')
     })
 
     copyBtn.addEventListener('mouseenter', () => {
-      copyBtn.textContent = 'Copy'
-      copyBtn.style.opacity = '0.6'
+      copyBtn.textContent = 'COPY'
+      copyBtn.style.opacity = '0.5'
     })
 
     copyBtn.addEventListener('mouseleave', () => {
@@ -121,6 +110,7 @@ onUpdated(() => {
 })
 
 onBeforeUnmount(() => {
+  observer.stop()
   unregisterParseMarkdownReply()
 })
 </script>
