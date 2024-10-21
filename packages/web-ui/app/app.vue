@@ -9,6 +9,7 @@
 const appStore = useAppStore()
 const fileStore = useFileStore()
 const { $socket } = useNuxtApp()
+const router = useRouter()
 
 onBeforeMount(() => {
   appStore.cleanUselessChat()
@@ -43,6 +44,25 @@ function handleNewMessage(msg: Message) {
   // set file downloaded
   if (msg.type !== 'text') {
     fileStore.fileStatus.push({ file: msg.content, download: true })
+  }
+
+  // notification
+  if (msg.receiver === appStore.userInfo.id && msg.sender !== appStore.currentChatUser.id) {
+    const senderName = appStore.users.find(user => user.id === msg.sender)?.username
+    const notification = ElNotification.success({
+      title: 'You have a new message',
+      message: `From ${senderName} (click to chat)`,
+      customClass: 'cursor-pointer',
+      position: 'top-right',
+      duration: 3000,
+      onClick() {
+        router.push({
+          path: '/chat',
+          query: { uid: msg.sender }
+        })
+        notification.close()
+      }
+    })
   }
 }
 
