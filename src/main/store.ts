@@ -1,5 +1,5 @@
 import Store from 'electron-store'
-import { getNetworksAddr, getResPath, isEmptyObj } from './utils'
+import { getNetworksAddr, isEmptyObj } from './utils'
 import type { Message, StoreHandlers } from 'lan-chat-server'
 
 interface User {
@@ -24,7 +24,6 @@ export const store = new Store<{
   }
 }>({
   name: 'stores',
-  cwd: getResPath(),
   defaults: {
     users: [],
     messages: [],
