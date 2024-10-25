@@ -19,7 +19,7 @@ export function useChatMessage(options: ChatMessageOptions) {
 
   const message = ref('')
 
-  const sendMessage = useThrottleFn(() => {
+  const sendMessage = useThrottleFn(async () => {
     if (!message.value.trim()) return
     const isSuccess = options.onBeforeSendMessage?.()
     if (!isSuccess) return
@@ -27,7 +27,7 @@ export function useChatMessage(options: ChatMessageOptions) {
     $socket.emit(event, msg)
     message.value = ''
 
-    options.onSendMessage?.(msg)
+    await options.onSendMessage?.(msg)
   }, 2000)
 
   $socket.on(event, options.onNewMessage!)

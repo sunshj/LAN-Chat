@@ -53,6 +53,12 @@ function gotoPrivateChat() {
 }
 </script>
 
+<style>
+.vue-recycle-scroller__item-wrapper {
+  overflow: unset;
+}
+</style>
+
 <style scoped>
 .message {
   position: relative;
@@ -76,6 +82,7 @@ function gotoPrivateChat() {
 .message.sender {
   background-color: #dcf8c6;
   border-top-right-radius: 0;
+  margin-right: 2px;
 }
 
 .message.sender::before {

@@ -1,26 +1,29 @@
 <template>
   <div class="h-full flex flex-col">
     <ChatHeader :online="appStore.currentChatIsOnline" />
-    <main
-      id="mainContainer"
-      class="h-full w-full flex flex-1 flex-col items-center gap-2 overflow-y-auto"
-    >
-      <div ref="containerRef" class="relative w-full flex-1 overflow-y-auto bg-gray-2">
-        <div class="h-full flex-1 p-10px">
-          <ChatMessage
-            v-for="msg in appStore.currentChatMessages"
-            :key="msg.time"
-            :msg
-            @loaded="scrollToBottom"
-            @contextmenu="handleContextMenu"
-          />
-        </div>
-      </div>
-    </main>
+    <ChatMain>
+      <DynamicScroller
+        ref="scrollerRef"
+        class="h-full w-full flex-1 flex-1 overflow-y-auto bg-gray-2 p-10px"
+        :items="appStore.currentChatMessages"
+        :min-item-size="60"
+        key-field="mid"
+        @resize="scrollToBottom"
+      >
+        <template #default="{ item, active }">
+          <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[item.content]">
+            <ChatMessage
+              :key="item.mid"
+              :msg="item"
+              @loaded="scrollToBottom"
+              @contextmenu="handleContextMenu"
+            />
+          </DynamicScrollerItem>
+        </template>
+      </DynamicScroller>
+    </ChatMain>
 
-    <footer
-      class="relative min-h-14 w-full flex flex-0-0-auto items-start justify-around gap-2 bg-white p-2"
-    >
+    <ChatFooter>
       <div
         :class="['absolute inset-0 z-10 h-1 w-full', percentage > 0 && 'bg-green-500']"
         :style="{ translate: `-${remainPercent}` }"
@@ -49,31 +52,36 @@
       <ElButton type="primary" size="large" :disabled="!message" @click="sendMessage()">
         Send
       </ElButton>
-    </footer>
+    </ChatFooter>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { TextFieldExposed } from '@/components/TextField.vue'
+import type { DynamicScroller } from 'vue-virtual-scroller'
 
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
 
-const containerRef = ref<HTMLDivElement | null>(null)
+const scrollerRef = ref<DynamicScroller | null>(null)
 const textFieldRef = ref<TextFieldExposed | null>(null)
 
-const { scrollToBottom } = useScrollToBottom(containerRef)
+function scrollToBottom() {
+  nextTick(() => {
+    scrollerRef.value?.scrollToBottom()
+  })
+}
 
 const { message, sendMessage, handleContextMenu, checkFileStatus } = useChatMessage({
-  onNewMessage: () => nextTick(scrollToBottom),
+  onNewMessage: () => scrollToBottom(),
   onBeforeSendMessage() {
     if (appStore.currentChatIsOnline) return true
     ElMessage.error('当前用户不在线，无法发送消息')
     return false
   },
   onSendMessage() {
-    nextTick(scrollToBottom)
+    scrollToBottom()
   }
 })
 
@@ -85,7 +93,7 @@ function onBeforeUpload() {
 }
 
 const { percentage, remainPercent, onUploadProgress, onUploadSuccess } = useFileUploader({
-  onSuccess: () => nextTick(scrollToBottom)
+  onSuccess: () => scrollToBottom()
 })
 
 onMounted(() => {
@@ -100,7 +108,6 @@ onMounted(() => {
   checkFileStatus()
 
   nextTick(() => {
-    scrollToBottom()
     textFieldRef.value?.focus()
   })
 })
