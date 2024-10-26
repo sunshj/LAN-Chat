@@ -12,7 +12,7 @@
         @contextmenu.prevent="$emit('contextmenu', $event, props.msg.mid)"
         @click.stop
       >
-        <ChatPreviewer :message="props.msg" @loaded="$emit('loaded')" />
+        <ChatPreviewer :message="props.msg" />
         <p class="relative block w-full text-end text-xs text-[#777]">
           {{ formatTimeAgo(new Date(props.msg.time)) }}
         </p>
@@ -32,7 +32,6 @@ const props = defineProps<{
 }>()
 
 defineEmits<{
-  loaded: []
   contextmenu: [event: MouseEvent, mid: string]
 }>()
 

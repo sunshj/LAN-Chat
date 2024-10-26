@@ -1,16 +1,14 @@
-import { marked, type TokensList } from 'marked'
-
 export function isMarkdownValue(value: string) {
-  function containsNonTextTokens(tokens: TokensList) {
-    return tokens.some(token => {
-      if (token.type !== 'text' && token.type !== 'paragraph') return true
-      // @ts-expect-error
-      if (token.tokens && containsNonTextTokens(token.tokens)) return true
-      return false
-    })
-  }
-  const tokens = marked.lexer(value)
-  return containsNonTextTokens(tokens)
+  if (value.startsWith('---md\n')) return true
+  if (value.startsWith('```')) return true
+  if (URL.canParse(value)) return true
+  return false
+}
+
+export function removeMarkdownSign(value: string) {
+  if (value.startsWith('---md\n')) return value.replace(/^---md\n/, '')
+
+  return value
 }
 
 export function generateMarkdownCodeBlock(language: string, code: string) {

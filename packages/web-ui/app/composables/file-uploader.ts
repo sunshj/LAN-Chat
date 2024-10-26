@@ -6,7 +6,6 @@ interface FileUploaderOptions {
 
 export function useFileUploader(options: FileUploaderOptions = {}) {
   const appStore = useAppStore()
-  const fileStore = useFileStore()
   const { $socket } = useNuxtApp()
 
   const percentage = ref(0)
@@ -29,7 +28,6 @@ export function useFileUploader(options: FileUploaderOptions = {}) {
     payload.image = type === 'image' ? await getImageThumbnail(file.raw!) : undefined
 
     const msg = appStore.addMessage(newFilename, { type, payload })
-    fileStore.fileStatus.push({ file: msg.content, download: true })
     $socket.emit('$new-message', msg)
 
     options.onSuccess?.()

@@ -6,18 +6,12 @@
         ref="scrollerRef"
         class="h-full w-full flex-1 flex-1 overflow-y-auto bg-gray-2 p-10px"
         :items="appStore.currentChatMessages"
-        :min-item-size="60"
+        :min-item-size="73"
         key-field="mid"
-        @resize="scrollToBottom"
       >
         <template #default="{ item, active }">
-          <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[item.content]">
-            <ChatMessage
-              :key="item.mid"
-              :msg="item"
-              @loaded="scrollToBottom"
-              @contextmenu="handleContextMenu"
-            />
+          <DynamicScrollerItem :item="item" :active="active">
+            <ChatMessage :key="item.mid" :msg="item" @contextmenu="handleContextMenu" />
           </DynamicScrollerItem>
         </template>
       </DynamicScroller>
@@ -71,7 +65,7 @@ function scrollToBottom() {
   })
 }
 
-const { message, sendMessage, handleContextMenu, checkFileStatus } = useChatMessage({
+const { message, sendMessage, handleContextMenu } = useChatMessage({
   isGroupChat: true,
   onNewMessage: scrollToBottom,
   onBeforeSendMessage() {
@@ -105,8 +99,6 @@ onMounted(() => {
     id: GROUP_CHAT_ID,
     username: 'Group Chat'
   })
-
-  checkFileStatus()
 
   nextTick(() => {
     textFieldRef.value?.focus()

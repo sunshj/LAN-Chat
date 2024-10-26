@@ -6,7 +6,6 @@
       :key="mid + type"
       :value="content"
       :is-sender="sender === appStore.userInfo.id"
-      @loaded="emit('loaded')"
     />
 
     <div v-else>{{ content }}</div>
@@ -35,7 +34,6 @@
       <template #preview="scope">
         <PreviewMarkdown
           :id="mid"
-          :key="mid + type"
           :value="scope.content"
           :is-sender="sender === appStore.userInfo.id"
         />
@@ -48,10 +46,6 @@
 const props = defineProps<{
   message: Message
   error?: string
-}>()
-
-const emit = defineEmits<{
-  loaded: []
 }>()
 
 const { type, content, sender, payload, mid } = toRefs(props.message)

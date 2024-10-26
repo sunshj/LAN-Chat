@@ -74,6 +74,16 @@ export default defineNuxtConfig({
       hmr: {
         clientPort: 8080
       }
+    },
+
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('shiki/dist/langs')) return 'shiki-langs'
+          }
+        }
+      }
     }
   },
 

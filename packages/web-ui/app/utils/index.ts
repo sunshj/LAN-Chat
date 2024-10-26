@@ -27,6 +27,21 @@ export function getFileExtension(filename: string) {
   return filename.slice(filename.lastIndexOf('.') + 1)
 }
 
+export async function readFileStatus(file: string) {
+  try {
+    const res = await fetch(formatFileUrl(file), { method: 'HEAD' })
+    return {
+      file,
+      download: res.ok
+    }
+  } catch {
+    return {
+      file,
+      download: false
+    }
+  }
+}
+
 export async function readFileContent(url: string) {
   return await fetch(url).then(res => res.text())
 }

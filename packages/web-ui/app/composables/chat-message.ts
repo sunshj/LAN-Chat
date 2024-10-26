@@ -12,8 +12,7 @@ interface ChatMessageOptions {
 
 export function useChatMessage(options: ChatMessageOptions) {
   const appStore = useAppStore()
-  const fileStore = useFileStore()
-  const { $socket, $contextmenu, $worker } = useNuxtApp()
+  const { $socket, $contextmenu } = useNuxtApp()
 
   const event: EventName = options.isGroupChat ? '$new-group-message' : '$new-message'
 
@@ -32,15 +31,6 @@ export function useChatMessage(options: ChatMessageOptions) {
 
   $socket.on(event, options.onNewMessage!)
 
-  function checkFileStatus() {
-    const fileMessages = appStore.currentChatMessages?.filter(m => m.type !== 'text')
-    if (fileMessages.length === 0) return
-    $worker.emit(
-      'check-file',
-      fileMessages.map(v => v.content)
-    )
-  }
-
   onMounted(() => {
     if (appStore.currentChatMessages.length > 0) {
       appStore.setMessagesAsRead()
@@ -49,7 +39,6 @@ export function useChatMessage(options: ChatMessageOptions) {
 
   onBeforeUnmount(() => {
     message.value = ''
-    fileStore.setFileStatus([])
     $socket.off(event, options.onNewMessage!)
   })
 
@@ -119,7 +108,6 @@ export function useChatMessage(options: ChatMessageOptions) {
   return {
     message,
     sendMessage,
-    checkFileStatus,
     handleContextMenu
   }
 }

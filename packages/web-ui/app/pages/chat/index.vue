@@ -12,12 +12,7 @@
       >
         <template #default="{ item, active }">
           <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[item.content]">
-            <ChatMessage
-              :key="item.mid"
-              :msg="item"
-              @loaded="scrollToBottom"
-              @contextmenu="handleContextMenu"
-            />
+            <ChatMessage :key="item.mid" :msg="item" @contextmenu="handleContextMenu" />
           </DynamicScrollerItem>
         </template>
       </DynamicScroller>
@@ -73,7 +68,7 @@ function scrollToBottom() {
   })
 }
 
-const { message, sendMessage, handleContextMenu, checkFileStatus } = useChatMessage({
+const { message, sendMessage, handleContextMenu } = useChatMessage({
   onNewMessage: () => scrollToBottom(),
   onBeforeSendMessage() {
     if (appStore.currentChatIsOnline) return true
@@ -104,8 +99,6 @@ onMounted(() => {
     return
   }
   appStore.setCurrentChatUser(uid)
-
-  checkFileStatus()
 
   nextTick(() => {
     textFieldRef.value?.focus()

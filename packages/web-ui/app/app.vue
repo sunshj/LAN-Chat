@@ -7,7 +7,6 @@
 
 <script setup lang="ts">
 const appStore = useAppStore()
-const fileStore = useFileStore()
 const { $socket } = useNuxtApp()
 const router = useRouter()
 
@@ -39,11 +38,6 @@ function handleNewMessage(msg: Message) {
   // set message read
   if (msg.receiver === appStore.userInfo.id && msg.sender === appStore.currentChatUser.id) {
     msg.read = true
-  }
-
-  // set file downloaded
-  if (msg.type !== 'text') {
-    fileStore.fileStatus.push({ file: msg.content, download: true })
   }
 
   // notification

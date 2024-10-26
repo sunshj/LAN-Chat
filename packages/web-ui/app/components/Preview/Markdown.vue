@@ -1,73 +1,33 @@
 <template>
-  <div ref="mdRef" class="md-output" v-html="output" />
-  <div
-    v-if="isLoading"
-    :class="[
-      'w-full flex items-center gap-2 -bottom-6',
-      {
-        '-left-1': props.isSender,
-        '-right-1 justify-end': !props.isSender
-      }
-    ]"
-  >
-    <IconSpinner />
-    <span>rendering...</span>
-  </div>
-  <div v-if="errorMsg" class="mt-2 w-full text-center text-sm text-red-600">{{ errorMsg }}</div>
+  <div ref="mdRef" class="md-output" v-html="code" />
 </template>
 
 <script setup lang="ts">
-const { $worker } = useNuxtApp()
-
 const props = defineProps<{
   id: string
   value: string
   isSender: boolean
 }>()
 
-const emit = defineEmits(['loaded'])
+const mdRef = ref<HTMLDivElement | null>(null)
+const { $md } = useNuxtApp()
 
-const output = ref(props.value)
-const errorMsg = ref('')
-const isLoading = ref(false)
+const code = computed(() => $md.render(removeMarkdownSign(props.value)))
+
+watchPostEffect(() => {
+  if (code.value) {
+    renderCodeCopyButton()
+    renderLink()
+  }
+})
 
 const { copy } = useClipboard({ legacy: true })
-
-const mdRef = ref<HTMLDivElement | null>(null)
-
-const observer = useIntersectionObserver(mdRef, (entries, el) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting && !(entry.target as HTMLDivElement).dataset.render) {
-      isLoading.value = true
-      $worker.emit('parse-markdown', { id: props.id, value: props.value })
-      el.unobserve(entry.target)
-    }
-  })
-})
-
-const unregisterParseMarkdownReply = $worker.on('parse-markdown-reply', payload => {
-  if (props.id !== payload.id) return
-  if (mdRef.value && mdRef.value.dataset.render) return
-
-  if (payload?.error) errorMsg.value = payload.error
-  if (payload?.value) {
-    output.value = payload.value
-    mdRef.value?.setAttribute('data-render', 'true')
-  }
-
-  emit('loaded')
-  isLoading.value = false
-
-  nextTick(() => {
-    renderCodeCopyButton()
-  })
-})
 
 function renderCodeCopyButton() {
   if (!mdRef.value) return
 
-  mdRef.value.querySelectorAll<HTMLPreElement>('pre[data-lang]').forEach(el => {
-    const lang = (el.dataset.lang as string).toUpperCase()
+  mdRef.value.querySelectorAll<HTMLPreElement>('pre.shiki').forEach(el => {
+    const [, lang] = el.querySelector('code')?.className.split('-') || []
 
     const copyBtn = document.createElement('span')
     const copyBtnStyle = {
@@ -83,7 +43,7 @@ function renderCodeCopyButton() {
 
     Object.assign(copyBtn.style, copyBtnStyle)
 
-    copyBtn.textContent = lang
+    copyBtn.textContent = lang.toUpperCase()
     copyBtn.addEventListener('click', () => {
       copy(el.querySelector('code')!.textContent!)
       ElMessage.success('Copied!')
@@ -95,7 +55,7 @@ function renderCodeCopyButton() {
     })
 
     copyBtn.addEventListener('mouseleave', () => {
-      copyBtn.textContent = lang
+      copyBtn.textContent = lang.toUpperCase()
       copyBtn.style.opacity = copyBtnStyle.opacity
     })
 
@@ -103,16 +63,13 @@ function renderCodeCopyButton() {
   })
 }
 
-onUpdated(() => {
-  document.querySelectorAll('.md-output a').forEach(el => {
+function renderLink() {
+  if (!mdRef.value) return
+
+  mdRef.value.querySelectorAll<HTMLAnchorElement>('a').forEach(el => {
     el.setAttribute('target', '_blank')
   })
-})
-
-onBeforeUnmount(() => {
-  observer.stop()
-  unregisterParseMarkdownReply()
-})
+}
 </script>
 
 <style>
