@@ -17,12 +17,13 @@ export async function getAudioFileInfo(file: File) {
   const filename = file.name.slice(0, file.name.lastIndexOf('.'))
   const coverName = `${file?.name}-cover.jpg`
 
-  info.title = common.title || (filename.includes('-') ? filename.split('-')[1] : filename)
-  info.artist = common.artist || (filename.includes('-') ? filename.split('-')[0] : '')
+  info.title =
+    common.title || (filename.includes('-') ? filename.split('-')[1] : filename) || filename
+  info.artist = common.artist || (filename.includes('-') ? filename.split('-')[0] : '') || filename
 
   if (common.picture && common.picture.length > 0) {
     const [pic] = common.picture
-    const coverFile = new File([pic.data], coverName, { type: pic.format })
+    const coverFile = new File([pic!.data], coverName, { type: pic?.format })
     const res = await uploadFile(coverFile)
     info.pic = res.data.newFilename
   }

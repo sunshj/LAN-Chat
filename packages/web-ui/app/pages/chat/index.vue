@@ -69,7 +69,7 @@ function scrollToBottom() {
 }
 
 const { message, sendMessage, handleContextMenu } = useChatMessage({
-  onNewMessage: () => scrollToBottom(),
+  onNewMessage: scrollToBottom,
   onBeforeSendMessage() {
     if (appStore.currentChatIsOnline) return true
     ElMessage.error('当前用户不在线，无法发送消息')
@@ -88,7 +88,7 @@ function onBeforeUpload() {
 }
 
 const { percentage, remainPercent, onUploadProgress, onUploadSuccess } = useFileUploader({
-  onSuccess: () => scrollToBottom()
+  onSuccess: scrollToBottom
 })
 
 onMounted(() => {

@@ -5,16 +5,14 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   sourcemap: false,
 
-  srcDir: './app',
+  future: {
+    compatibilityVersion: 4
+  },
 
   app: {
     head: {
       title: 'LAN Chat'
     }
-  },
-
-  experimental: {
-    payloadExtraction: false
   },
 
   modules: [
@@ -59,17 +57,15 @@ export default defineNuxtConfig({
   },
 
   mdc: {
-    highlight: {},
+    highlight: {
+      theme: 'github-light-default'
+    },
     headings: {
       anchorLinks: false
     },
     components: {
       prose: true
     }
-  },
-
-  elementPlus: {
-    icon: false
   },
 
   piniaPluginPersistedstate: {
@@ -80,16 +76,6 @@ export default defineNuxtConfig({
     server: {
       hmr: {
         clientPort: 8080
-      }
-    },
-
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks(id: string) {
-            if (id.includes('shiki/dist/langs')) return 'shiki-langs'
-          }
-        }
       }
     }
   },
@@ -116,5 +102,7 @@ export default defineNuxtConfig({
     },
 
     sourceMap: false
-  }
+  },
+
+  compatibilityDate: '2024-11-01'
 })

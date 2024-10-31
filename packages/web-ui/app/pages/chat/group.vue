@@ -80,7 +80,11 @@ const { message, sendMessage, handleContextMenu } = useChatMessage({
 })
 
 const { percentage, remainPercent, onUploadProgress, onUploadSuccess } = useFileUploader({
-  onSuccess: () => scrollToBottom()
+  isGroupChat: true,
+  async onSuccess(msg) {
+    await appStore.createGroupMessage(msg)
+    scrollToBottom()
+  }
 })
 
 function onBeforeUpload() {

@@ -119,13 +119,13 @@ export const useAppStore = defineStore(
         ...options
       }
       if (!messages.value[currentChatId.value]) messages.value[currentChatId.value] = []
-      messages.value[currentChatId.value].push(msg)
+      messages.value[currentChatId.value]!.push(msg)
       return msg
     }
 
     function deleteMessage(mid: string) {
       const msgs = messages.value[currentChatId.value]
-      if (msgs?.length > 0) {
+      if (msgs?.length) {
         messages.value[currentChatId.value] = msgs.filter(msg => msg.mid !== mid)
       }
     }

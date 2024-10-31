@@ -1,7 +1,4 @@
 import { useZIndex } from 'element-plus'
-import type { Awaitable, ClientToServerEvents, ServerToClientEvents } from 'lan-chat-server'
-
-type EventName = keyof ClientToServerEvents & keyof ServerToClientEvents
 
 interface ChatMessageOptions {
   isGroupChat?: boolean
@@ -14,7 +11,7 @@ export function useChatMessage(options: ChatMessageOptions) {
   const appStore = useAppStore()
   const { $socket, $contextmenu } = useNuxtApp()
 
-  const event: EventName = options.isGroupChat ? '$new-group-message' : '$new-message'
+  const event: SocketEventName = options.isGroupChat ? '$new-group-message' : '$new-message'
 
   const message = ref('')
 

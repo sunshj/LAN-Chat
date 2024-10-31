@@ -1,12 +1,15 @@
 import type { UploadFile, UploadProgressEvent } from 'element-plus'
 
 interface FileUploaderOptions {
-  onSuccess?: () => void
+  isGroupChat?: boolean
+  onSuccess?: (msg: Message) => Awaitable<void>
 }
 
 export function useFileUploader(options: FileUploaderOptions = {}) {
   const appStore = useAppStore()
   const { $socket } = useNuxtApp()
+
+  const event: SocketEventName = options.isGroupChat ? '$new-group-message' : '$new-message'
 
   const percentage = ref(0)
   const remainPercent = computed(() => `${100 - percentage.value}%`)
@@ -28,9 +31,9 @@ export function useFileUploader(options: FileUploaderOptions = {}) {
     payload.image = type === 'image' ? await getImageThumbnail(file.raw!) : undefined
 
     const msg = appStore.addMessage(newFilename, { type, payload })
-    $socket.emit('$new-message', msg)
+    $socket.emit(event, msg)
 
-    options.onSuccess?.()
+    options.onSuccess?.(msg)
   }
 
   return {
