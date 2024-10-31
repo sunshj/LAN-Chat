@@ -67,9 +67,6 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    worker: {
-      format: 'es'
-    },
     server: {
       hmr: {
         clientPort: 8080
@@ -105,7 +102,7 @@ export default defineNuxtConfig({
 
     prerender: {
       crawlLinks: true,
-      routes: ['/', '/chat', '/404.html']
+      routes: ['/', '/chat', '/chat/group', '/404.html']
     },
 
     sourceMap: false
