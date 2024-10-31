@@ -22,7 +22,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@element-plus/nuxt',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    '@nuxtjs/mdc'
   ],
 
   runtimeConfig: {
@@ -50,12 +51,21 @@ export default defineNuxtConfig({
   },
 
   devServer: {
-    port: 8080,
-    host: '0.0.0.0'
+    port: 8080
   },
 
   imports: {
     dirs: ['./app/stores']
+  },
+
+  mdc: {
+    highlight: {},
+    headings: {
+      anchorLinks: false
+    },
+    components: {
+      prose: true
+    }
   },
 
   elementPlus: {
@@ -76,7 +86,7 @@ export default defineNuxtConfig({
     build: {
       rollupOptions: {
         output: {
-          manualChunks(id) {
+          manualChunks(id: string) {
             if (id.includes('shiki/dist/langs')) return 'shiki-langs'
           }
         }

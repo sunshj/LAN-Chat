@@ -7,7 +7,6 @@ export function isMarkdownValue(value: string) {
 
 export function removeMarkdownSign(value: string) {
   if (value.startsWith('---md\n')) return value.replace(/^---md\n/, '')
-
   return value
 }
 

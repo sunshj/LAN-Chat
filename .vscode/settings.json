@@ -21,5 +21,8 @@
     "jsonc",
     "yaml"
   ],
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "nuxtr.defaultPackageManager": "pnpm",
+  "nuxtr.monorepoMode.DirectoryName": "./packages/web-ui",
+  "nuxtr.piniaFiles.defaultTemplate": "setup"
 }

@@ -2,10 +2,8 @@
   <div v-if="type === 'text'">
     <PreviewMarkdown
       v-if="isMarkdownValue(content)"
-      :id="mid"
-      :key="mid + type"
-      :value="content"
-      :is-sender="sender === appStore.userInfo.id"
+      :key="mid"
+      :value="removeMarkdownSign(content)"
     />
 
     <div v-else>{{ content }}</div>
@@ -32,11 +30,7 @@
 
     <PreviewFile v-else :url="formatFileUrl(content)" :filename="content" :error="props.error">
       <template #preview="scope">
-        <PreviewMarkdown
-          :id="mid"
-          :value="scope.content"
-          :is-sender="sender === appStore.userInfo.id"
-        />
+        <PreviewMarkdown :value="scope.content" />
       </template>
     </PreviewFile>
   </div>
@@ -48,7 +42,5 @@ const props = defineProps<{
   error?: string
 }>()
 
-const { type, content, sender, payload, mid } = toRefs(props.message)
-
-const appStore = useAppStore()
+const { mid, type, content, payload } = toRefs(props.message)
 </script>
