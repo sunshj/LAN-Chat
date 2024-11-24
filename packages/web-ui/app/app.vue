@@ -12,24 +12,11 @@ const router = useRouter()
 
 onBeforeMount(() => {
   appStore.cleanUselessChat()
+
+  $socket.on('$new-message', handleNewMessage)
+  $socket.on('$new-group-message', handleNewMessage)
+  $socket.on('$get-users', handleGetUsers)
 })
-
-async function onConnect() {
-  const storageUid = appStore.userInfo.id || 'invalid_uid'
-  const userExist = await appStore.fetchUser(storageUid)
-
-  if (userExist) {
-    $socket.emit('$user-online', appStore.userInfo.id)
-  } else {
-    const user = await appStore.createUser(getDeviceName(navigator.userAgent!))
-    appStore.setUserInfo(user)
-    $socket.emit('$user-online', user.id)
-  }
-}
-
-function onDisconnect() {
-  appStore.setRawOnlineUsers([])
-}
 
 function handleNewMessage(msg: Message) {
   if (!appStore.messages[msg.cid]) appStore.messages[msg.cid] = []
@@ -72,15 +59,7 @@ async function handleGetUsers(usersId: string[]) {
   }
 }
 
-$socket.on('connect', onConnect)
-$socket.on('$new-message', handleNewMessage)
-$socket.on('$new-group-message', handleNewMessage)
-$socket.on('$get-users', handleGetUsers)
-$socket.on('disconnect', onDisconnect)
-
 onBeforeUnmount(() => {
-  $socket.off('connect', onConnect)
-  $socket.off('disconnect', onDisconnect)
   $socket.off('$new-message', handleNewMessage)
   $socket.off('$new-group-message', handleNewMessage)
   $socket.off('$get-users', handleGetUsers)
@@ -101,5 +80,9 @@ body,
   height: 100%;
   width: 100%;
   overflow: hidden;
+}
+
+.prose-p {
+  margin: 0;
 }
 </style>

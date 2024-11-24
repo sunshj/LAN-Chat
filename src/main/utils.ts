@@ -20,14 +20,14 @@ export function $notify(
   message: string,
   options: NotificationConstructorOptions = {}
 ) {
-  const notificationAfterStartServer = new Notification({
+  const notification = new Notification({
     title,
     body: message,
     icon: path.join(getResPath(), 'icon.png'),
     ...options
   })
-  notificationAfterStartServer.show()
-  return notificationAfterStartServer
+  notification.show()
+  return notification
 }
 
 export const isEmptyObj = (obj: object) => Object.keys(obj).length === 0

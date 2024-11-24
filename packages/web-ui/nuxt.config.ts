@@ -15,6 +15,12 @@ export default defineNuxtConfig({
     }
   },
 
+  router: {
+    options: {
+      scrollBehaviorType: 'smooth'
+    }
+  },
+
   modules: [
     '@unocss/nuxt',
     '@pinia/nuxt',
@@ -52,19 +58,12 @@ export default defineNuxtConfig({
     port: 8080
   },
 
-  imports: {
-    dirs: ['./app/stores']
-  },
-
   mdc: {
     highlight: {
       theme: 'github-light-default'
     },
     headings: {
       anchorLinks: false
-    },
-    components: {
-      prose: true
     }
   },
 
@@ -84,7 +83,6 @@ export default defineNuxtConfig({
     experimental: {
       websocket: true
     },
-    preset: 'static',
     output: {
       publicDir: '../../resources/ui'
     },
@@ -94,11 +92,6 @@ export default defineNuxtConfig({
         target: 'http://127.0.0.1:3000/api',
         changeOrigin: true
       }
-    },
-
-    prerender: {
-      crawlLinks: true,
-      routes: ['/', '/chat', '/chat/group', '/404.html']
     },
 
     sourceMap: false
