@@ -1,6 +1,6 @@
 {
   "name": "lan-chat",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": true,
   "description": "局域网聊天与传输工具",
   "type": "module",
