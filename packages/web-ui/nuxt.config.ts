@@ -22,12 +22,12 @@ export default defineNuxtConfig({
   },
 
   modules: [
+    '@sunshj/mdc',
     '@unocss/nuxt',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@element-plus/nuxt',
-    '@vueuse/nuxt',
-    '@nuxtjs/mdc'
+    '@vueuse/nuxt'
   ],
 
   runtimeConfig: {

@@ -2,19 +2,14 @@
   <div class="h-full flex flex-col">
     <ChatHeader group :online="appStore.currentChatIsOnline" />
     <ChatMain>
-      <DynamicScroller
-        ref="scrollerRef"
-        class="h-full w-full flex-1 flex-1 overflow-y-auto bg-gray-2 p-10px"
-        :items="appStore.currentChatMessages"
-        :min-item-size="73"
-        key-field="mid"
-      >
-        <template #default="{ item, active }">
-          <DynamicScrollerItem :item="item" :active="active">
-            <ChatMessage :key="item.mid" :msg="item" @contextmenu="handleContextMenu" />
-          </DynamicScrollerItem>
-        </template>
-      </DynamicScroller>
+      <div ref="scrollerRef" class="h-full w-full flex-1 flex-1 overflow-y-auto bg-gray-2 p-10px">
+        <ChatMessage
+          v-for="item in appStore.currentChatMessages"
+          :key="item.mid"
+          :msg="item"
+          @contextmenu="handleContextMenu"
+        />
+      </div>
     </ChatMain>
 
     <ChatFooter>
@@ -52,18 +47,13 @@
 
 <script setup lang="ts">
 import type { TextFieldExposed } from '~/components/TextField.vue'
-import type { DynamicScroller } from 'vue-virtual-scroller'
 
 const appStore = useAppStore()
 
-const scrollerRef = ref<DynamicScroller | null>(null)
+const scrollerRef = ref<HTMLDivElement | null>(null)
 const textFieldRef = ref<TextFieldExposed | null>(null)
 
-function scrollToBottom() {
-  nextTick(() => {
-    scrollerRef.value?.scrollToBottom()
-  })
-}
+const { scrollToBottom } = useScrollBottom(scrollerRef)
 
 const { message, sendMessage, handleContextMenu } = useChatMessage({
   isGroupChat: true,
@@ -95,6 +85,7 @@ function onBeforeUpload() {
 }
 
 onBeforeMount(() => {
+  appStore.clearGroupMessages()
   appStore.syncGroupMessages()
 })
 

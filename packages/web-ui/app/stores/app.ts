@@ -186,6 +186,10 @@ export const useAppStore = defineStore(
       messages.value[GROUP_CHAT_ID] = res
     }
 
+    function clearGroupMessages() {
+      messages.value[GROUP_CHAT_ID] = []
+    }
+
     return {
       userInfo,
       setUserInfo,
@@ -216,7 +220,8 @@ export const useAppStore = defineStore(
       unreadMessagesCount,
       validateUid,
       createGroupMessage,
-      syncGroupMessages
+      syncGroupMessages,
+      clearGroupMessages
     }
   },
   {

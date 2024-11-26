@@ -2,7 +2,8 @@ export function isMarkdownValue(value: string) {
   if (value.startsWith('---md\n')) return true
   if (value.startsWith('```')) return true
   // eslint-disable-next-line regexp/no-unused-capturing-group
-  if (/^http(s)?:\/\//.test(value)) return true
+  if (/(((ht|f)tps?):\/\/)?([^!@#$%^&*?.\s-]([^!@#$%^&*?.\s]{1,64})?\.)+[a-z]{2,6}\/?/.test(value))
+    return true
   return false
 }
 
