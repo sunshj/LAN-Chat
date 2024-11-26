@@ -10,6 +10,12 @@ const appStore = useAppStore()
 const { $socket } = useNuxtApp()
 const router = useRouter()
 
+const bus = useEventBus('mdc:copied')
+
+bus.on(() => {
+  ElMessage.success('Copied!')
+})
+
 onBeforeMount(() => {
   appStore.cleanUselessChat()
 
