@@ -2,10 +2,11 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
-import { app, dialog, ipcMain, shell } from 'electron'
+import { app, dialog, ipcMain, shell, type BrowserWindow } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
 import { networkStore, store, storeHandlers } from './store'
-import { $notify, fetchReleases, getResPath, getSettings, openFile } from './utils'
+import { $notify, getResPath, getSettings, openFile } from './utils/app'
+import { checkForUpgrade, fetchReleases } from './utils/updater'
 
 export function ipcHandler() {
   ipcMain.handle('start-server', (_, { host, port }) => {
@@ -17,7 +18,7 @@ export function ipcHandler() {
       uploadsDir,
       storeHandlers,
       onListening(host) {
-        networkStore.incr(host)
+        networkStore.increment(host)
 
         if (notificationAfterStartServer) {
           const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)
@@ -113,4 +114,10 @@ export function ipcHandler() {
         .join('\n')
     })
   })
+}
+
+export function ipcHandlerAfterReady(mainWindow: BrowserWindow) {
+  ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
+  ipcMain.handle('check-for-upgrade', (_, show) => checkForUpgrade(mainWindow, show))
+  ipcMain.handle('exit-app', () => mainWindow.destroy())
 }

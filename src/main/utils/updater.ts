@@ -1,66 +1,8 @@
 import { exec } from 'node:child_process'
-import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
-import os from 'node:os'
 import path from 'node:path'
-import process from 'node:process'
 import axios from 'axios'
-import {
-  app,
-  dialog,
-  Notification,
-  type BrowserWindow,
-  type NotificationConstructorOptions,
-  type OpenDialogOptions
-} from 'electron'
-import { store } from './store'
-
-export function $notify(
-  title: string,
-  message: string,
-  options: NotificationConstructorOptions = {}
-) {
-  const notification = new Notification({
-    title,
-    body: message,
-    icon: path.join(getResPath(), 'icon.png'),
-    ...options
-  })
-  notification.show()
-  return notification
-}
-
-export const isEmptyObj = (obj: object) => Object.keys(obj).length === 0
-
-export const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
-export const randomId = (n = 16) => crypto.randomBytes(16).toString('hex').slice(0, n)
-
-/**
- * 获取resources目录
- */
-export function getResPath() {
-  const resourcesPathDev = path.join(process.cwd(), 'resources')
-  const resourcesPathProd = path
-    .join(app.getAppPath(), 'resources')
-    .replace('app.asar', 'app.asar.unpacked')
-  return app.isPackaged ? resourcesPathProd : resourcesPathDev
-}
-
-export function getNetworksAddr() {
-  return Object.values(os.networkInterfaces())
-    .flatMap(nInterface => nInterface ?? [])
-    .filter(
-      detail =>
-        detail &&
-        detail.address &&
-        (detail.family === 'IPv4' ||
-          // @ts-expect-error Node 18.0 - 18.3 returns number
-          detail.family === 4)
-    )
-    .map(v => v.address)
-    .reverse()
-}
+import { app, dialog, type BrowserWindow } from 'electron'
 
 export async function fetchReleases() {
   const { data: res } = await axios
@@ -114,7 +56,7 @@ export async function upgradeApp(url: string, onProgress?: (val: number) => void
     .get(url, {
       responseType: 'arraybuffer',
       onDownloadProgress(e) {
-        onProgress && onProgress(Number.parseFloat(e.progress!.toFixed(2)))
+        onProgress?.(Number.parseFloat(e.progress!.toFixed(2)))
       }
     })
     .catch(error => {
@@ -132,20 +74,4 @@ export async function upgradeApp(url: string, onProgress?: (val: number) => void
     app.exit()
   }, 100)
   exec(`start "" "${tempPath}"`)
-}
-
-export async function openFile(options: OpenDialogOptions) {
-  const { canceled, filePaths } = await dialog.showOpenDialog(options)
-  if (!canceled) {
-    return filePaths[0]
-  }
-  return null
-}
-
-export function getSettings() {
-  const settings = store.get('settings')
-  return {
-    ...settings,
-    uploadsDir: settings.uploadsDir || path.join(getResPath(), 'uploads')
-  }
 }

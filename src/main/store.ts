@@ -1,5 +1,5 @@
 import Store from 'electron-store'
-import { getNetworksAddr, isEmptyObj } from './utils'
+import { getNetworkAddresses, isEmptyObj } from './utils'
 import type { Message, StoreHandlers } from 'lan-chat-server'
 
 interface User {
@@ -56,7 +56,7 @@ export const networkStore = {
     if (isEmptyObj(store.get('networks'))) {
       store.set(
         'networks',
-        getNetworksAddr().reduce((acc, item) => ((acc[item] = 0), acc), {})
+        getNetworkAddresses().reduce((acc, item) => ((acc[item] = 0), acc), {})
       )
     }
 
@@ -65,7 +65,7 @@ export const networkStore = {
       .map(([ip]) => ip)
   },
 
-  incr(ip: string) {
+  increment(ip: string) {
     const count = store.get('networks', {})[ip] ?? 0
     store.set('networks', { ...store.get('networks', {}), [ip]: count + 1 })
   }

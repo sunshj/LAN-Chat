@@ -21,7 +21,6 @@
       <ElUpload
         :show-file-list="false"
         action="/api/upload"
-        :before-upload="onBeforeUpload"
         :on-progress="onUploadProgress"
         :on-success="onUploadSuccess"
       >
@@ -59,7 +58,7 @@ const { message, sendMessage, handleContextMenu } = useChatMessage({
   isGroupChat: true,
   onNewMessage: scrollToBottom,
   onBeforeSendMessage() {
-    if (appStore.onlineUsers.length !== 0) return true
+    if (appStore.users.length !== 0) return true
     ElMessage.error('当前群聊无在线用户，无法发送消息')
     return false
   },
@@ -76,13 +75,6 @@ const { percentage, remainPercent, onUploadProgress, onUploadSuccess } = useFile
     scrollToBottom()
   }
 })
-
-function onBeforeUpload() {
-  if (appStore.onlineUsers.length === 0) {
-    ElMessage.error('当前群聊无在线用户，无法发送消息')
-    return false
-  }
-}
 
 onBeforeMount(() => {
   appStore.clearGroupMessages()

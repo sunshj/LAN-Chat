@@ -2,17 +2,18 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, ipcMain, shell, Tray } from 'electron'
-import { ipcHandler } from './ipc'
+import { app, BrowserWindow, dialog, shell, Tray } from 'electron'
+import { ipcHandler, ipcHandlerAfterReady } from './ipc'
 import { createTrayMenu } from './menu'
 import { store } from './store'
-import { checkForUpgrade, getSettings } from './utils'
+import { getSettings } from './utils/app'
+import { checkForUpgrade } from './utils/updater'
 
 const currentDirname = dirname(fileURLToPath(import.meta.url))
 
 const icon = join(currentDirname, '../../resources/icon.png')
 
-function createWindow(): void {
+function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 500,
@@ -31,10 +32,6 @@ function createWindow(): void {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
-
-  ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
-  ipcMain.handle('check-for-upgrade', (_, show) => checkForUpgrade(mainWindow, show))
-  ipcMain.handle('exit-app', () => mainWindow.destroy())
 
   if (getSettings().autoCheckUpgrade) {
     checkForUpgrade(mainWindow)
@@ -99,6 +96,8 @@ function createWindow(): void {
     mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
     mainWindow.isVisible() ? mainWindow.setSkipTaskbar(false) : mainWindow.setSkipTaskbar(true)
   })
+
+  return mainWindow
 }
 
 // This method will be called when Electron has finished
@@ -118,7 +117,10 @@ app.whenReady().then(() => {
   // IPC
   ipcHandler()
 
-  createWindow()
+  const mainWindow = createWindow()
+
+  // IPC (after ready)
+  ipcHandlerAfterReady(mainWindow)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
