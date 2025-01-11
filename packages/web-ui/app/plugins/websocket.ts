@@ -5,7 +5,7 @@ type SocketType = Socket<ServerToClientEvents, ClientToServerEvents>
 
 export default defineNuxtPlugin(nuxtApp => {
   const { wsUrl } = nuxtApp.$config.public
-  const url = wsUrl === '/' ? window.location.href.replace('http', 'ws') : wsUrl
+  const url = wsUrl === '/' ? window.location.origin.replace('http', 'ws') : wsUrl
 
   const socket: SocketType = io(url, {
     transports: ['websocket']
