@@ -58,7 +58,7 @@ async function handlePaste(e: ClipboardEvent) {
     for (const file of files) {
       const res = await uploadFile(file, props.onUploadProgress)
 
-      props.onUploadSuccess?.(res)
+      props.onUploadSuccess?.(res, { raw: file })
     }
   }
 }
