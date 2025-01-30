@@ -36,6 +36,7 @@
     "@vueuse/integrations": "11.3.0",
     "axios": "1.7.2",
     "electron-store": "9.0.0",
+    "electron-updater": "^6.3.9",
     "element-plus": "2.8.3",
     "pinia": "2.2.2",
     "qrcode": "1.5.3"

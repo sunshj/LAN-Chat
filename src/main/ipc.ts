@@ -2,13 +2,13 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
-import { app, dialog, ipcMain, shell, type BrowserWindow } from 'electron'
+import { app, dialog, ipcMain, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
-import { networkStore, store, storeHandlers } from './store'
-import { $notify, getResPath, getSettings, openFile } from './utils/app'
-import { checkForUpgrade, fetchReleases } from './utils/updater'
+import { getSettings, networkStore, store, storeHandlers } from './store'
+import { checkForUpgrade } from './updater'
+import { $notify, getResPath } from './utils'
 
-export function ipcHandler() {
+export function registerIPCHandler() {
   ipcMain.handle('start-server', (_, { host, port }) => {
     const { notificationAfterStartServer, uploadsDir } = getSettings()
     return startServer({
@@ -35,17 +35,20 @@ export function ipcHandler() {
 
   ipcMain.handle('stop-server', () => stopServer())
 
-  ipcMain.handle('get-networks', () => networkStore.value)
+  ipcMain.handle('get-ip-addresses', () => networkStore.addresses)
 
   ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
 
-  ipcMain.handle('fetch-releases', fetchReleases)
-
   ipcMain.handle('get-version', () => app.getVersion())
 
-  ipcMain.handle('open-uploads-dir', () =>
-    openFile({ properties: ['openDirectory'], defaultPath: getSettings().uploadsDir })
-  )
+  ipcMain.handle('open-uploads-dir', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+      defaultPath: getSettings().uploadsDir
+    })
+    if (canceled) return null
+    return filePaths[0]
+  })
 
   ipcMain.handle('clean-uploads-dir', () => {
     const { uploadsDir } = getSettings()
@@ -114,10 +117,6 @@ export function ipcHandler() {
         .join('\n')
     })
   })
-}
 
-export function ipcHandlerAfterReady(mainWindow: BrowserWindow) {
-  ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
-  ipcMain.handle('check-for-upgrade', (_, show) => checkForUpgrade(mainWindow, show))
-  ipcMain.handle('exit-app', () => mainWindow.destroy())
+  ipcMain.handle('check-for-upgrade', () => checkForUpgrade(true))
 }

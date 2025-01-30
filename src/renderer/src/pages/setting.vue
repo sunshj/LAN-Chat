@@ -124,7 +124,7 @@ function cleanStores() {
 const saveSettings = useDebounceFn(appStore.saveSettings, 500)
 const openDevtools = useThrottleFn(window.api.openDevtools, 2000)
 const openStoresData = useThrottleFn(window.api.openStoresData, 2000)
-const checkForUpgrade = useThrottleFn(() => window.api.checkForUpgrade(true), 2000)
+const checkForUpgrade = useThrottleFn(window.api.checkForUpgrade, 2000)
 const showVersionData = useThrottleFn(window.api.showVersionData, 2000)
 const exitApp = useThrottleFn(window.api.exitApp, 2000)
 

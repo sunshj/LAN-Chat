@@ -1,5 +1,6 @@
+import path from 'node:path'
 import Store from 'electron-store'
-import { getNetworkAddresses, isEmptyObj } from './utils'
+import { getNetworkAddresses, getResPath, isEmptyObj } from './utils'
 import type { Message, StoreHandlers } from 'lan-chat-server'
 
 interface User {
@@ -7,29 +8,36 @@ interface User {
   username: string
 }
 
-export const store = new Store<{
+interface AppStore {
   /** store data */
   users: User[]
   messages: Message[]
 
-  /** app settings */
-  networks: Record<string, number>
-  quitApp: 'quit' | 'minimize' | 'none'
-  quitAppTipChecked: boolean
+  /** internal app settings */
+  internalSettings: {
+    networks: Record<string, number>
+    quitApp: 'quit' | 'minimize' | 'none'
+    quitAppTipChecked: boolean
+  }
 
+  /** exposed app settings */
   settings: {
     uploadsDir: string
     notificationAfterStartServer: boolean
     autoCheckUpgrade: boolean
   }
-}>({
+}
+
+export const store = new Store<AppStore>({
   name: 'stores',
   defaults: {
     users: [],
     messages: [],
-    networks: {},
-    quitApp: 'none',
-    quitAppTipChecked: false,
+    internalSettings: {
+      networks: {},
+      quitApp: 'none',
+      quitAppTipChecked: false
+    },
     settings: {
       uploadsDir: '',
       notificationAfterStartServer: true,
@@ -51,22 +59,37 @@ export const storeHandlers: StoreHandlers = {
   }
 }
 
+export function getSettings() {
+  const settings = store.get('settings')
+  return {
+    ...settings,
+    uploadsDir: settings.uploadsDir || path.join(getResPath(), 'uploads')
+  }
+}
+
 export const networkStore = {
-  get value() {
-    if (isEmptyObj(store.get('networks'))) {
+  get networks() {
+    return store.get('internalSettings').networks ?? {}
+  },
+
+  get addresses() {
+    if (isEmptyObj(this.networks)) {
       store.set(
-        'networks',
+        'internalSettings.networks',
         getNetworkAddresses().reduce((acc, item) => ((acc[item] = 0), acc), {})
       )
     }
 
-    return Object.entries(store.get('networks'))
+    return Object.entries(this.networks)
       .sort((a, b) => b[1] - a[1])
       .map(([ip]) => ip)
   },
 
   increment(ip: string) {
-    const count = store.get('networks', {})[ip] ?? 0
-    store.set('networks', { ...store.get('networks', {}), [ip]: count + 1 })
+    const count = this.networks[ip] ?? 0
+    store.set('internalSettings.networks', {
+      ...this.networks,
+      [ip]: count + 1
+    })
   }
 }

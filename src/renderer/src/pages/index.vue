@@ -24,9 +24,14 @@
             v-model="appStore.server.host"
             :disabled="appStore.isRunning"
             remote
-            :remote-method="appStore.getNetworks"
+            :remote-method="appStore.getIPAddresses"
           >
-            <ElOption v-for="item in appStore.networks" :key="item" :label="item" :value="item" />
+            <ElOption
+              v-for="item in appStore.ipAddresses"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </ElSelect>
         </ElFormItem>
       </ElForm>
@@ -73,6 +78,6 @@ const startServer = useThrottleFn(appStore.startServer, 1000)
 const stopServer = useThrottleFn(appStore.stopServer, 1000)
 
 onBeforeMount(() => {
-  appStore.getNetworks()
+  appStore.getIPAddresses()
 })
 </script>

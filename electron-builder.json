@@ -31,5 +31,12 @@
   "portable": {
     "artifactName": "${name}-${version}-portable.${ext}"
   },
-  "npmRebuild": false
+  "npmRebuild": false,
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "sunshj",
+      "repo": "LAN-Chat"
+    }
+  ]
 }

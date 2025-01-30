@@ -16,11 +16,11 @@ export const useAppStore = defineStore('app', () => {
     isRunning.value = await window.api.stopServer()
   }
 
-  const networks = ref<string[]>([])
+  const ipAddresses = ref<string[]>([])
 
-  async function getNetworks() {
-    networks.value = await window.api.getNetworks()
-    server.value.host = networks.value[0]
+  async function getIPAddresses() {
+    ipAddresses.value = await window.api.getIPAddresses()
+    server.value.host = ipAddresses.value[0]
   }
 
   const settings = ref({
@@ -62,13 +62,15 @@ export const useAppStore = defineStore('app', () => {
     server,
     startServer,
     stopServer,
-    networks,
-    getNetworks,
-    settings,
 
+    ipAddresses,
+    getIPAddresses,
+
+    settings,
     syncSettings,
     resetSettings,
     saveSettings,
+
     selectUploadsDir
   }
 })
