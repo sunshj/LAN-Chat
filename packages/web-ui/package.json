@@ -12,7 +12,7 @@
     "@imengyu/vue3-context-menu": "1.4.1",
     "@sunshj/mdc": "0.2.2",
     "lan-chat-server": "workspace:*",
-    "music-metadata": "^10.5.0",
+    "music-metadata": "^10.8.0",
     "nuxt": "3.14.1592",
     "pinia-plugin-persistedstate": "^4.1.2",
     "seedrandom": "3.0.5",
