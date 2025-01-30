@@ -3,6 +3,7 @@ import process from 'node:process'
 import { is } from '@electron-toolkit/utils'
 import { dialog } from 'electron'
 import electronUpdater, { type AppUpdater } from 'electron-updater'
+import { store } from './store'
 import { getMainWindow } from './window'
 
 const autoUpdater: AppUpdater & { notifyWhenNotAvailable?: boolean } = electronUpdater.autoUpdater
@@ -57,6 +58,7 @@ export function registerAutoUpdater() {
       })
       .then(({ response }) => {
         if (response === 0) {
+          store.set('internalSettings.quitAppForUpdate', true)
           autoUpdater.quitAndInstall()
         }
       })

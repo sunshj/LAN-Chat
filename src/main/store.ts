@@ -17,7 +17,8 @@ interface AppStore {
   internalSettings: {
     networks: Record<string, number>
     quitApp: 'quit' | 'minimize' | 'none'
-    quitAppTipChecked: boolean
+    quitAppTipShown: boolean
+    quitAppForUpdate: boolean
   }
 
   /** exposed app settings */
@@ -36,7 +37,8 @@ export const store = new Store<AppStore>({
     internalSettings: {
       networks: {},
       quitApp: 'none',
-      quitAppTipChecked: false
+      quitAppTipShown: false,
+      quitAppForUpdate: false
     },
     settings: {
       uploadsDir: '',

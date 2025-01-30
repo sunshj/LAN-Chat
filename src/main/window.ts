@@ -64,13 +64,21 @@ export function createMainWindow() {
 
   mainWindow.on('close', event => {
     event.preventDefault()
-    const { quitApp, quitAppTipChecked } = store.get('internalSettings')
-    if (quitAppTipChecked && quitApp === 'quit') {
-      mainWindow.destroy()
+
+    const { quitApp, quitAppTipShown, quitAppForUpdate } = store.get('internalSettings')
+
+    if (quitAppForUpdate) {
+      store.set('internalSettings.quitAppForUpdate', false)
+      destroyMainWindow()
       return
     }
 
-    if (quitAppTipChecked && quitApp === 'minimize') {
+    if (quitAppTipShown && quitApp === 'quit') {
+      destroyMainWindow()
+      return
+    }
+
+    if (quitAppTipShown && quitApp === 'minimize') {
       mainWindow.hide()
       mainWindow.setSkipTaskbar(true)
       return
@@ -87,12 +95,12 @@ export function createMainWindow() {
         cancelId: -1
       })
       .then(({ response, checkboxChecked }) => {
-        store.set('quitAppTipChecked', checkboxChecked)
+        store.set('internalSettings.quitAppTipShown', checkboxChecked)
         if (response === 0) {
-          store.set('quitApp', 'quit')
-          mainWindow.destroy()
+          if (checkboxChecked) store.set('internalSettings.quitApp', 'quit')
+          destroyMainWindow()
         } else if (response === 1) {
-          store.set('quitApp', 'minimize')
+          if (checkboxChecked) store.set('internalSettings.quitApp', 'minimize')
           mainWindow.hide()
           mainWindow.setSkipTaskbar(true)
         } else {
