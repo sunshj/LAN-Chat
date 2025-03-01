@@ -26,6 +26,7 @@ interface AppStore {
     uploadsDir: string
     notificationAfterStartServer: boolean
     autoCheckUpgrade: boolean
+    autoLaunch: boolean
   }
 }
 
@@ -43,7 +44,8 @@ export const store = new Store<AppStore>({
     settings: {
       uploadsDir: '',
       notificationAfterStartServer: true,
-      autoCheckUpgrade: false
+      autoCheckUpgrade: false,
+      autoLaunch: false
     }
   }
 })

@@ -9,6 +9,13 @@ export function createTrayMenu(mainWindow: BrowserWindow) {
       }
     },
     {
+      label: '设置',
+      click: () => {
+        mainWindow.show()
+        mainWindow.webContents.send('navigate', '/setting')
+      }
+    },
+    {
       label: '退出',
       click: () => {
         mainWindow.destroy()

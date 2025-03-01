@@ -12,4 +12,10 @@ const router = createRouter({
 
 const pinia = createPinia()
 
-createApp(App).use(router).use(pinia).mount('#app')
+const app = createApp(App).use(router).use(pinia)
+
+window.electron.ipcRenderer.on('navigate', (_, path) => {
+  router.push(path)
+})
+
+app.mount('#app')

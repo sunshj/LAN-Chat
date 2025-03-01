@@ -30,6 +30,9 @@
         <ElFormItem label="启动后检测更新">
           <ElSwitch v-model="appStore.settings.autoCheckUpgrade" @change="saveSettings" />
         </ElFormItem>
+        <ElFormItem label="开机自启动">
+          <ElSwitch v-model="appStore.settings.autoLaunch" @change="saveSettings" />
+        </ElFormItem>
       </ElForm>
     </ElCard>
 

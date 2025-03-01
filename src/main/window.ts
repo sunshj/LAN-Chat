@@ -2,7 +2,7 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { is } from '@electron-toolkit/utils'
-import { BrowserWindow, dialog, shell, Tray } from 'electron'
+import { app, BrowserWindow, dialog, shell, Tray } from 'electron'
 import { createTrayMenu } from './menu'
 import { getSettings, store } from './store'
 import { checkForUpgrade } from './updater'
@@ -42,9 +42,23 @@ export function createMainWindow() {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    if (!process.argv.includes('--hidden')) {
+      mainWindow.show()
+    } else {
+      mainWindow.setSkipTaskbar(true)
+    }
   })
 
+  // auto start
+  if (getSettings().autoLaunch && app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      path: app.getPath('exe'),
+      args: ['--hidden']
+    })
+  }
+
+  // auto check upgrade when app start
   if (getSettings().autoCheckUpgrade) {
     checkForUpgrade(false)
   }
@@ -112,7 +126,7 @@ export function createMainWindow() {
   const tray = new Tray(icon)
   tray.setToolTip('LAN Chat')
   tray.setContextMenu(createTrayMenu(mainWindow))
-  tray.on('double-click', () => {
+  tray.on('click', () => {
     mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
     mainWindow.isVisible() ? mainWindow.setSkipTaskbar(false) : mainWindow.setSkipTaskbar(true)
   })
