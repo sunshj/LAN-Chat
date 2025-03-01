@@ -23,6 +23,8 @@ overrides:
   side-channel: npm:@nolyfill/side-channel@^1
   string.prototype.matchall: npm:@nolyfill/string.prototype.matchall@^1
   typedarray: npm:@nolyfill/typedarray@^1
+  safe-buffer: npm:@nolyfill/safe-buffer@^1
+  safer-buffer: npm:@nolyfill/safer-buffer@^1
 
 importers:
 
@@ -59,12 +61,12 @@ importers:
         specifier: 1.5.3
         version: 1.5.3
     devDependencies:
+      '@commitlint/config-conventional':
+        specifier: '18'
+        version: 18.6.3
       '@electron-toolkit/tsconfig':
         specifier: 1.0.1
         version: 1.0.1(@types/node@18.19.9)
-      '@sunshj/commitlint-config':
-        specifier: 1.0.0
-        version: 1.0.0
       '@sunshj/eslint-config':
         specifier: 2.1.0
         version: 2.1.0(@typescript-eslint/eslint-plugin@8.12.2(@typescript-eslint/parser@8.12.2(eslint@9.10.0(jiti@2.4.0))(typescript@5.3.3))(eslint@9.10.0(jiti@2.4.0))(typescript@5.3.3))(eslint@9.10.0(jiti@2.4.0))(typescript@5.3.3)
@@ -87,7 +89,7 @@ importers:
         specifier: 4.3.0
         version: 4.3.0(@types/node@18.19.9)(typescript@5.3.3)
       commitlint:
-        specifier: '18'
+        specifier: ^18.6.1
         version: 18.6.1(@types/node@18.19.9)(typescript@5.3.3)
       cz-git:
         specifier: 1.9.2
@@ -487,6 +489,10 @@ packages:
     resolution: {integrity: sha512-5IDE0a+lWGdkOvKH892HHAZgbAjcj1mT5QrfA/SVbLJV/BbBMGyKN0W5mhgjekPJJwEQdVNvhl9PwUacY58Usw==}
     engines: {node: '>=v18'}
     hasBin: true
+
+  '@commitlint/config-conventional@18.6.3':
+    resolution: {integrity: sha512-8ZrRHqF6je+TRaFoJVwszwnOXb/VeYrPmTwPhf0WxpzpGTcYy1p0SPyZ2eRn/sRi/obnWAcobtDAq6+gJQQNhQ==}
+    engines: {node: '>=v18'}
 
   '@commitlint/config-validator@18.6.1':
     resolution: {integrity: sha512-05uiToBVfPhepcQWE1ZQBR/Io3+tb3gEotZjnI4tTzzPk16NffN6YABgwFQCLmzZefbDcmwWqJWc2XT47q7Znw==}
@@ -1403,6 +1409,14 @@ packages:
     resolution: {integrity: sha512-YXk/GW1mquC9LpdjrwhY/RjGWp3ud4JZopFjU0XDHHOCy1h1lzMaiUzH8cjLDrbgSDe3yuk2wL4DNPgpkypulA==}
     engines: {node: '>=12.4.0'}
 
+  '@nolyfill/safe-buffer@1.0.41':
+    resolution: {integrity: sha512-QUutoN6a0Rf49n6kYVSppQpfraXfrtrUaxTU/GhcxIhz+3GHp+SrBVnTKE3ASB7AzgZJ7XrxhaBgwrF+hSmeKg==}
+    engines: {node: '>=12.4.0'}
+
+  '@nolyfill/safer-buffer@1.0.41':
+    resolution: {integrity: sha512-RieuhcNjFpL2NObzKlsNGM5rCan1y2PH3KUUJ01Yhxqj4gTB20WplufPmQRSrLdI9BWf8cBrxvXuRtjvMRKzxQ==}
+    engines: {node: '>=12.4.0'}
+
   '@nolyfill/side-channel@1.0.29':
     resolution: {integrity: sha512-nqk0vlqUL0wmmoPrm2HqDi0KXGy+jTNHlH/oSx7jsrh2rEApSy1mactsSUGWnhuz2ZsngJSrVHWZIaJKi3WUNA==}
     engines: {node: '>=12.4.0'}
@@ -1770,9 +1784,6 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
-
-  '@sunshj/commitlint-config@1.0.0':
-    resolution: {integrity: sha512-tiy/d4lcSfCoyDN2s0Cf+sFxMlkJswxBW9urvcbau9KN+0VMrLx2G+CGcqOEWoYQpX7O2/Ii0TYfsJCb+/UJFA==}
 
   '@sunshj/eslint-config@2.1.0':
     resolution: {integrity: sha512-dO6arIa02i7IFXR9uJIceKiDC4jd7LFsEtm/9YtgHb2yl6cBU4UW8bEl3Iw0slsZgtBofP2izn8YOjks1WnKpg==}
@@ -3167,6 +3178,10 @@ packages:
 
   conventional-changelog-angular@7.0.0:
     resolution: {integrity: sha512-ROjNchA9LgfNMTTFSIWPzebCwOGFdgkEq45EnvvrmSLvCtAw0HSmrCs7/ty+wAeYUZyNay0YMUNYFTRL72PkBQ==}
+    engines: {node: '>=16'}
+
+  conventional-changelog-conventionalcommits@7.0.2:
+    resolution: {integrity: sha512-NKXYmMR/Hr1DevQegFB4MwfM5Vv0m4UIxKZTTYuD98lpTknaZlSRrDOG4X7wIXpGkfsYxZTghUN+Qq+T0YQI7w==}
     engines: {node: '>=16'}
 
   conventional-commit-types@3.0.0:
@@ -6367,15 +6382,6 @@ packages:
   rxjs@7.8.1:
     resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
 
-  safe-buffer@5.1.2:
-    resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
-
-  safe-buffer@5.2.1:
-    resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
-
-  safer-buffer@2.1.2:
-    resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
-
   sanitize-filename@1.6.3:
     resolution: {integrity: sha512-y/52Mcy7aw3gRm7IrcGDFx/bCk4AhRh2eI9luHOQM86nZsqwiRkkq2GekHXBBD+SmPidc8i2PqtYZl+pWJ8Oeg==}
 
@@ -8074,6 +8080,11 @@ snapshots:
       - '@types/node'
       - typescript
 
+  '@commitlint/config-conventional@18.6.3':
+    dependencies:
+      '@commitlint/types': 18.6.1
+      conventional-changelog-conventionalcommits: 7.0.2
+
   '@commitlint/config-validator@18.6.1':
     dependencies:
       '@commitlint/types': 18.6.1
@@ -8911,6 +8922,10 @@ snapshots:
 
   '@nolyfill/isarray@1.0.29': {}
 
+  '@nolyfill/safe-buffer@1.0.41': {}
+
+  '@nolyfill/safer-buffer@1.0.41': {}
+
   '@nolyfill/side-channel@1.0.29': {}
 
   '@nuxt/devalue@2.0.2': {}
@@ -9534,8 +9549,6 @@ snapshots:
   '@sindresorhus/merge-streams@2.3.0': {}
 
   '@socket.io/component-emitter@3.1.2': {}
-
-  '@sunshj/commitlint-config@1.0.0': {}
 
   '@sunshj/eslint-config@2.1.0(@typescript-eslint/eslint-plugin@8.12.2(@typescript-eslint/parser@8.12.2(eslint@9.10.0(jiti@2.4.0))(typescript@5.3.3))(eslint@9.10.0(jiti@2.4.0))(typescript@5.3.3))(eslint@9.10.0(jiti@2.4.0))(typescript@5.3.3)':
     dependencies:
@@ -11538,6 +11551,10 @@ snapshots:
     dependencies:
       compare-func: 2.0.0
 
+  conventional-changelog-conventionalcommits@7.0.2:
+    dependencies:
+      compare-func: 2.0.0
+
   conventional-commit-types@3.0.0: {}
 
   conventional-commits-parser@5.0.0:
@@ -11946,7 +11963,7 @@ snapshots:
 
   ecdsa-sig-formatter@1.0.11:
     dependencies:
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   ee-first@1.1.1: {}
 
@@ -13340,11 +13357,11 @@ snapshots:
 
   iconv-lite@0.4.24:
     dependencies:
-      safer-buffer: 2.1.2
+      safer-buffer: '@nolyfill/safer-buffer@1.0.41'
 
   iconv-lite@0.6.3:
     dependencies:
-      safer-buffer: 2.1.2
+      safer-buffer: '@nolyfill/safer-buffer@1.0.41'
 
   ieee754@1.2.1: {}
 
@@ -13695,23 +13712,23 @@ snapshots:
     dependencies:
       buffer-equal-constant-time: 1.0.1
       ecdsa-sig-formatter: 1.0.11
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   jwa@2.0.0:
     dependencies:
       buffer-equal-constant-time: 1.0.1
       ecdsa-sig-formatter: 1.0.11
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   jws@3.2.2:
     dependencies:
       jwa: 1.4.1
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   jws@4.0.0:
     dependencies:
       jwa: 2.0.0
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   keytar@7.9.0:
     dependencies:
@@ -15264,7 +15281,7 @@ snapshots:
 
   randombytes@2.1.0:
     dependencies:
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   range-parser@1.2.1: {}
 
@@ -15318,7 +15335,7 @@ snapshots:
       inherits: 2.0.4
       isarray: '@nolyfill/isarray@1.0.29'
       process-nextick-args: 2.0.1
-      safe-buffer: 5.1.2
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
       string_decoder: 1.1.1
       util-deprecate: 1.0.2
 
@@ -15592,12 +15609,6 @@ snapshots:
   rxjs@7.8.1:
     dependencies:
       tslib: 2.8.0
-
-  safe-buffer@5.1.2: {}
-
-  safe-buffer@5.2.1: {}
-
-  safer-buffer@2.1.2: {}
 
   sanitize-filename@1.6.3:
     dependencies:
@@ -15916,11 +15927,11 @@ snapshots:
 
   string_decoder@1.1.1:
     dependencies:
-      safe-buffer: 5.1.2
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   string_decoder@1.3.0:
     dependencies:
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
 
   stringify-entities@4.0.4:
     dependencies:
@@ -16215,7 +16226,7 @@ snapshots:
 
   tunnel-agent@0.6.0:
     dependencies:
-      safe-buffer: 5.2.1
+      safe-buffer: '@nolyfill/safe-buffer@1.0.41'
     optional: true
 
   tunnel@0.0.6: {}
