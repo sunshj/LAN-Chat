@@ -84,6 +84,15 @@ export function registerIPCHandler() {
 
   ipcMain.handle('save-settings', (_, settings) => {
     store.set('settings', settings)
+
+    // Update auto launch settings when changed
+    if (app.isPackaged) {
+      app.setLoginItemSettings({
+        openAtLogin: settings.autoLaunch,
+        path: app.getPath('exe'),
+        args: ['--hidden']
+      })
+    }
   })
 
   ipcMain.handle('reset-settings', () => {

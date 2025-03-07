@@ -50,9 +50,9 @@ export function createMainWindow() {
   })
 
   // auto start
-  if (getSettings().autoLaunch && app.isPackaged) {
+  if (app.isPackaged) {
     app.setLoginItemSettings({
-      openAtLogin: true,
+      openAtLogin: getSettings().autoLaunch,
       path: app.getPath('exe'),
       args: ['--hidden']
     })
