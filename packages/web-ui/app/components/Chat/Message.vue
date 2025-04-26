@@ -8,6 +8,7 @@
       <div v-if="isGroupChat" class="text-xs text-[#777]">{{ senderName }}</div>
 
       <div
+        :id="props.msg.mid"
         :class="['message', props.msg.sender === appStore.userInfo.id ? 'sender' : 'receiver']"
         @contextmenu.prevent="$emit('contextmenu', $event, props.msg.mid)"
         @click.stop
@@ -39,7 +40,7 @@ const isGroupChat = computed(() => appStore.currentChatUser.id === GROUP_CHAT_ID
 
 const senderName = computed(() => {
   if (props.msg.sender === appStore.userInfo.id) return
-  return appStore.users.find(user => user.id === props.msg.sender)?.username
+  return appStore.users.find(user => user.id === props.msg.sender)?.username ?? props.msg.sender
 })
 
 function gotoPrivateChat() {

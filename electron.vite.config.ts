@@ -1,6 +1,7 @@
 import { resolve } from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import IconsResolver from 'lan-chat-icons/resolver'
 import unocss from 'unocss/vite'
 import autoImports from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
@@ -37,7 +38,7 @@ export default defineConfig({
       components({
         dts: './types/components.d.ts',
         directoryAsNamespace: true,
-        resolvers: [ElementPlusResolver()]
+        resolvers: [ElementPlusResolver(), IconsResolver()]
       }),
       unocss()
     ]

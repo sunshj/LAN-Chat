@@ -6,9 +6,12 @@ import { contextBridge, ipcRenderer } from 'electron'
 /// sorted
 export const api = {
   checkForUpgrade: (show?: boolean) => ipcRenderer.invoke('check-for-upgrade', show),
+  cleanAppData: () => ipcRenderer.invoke('clean-app-data'),
   cleanStores: () => ipcRenderer.invoke('clean-stores'),
   cleanUploads: () => ipcRenderer.invoke('clean-uploads-dir'),
   exitApp: () => ipcRenderer.invoke('exit-app'),
+  getAIModels: () => ipcRenderer.invoke('get-ai-models'),
+  getAISettings: () => ipcRenderer.invoke('get-ai-settings'),
   getIPAddresses: () => ipcRenderer.invoke('get-ip-addresses'),
   getSettings: () => ipcRenderer.invoke('get-settings'),
   getVersion: () => ipcRenderer.invoke('get-version'),
@@ -17,6 +20,8 @@ export const api = {
   openStoresData: () => ipcRenderer.invoke('open-stores-data'),
   openUploadsDir: () => ipcRenderer.invoke('open-uploads-dir'),
   resetSettings: () => ipcRenderer.invoke('reset-settings'),
+  saveAISettings: (data: { baseUrl: string; apiKey: string; model: string }) =>
+    ipcRenderer.invoke('save-ai-settings', data),
   saveSettings: (settings: any) => ipcRenderer.invoke('save-settings', settings),
   showVersionData: () => ipcRenderer.invoke('show-version-data'),
   startServer: (data: { host: string; port: number }) => ipcRenderer.invoke('start-server', data),

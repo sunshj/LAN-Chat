@@ -1,18 +1,9 @@
 import path from 'node:path'
-import Store from 'electron-store'
+import ElectronStore from 'electron-store'
 import { getNetworkAddresses, getResPath, isEmptyObj } from './utils'
-import type { Message, StoreHandlers } from 'lan-chat-server'
+import type { Store, StoreHandlers } from 'lan-chat-server'
 
-interface User {
-  id: string
-  username: string
-}
-
-interface AppStore {
-  /** store data */
-  users: User[]
-  messages: Message[]
-
+interface AppStore extends Store {
   /** internal app settings */
   internalSettings: {
     networks: Record<string, number>
@@ -27,14 +18,20 @@ interface AppStore {
     notificationAfterStartServer: boolean
     autoCheckUpgrade: boolean
     autoLaunch: boolean
+    enableAI: boolean
   }
 }
 
-export const store = new Store<AppStore>({
+export const store = new ElectronStore<AppStore>({
   name: 'stores',
   defaults: {
     users: [],
     messages: [],
+    ai: {
+      baseUrl: '',
+      apiKey: '',
+      model: ''
+    },
     internalSettings: {
       networks: {},
       quitApp: 'none',
@@ -45,7 +42,8 @@ export const store = new Store<AppStore>({
       uploadsDir: '',
       notificationAfterStartServer: true,
       autoCheckUpgrade: false,
-      autoLaunch: false
+      autoLaunch: false,
+      enableAI: false
     }
   }
 })
@@ -54,12 +52,14 @@ export const storeHandlers: StoreHandlers = {
   get() {
     return {
       users: store.get('users', []),
-      messages: store.get('messages', [])
+      messages: store.get('messages', []),
+      ai: store.get('ai')
     }
   },
   set(_store) {
     store.set('users', _store.users)
     store.set('messages', _store.messages)
+    store.set('ai', _store.ai)
   }
 }
 

@@ -5,6 +5,7 @@ interface ChatMessageOptions {
   onNewMessage: () => void
   onBeforeSendMessage?: () => boolean
   onSendMessage?: (msg: Message) => Awaitable<void>
+  focusInput?: () => void
 }
 
 export function useChatMessage(options: ChatMessageOptions) {
@@ -67,6 +68,13 @@ export function useChatMessage(options: ChatMessageOptions) {
       y: e.y,
       zIndex: nextZIndex(),
       items: [
+        {
+          label: '回复',
+          onClick() {
+            message.value = `---md\n> <a href="#${currentSelectMessage.value?.mid}">${removeMarkdownSign(currentSelectMessage.value!.content)}</a>\n\n`
+            options?.focusInput?.()
+          }
+        },
         {
           label: selectedText.value ? '复制选中' : '复制',
           hidden: currentSelectMessage.value?.type !== 'text' && !selectedText.value,

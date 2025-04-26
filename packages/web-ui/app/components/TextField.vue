@@ -1,5 +1,5 @@
 <template>
-  <ElInput
+  <ElMention
     ref="inputRef"
     v-model="message"
     type="textarea"
@@ -8,16 +8,32 @@
       maxRows: 6
     }"
     resize="none"
-    placeholder="Ctrl + Enter to send"
+    placeholder="输入 / 启用 AI 命令， Ctrl + Enter 发送消息"
+    :prefix="['/']"
+    :options="mentionOptions"
+    @search="handleSearch"
     @paste="handlePaste"
     @keydown.ctrl.enter="emit('enter', message)"
   />
 </template>
 
 <script setup lang="ts">
-import type { InputInstance } from 'element-plus'
+import type { MentionInstance, MentionOption } from 'element-plus'
 
-const inputRef = ref<InputInstance | null>(null)
+const mentionData: Record<string, MentionOption[]> = {
+  '/': availableMentions
+}
+
+const mentionOptions = ref<MentionOption[]>([])
+
+function handleSearch(_: string, prefix: string) {
+  mentionOptions.value = (mentionData[prefix] || []).map(({ label, value }) => ({
+    label,
+    value
+  }))
+}
+
+const inputRef = ref<MentionInstance | null>(null)
 
 export interface TextFieldExposed {
   focus: () => void
@@ -26,10 +42,10 @@ export interface TextFieldExposed {
 
 defineExpose<TextFieldExposed>({
   focus() {
-    inputRef.value?.textarea?.setAttribute('readonly', 'readonly')
-    inputRef.value?.focus()
+    inputRef.value?.input?.textarea?.setAttribute('readonly', 'readonly')
+    inputRef.value?.input?.focus()
     setTimeout(() => {
-      inputRef.value?.textarea?.removeAttribute('readonly')
+      inputRef.value?.input?.textarea?.removeAttribute('readonly')
     }, 200)
   },
   clear() {
@@ -37,9 +53,7 @@ defineExpose<TextFieldExposed>({
   }
 })
 
-const message = defineModel<string>({
-  required: true
-})
+const message = defineModel<string>({ required: true })
 
 const props = defineProps<{
   onUploadProgress?: (event: any) => void

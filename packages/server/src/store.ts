@@ -1,8 +1,14 @@
+import { ofetch } from 'ofetch'
 import type { Awaitable, Message, User } from './types'
 
 export interface Store {
   users: User[]
   messages: Message[]
+  ai?: {
+    baseUrl: string
+    apiKey: string
+    model: string
+  }
 }
 
 export const defaultStore: Store = {
@@ -79,6 +85,58 @@ export function toGroupChatMessageStore(storeHandlers: StoreHandlers): GroupChat
       const store = await storeHandlers.get()
       store.messages.length = 0
       await storeHandlers.set(store)
+    }
+  }
+}
+
+export type AiStore = {
+  getConfig: () => Awaitable<{ enable: boolean; model: string }>
+  getModels: () => Awaitable<string[]>
+  chat: (message: string) => Awaitable<any>
+}
+
+export function toAiStore(storeHandlers: StoreHandlers): AiStore {
+  return {
+    async getConfig() {
+      const { ai } = await storeHandlers.get()
+      return {
+        enable: !!ai && !!ai.baseUrl && !!ai.apiKey && !!ai.model,
+        model: ai?.model ?? 'unknown'
+      }
+    },
+    async getModels() {
+      const { ai } = await storeHandlers.get()
+      if (!ai) return []
+      const { data } = await ofetch(`${ai?.baseUrl}/models?type=text&sub_type=chat`, {
+        headers: {
+          Authorization: `Bearer ${ai?.apiKey}`
+        }
+      })
+      return (data as Array<{ id: string }>).map(v => v.id)
+    },
+
+    async chat(message) {
+      const { ai } = await storeHandlers.get()
+      return ofetch(`${ai?.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${ai?.apiKey}`
+        },
+        body: {
+          model: ai?.model,
+          messages: [
+            {
+              role: 'system',
+              content:
+                '你是一个聊天机器人，你可以回答任何问题；你可以使用markdown语法来格式化你的回答，但是你必须使用“---md”加换行符作为第一行的内容来标记你的回答是markdown格式'
+            },
+            {
+              role: 'user',
+              content: message
+            }
+          ]
+        }
+      })
     }
   }
 }

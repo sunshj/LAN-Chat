@@ -106,6 +106,9 @@ importers:
       eslint:
         specifier: 9.10.0
         version: 9.10.0(jiti@2.4.0)
+      lan-chat-icons:
+        specifier: workspace:*
+        version: link:packages/icons
       lan-chat-server:
         specifier: workspace:*
         version: link:packages/server
@@ -161,6 +164,8 @@ importers:
         specifier: workspace:*
         version: link:../server
 
+  packages/icons: {}
+
   packages/server:
     dependencies:
       '@paralleldrive/cuid2':
@@ -175,6 +180,9 @@ importers:
       mrmime:
         specifier: ^2.0.0
         version: 2.0.0
+      ofetch:
+        specifier: 1.4.1
+        version: 1.4.1
       socket.io:
         specifier: 4.7.5
         version: 4.7.5
@@ -259,6 +267,9 @@ importers:
       '@vueuse/nuxt':
         specifier: 11.3.0
         version: 11.3.0(magicast@0.3.5)(nuxt@3.14.1592(@azure/identity@4.5.0)(@parcel/watcher@2.4.1)(@types/node@18.19.9)(eslint@9.10.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.24.3)(terser@5.36.0)(typescript@5.3.3)(vite@5.4.11(@types/node@18.19.9)(terser@5.36.0))(vue-tsc@2.1.10(typescript@5.3.3))(webpack-sources@3.2.3))(rollup@4.24.3)(vue@3.4.4(typescript@5.3.3))
+      lan-chat-icons:
+        specifier: workspace:*
+        version: link:../icons
 
 packages:
 

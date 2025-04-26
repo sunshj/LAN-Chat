@@ -2,6 +2,35 @@ import parser from 'ua-parser-js'
 
 export const GROUP_CHAT_ID = 'group'
 
+export function getStartingPrefix<T>(
+  str: string,
+  prefixes: T[] | string[],
+  getter?: (item: T) => string
+) {
+  for (const [i, item] of prefixes.entries()) {
+    let prefix: string
+
+    if (typeof item === 'string') {
+      prefix = item
+    } else {
+      if (!getter) {
+        throw new Error('Getter function is required when prefixes is an object array')
+      }
+      prefix = getter(item as T)
+    }
+
+    if (str.startsWith(prefix)) {
+      return {
+        matched: prefix,
+        item: item as T,
+        index: i
+      }
+    }
+  }
+
+  return null
+}
+
 export function getDeviceName(ua: string) {
   const { os, browser } = parser(ua)
   const osName = os.name?.replace('macOS', 'Mac').replace('Windows', 'Win') ?? ''

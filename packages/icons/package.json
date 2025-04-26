@@ -1,0 +1,35 @@
+{
+  "name": "lan-chat-icons",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./resolver": {
+      "types": "./dist/resolver.d.ts",
+      "import": "./dist/resolver.js"
+    },
+    "./nuxt": {
+      "types": "./dist/nuxt.d.ts",
+      "import": "./dist/nuxt.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "pnpm generate && tsup",
+    "generate": "node scripts/generate.cjs",
+    "postinstall": "pnpm generate"
+  }
+}

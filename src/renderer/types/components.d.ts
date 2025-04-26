@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
@@ -18,12 +19,12 @@ declare module 'vue' {
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
-    IconBack: typeof import('./../src/components/Icon/Back.vue')['default']
-    IconDelete: typeof import('./../src/components/Icon/Delete.vue')['default']
-    IconExit: typeof import('./../src/components/Icon/Exit.vue')['default']
-    IconPosition: typeof import('./../src/components/Icon/Position.vue')['default']
-    IconSetting: typeof import('./../src/components/Icon/Setting.vue')['default']
-    IconUpgrade: typeof import('./../src/components/Icon/Upgrade.vue')['default']
+    IconBack: typeof import('lan-chat-icons')['IconBack']
+    IconDelete: typeof import('lan-chat-icons')['IconDelete']
+    IconExit: typeof import('lan-chat-icons')['IconExit']
+    IconPosition: typeof import('lan-chat-icons')['IconPosition']
+    IconSetting: typeof import('lan-chat-icons')['IconSetting']
+    IconUpgrade: typeof import('lan-chat-icons')['IconUpgrade']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

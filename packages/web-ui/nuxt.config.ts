@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process'
 
 export default defineNuxtConfig({
   ssr: false,
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   sourcemap: false,
 
   future: {
@@ -27,7 +27,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@element-plus/nuxt',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    'lan-chat-icons/nuxt'
   ],
 
   runtimeConfig: {
@@ -76,6 +77,10 @@ export default defineNuxtConfig({
       hmr: {
         clientPort: 8080
       }
+    },
+
+    optimizeDeps: {
+      include: ['debug']
     }
   },
 

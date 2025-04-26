@@ -7,8 +7,9 @@ import type { Server } from 'node:http'
 export * from './store'
 export * from './types'
 
-let server: Server | null
-let wss: WebSocketServer | null
+export type ServerWithSocketIOType = Server & { wss?: WebSocketServer }
+
+let server: ServerWithSocketIOType | null = null
 
 interface StartServerOptions extends CreateServerOptions {
   host: string
@@ -17,7 +18,7 @@ interface StartServerOptions extends CreateServerOptions {
 }
 
 function cleanUp() {
-  wss?.close()
+  server?.wss?.close()
   server?.close()
 }
 
@@ -34,8 +35,7 @@ export async function startServer(options: StartServerOptions) {
     uploadsDir,
     storeHandlers
   })
-
-  wss = createWSServer(server)
+  server.wss = createWSServer(server)
 
   return await new Promise<boolean>(resolve => {
     server?.listen(data.port, data.host, async () => {
@@ -46,7 +46,7 @@ export async function startServer(options: StartServerOptions) {
 }
 
 export function stopServer() {
-  wss?.emit('message', 'Server is shutting down')
+  server?.wss?.emit('message', 'Server is shutting down')
   cleanUp()
   return server?.listening ?? false
 }

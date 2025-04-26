@@ -105,19 +105,24 @@ export const useAppStore = defineStore(
 
     const currentChatMessages = computed(() => messages.value[currentChatId.value] ?? [])
 
-    function addMessage(
-      content: string,
-      options: Pick<Message, 'type' | 'payload'> = { type: 'text' }
-    ) {
-      const msg: Message = {
+    function createMessage(msg: Partial<Message>): Message {
+      return {
         mid: `${Date.now()}-${randomId()}`,
         cid: currentChatId.value,
         sender: userInfo.value.id,
         receiver: currentChatUser.value.id,
         time: Date.now(),
-        content,
-        ...options
+        content: '',
+        type: 'text',
+        ...msg
       }
+    }
+
+    function addMessage(
+      content: string,
+      options: Pick<Message, 'type' | 'payload'> = { type: 'text' }
+    ) {
+      const msg = createMessage({ content, ...options })
       if (!messages.value[currentChatId.value]) messages.value[currentChatId.value] = []
       messages.value[currentChatId.value]!.push(msg)
       return msg
@@ -173,12 +178,28 @@ export const useAppStore = defineStore(
     })
 
     async function createGroupMessage(msg: Message) {
-      const { data: res } = await $fetch<{ data: Message }>('/api/group_chat/message', {
+      const results: Record<string, any> = {}
+      const { data } = await $fetch<{ data: Message }>('/api/group_chat/message', {
         method: 'POST',
         body: msg
       })
+      results[GROUP_CHAT_ID] = data
 
-      return res
+      const prefix = getStartingPrefix(msg.content, availableMentions, v => `/${v.value} `)
+      if (prefix?.matched) {
+        const res = await $fetch<any>('/api/ai/chat', {
+          method: 'POST',
+          body: {
+            user: userInfo.value.id,
+            prompt: `根据[指令]和[输入]进行回复，回复内容仅限简洁,若携带[上下文]，还需要结合上下文进行回复。
+            [指令]：${prefix.item.command}，[输入]：${msg.content}，
+            ${prefix.item.context ? `[上下文]：${JSON.stringify(currentChatMessages.value)}` : ''}`
+          }
+        })
+        results[prefix.item.value] = res.data
+      }
+
+      return results
     }
 
     async function syncGroupMessages() {
@@ -188,6 +209,14 @@ export const useAppStore = defineStore(
 
     function clearGroupMessages() {
       messages.value[GROUP_CHAT_ID] = []
+    }
+
+    async function getAiModelConfig() {
+      const { data } = await $fetch<{ data: any }>('/api/ai')
+      return {
+        enable: data.enable,
+        model: data.model
+      }
     }
 
     return {
@@ -212,6 +241,7 @@ export const useAppStore = defineStore(
       messages,
       currentChatMessages,
       deleteChatByUserId,
+      createMessage,
       getMessage,
       addMessage,
       deleteMessage,
@@ -221,7 +251,9 @@ export const useAppStore = defineStore(
       validateUid,
       createGroupMessage,
       syncGroupMessages,
-      clearGroupMessages
+      clearGroupMessages,
+
+      getAiModelConfig
     }
   },
   {

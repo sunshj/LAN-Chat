@@ -57,6 +57,7 @@
     "electron-builder": "24.9.1",
     "electron-vite": "2.3.0",
     "eslint": "9.10.0",
+    "lan-chat-icons": "workspace:*",
     "lan-chat-server": "workspace:*",
     "lint-staged": "15",
     "prettier": "3.2.5",

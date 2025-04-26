@@ -65,6 +65,9 @@ const { message, sendMessage, handleContextMenu } = useChatMessage({
   async onSendMessage(msg) {
     await appStore.createGroupMessage(msg)
     scrollToBottom()
+  },
+  focusInput() {
+    textFieldRef.value?.focus()
   }
 })
 
@@ -75,6 +78,19 @@ const { percentage, remainPercent, onUploadProgress, onUploadSuccess } = useFile
     scrollToBottom()
   }
 })
+
+const route = useRoute()
+
+watch(
+  () => route.hash,
+  () => {
+    // eslint-disable-next-line unicorn/prefer-query-selector
+    const el = document.getElementById(route.hash.slice(1))
+    el?.scrollIntoView({
+      behavior: 'smooth'
+    })
+  }
+)
 
 onBeforeMount(() => {
   appStore.clearGroupMessages()

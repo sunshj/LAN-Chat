@@ -49,3 +49,8 @@ export const messageSchema = z.object({
     })
     .optional()
 })
+
+export const aiChatSchema = z.object({
+  user: z.string({ message: 'user id is required' }).min(1),
+  prompt: z.string({ message: 'prompt is required' }).min(1)
+})

@@ -39,6 +39,41 @@
     <ElCard shadow="never">
       <div class="flex flex-col gap-10px">
         <div class="flex items-center justify-between">
+          <div>启用 AI</div>
+          <ElSwitch v-model="appStore.settings.enableAI" @change="saveSettings" />
+        </div>
+
+        <template v-if="appStore.settings.enableAI">
+          <div class="flex items-center justify-between gap-2">
+            <div>Base URL</div>
+            <ElInput v-model.trim="aiSettings.baseUrl" @change="saveAISettings" />
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <div>API Key</div>
+            <ElInput
+              v-model.trim="aiSettings.apiKey"
+              show-password
+              type="password"
+              @change="saveAISettings"
+            />
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <div>Model</div>
+            <ElAutocomplete
+              v-model.trim="aiSettings.model"
+              :fetch-suggestions="querySearchAIModels"
+              clearable
+              @change="saveAISettings()"
+              @select="saveAISettings()"
+            />
+          </div>
+        </template>
+      </div>
+    </ElCard>
+
+    <ElCard shadow="never">
+      <div class="flex flex-col gap-10px">
+        <div class="flex items-center justify-between">
           <div>删除上传文件</div>
           <ElButton type="danger" @click="cleanUploads()">
             <IconDelete />
@@ -46,7 +81,14 @@
         </div>
 
         <div class="flex items-center justify-between">
-          <div>清空应用数据</div>
+          <div>清空用户及聊天数据</div>
+          <ElButton type="danger" @click="cleanAppData()">
+            <IconDelete />
+          </ElButton>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>清空所有数据</div>
           <ElButton type="danger" @click="cleanStores()">
             <IconDelete />
           </ElButton>
@@ -114,15 +156,58 @@ function cleanUploads() {
 }
 
 function cleanStores() {
-  ElMessageBox.confirm('Are you sure to clean stores?', 'Warning', {
+  ElMessageBox.confirm('Are you sure to clean all stores?', 'Warning', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
     type: 'warning'
   }).then(async () => {
     await window.api.cleanStores()
+    appStore.syncSettings()
     ElMessage.success('Clean stores success')
   })
 }
+
+function cleanAppData() {
+  ElMessageBox.confirm('Are you sure to clean all users and messages data?', 'Warning', {
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+    type: 'warning'
+  }).then(async () => {
+    await window.api.cleanAppData()
+    appStore.syncSettings()
+    ElMessage.success('Clean app data success')
+  })
+}
+
+const aiSettings = ref({
+  baseUrl: '',
+  apiKey: '',
+  model: ''
+})
+
+const models = ref<Array<{ value: string }>>([])
+
+async function querySearchAIModels(queryString: string, cb: any) {
+  models.value = await getAIModels()
+  const results = queryString
+    ? models.value.filter(item => item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+    : models.value
+  return cb(results)
+}
+
+async function getAISettings() {
+  aiSettings.value = await window.api.getAISettings()
+}
+
+async function getAIModels() {
+  const data: string[] = await window.api.getAIModels()
+  return data.map(item => ({ value: item }))
+}
+
+const saveAISettings = useDebounceFn(async () => {
+  console.log('saveAISettings', aiSettings.value)
+  await window.api.saveAISettings({ ...aiSettings.value })
+}, 500)
 
 const saveSettings = useDebounceFn(appStore.saveSettings, 500)
 const openDevtools = useThrottleFn(window.api.openDevtools, 2000)
@@ -133,6 +218,7 @@ const exitApp = useThrottleFn(window.api.exitApp, 2000)
 
 onBeforeMount(() => {
   appStore.syncSettings()
+  getAISettings()
 })
 </script>
 

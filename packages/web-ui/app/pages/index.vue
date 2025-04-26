@@ -39,22 +39,16 @@
 import type { BadgeProps } from 'element-plus'
 
 const appStore = useAppStore()
-const router = useRouter()
 
 const profileDrawerVisible = ref(false)
 
 function gotoChat(user: User) {
   appStore.setCurrentChatUser(user)
-  router.push({
-    path: '/chat',
-    query: {
-      uid: user.id
-    }
-  })
+  navigateTo(`/chat?uid=${user.id}`)
 }
 
 function gotoGroupChat() {
-  router.push('/chat/group')
+  navigateTo('/chat/group')
 }
 
 function showProfile() {

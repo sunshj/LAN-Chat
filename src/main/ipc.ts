@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
+import axios from 'axios'
 import { app, dialog, ipcMain, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
 import { getSettings, networkStore, store, storeHandlers } from './store'
@@ -80,6 +81,11 @@ export function registerIPCHandler() {
     store.clear()
   })
 
+  ipcMain.handle('clean-app-data', () => {
+    store.reset('users')
+    store.reset('messages')
+  })
+
   ipcMain.handle('get-settings', () => getSettings())
 
   ipcMain.handle('save-settings', (_, settings) => {
@@ -128,4 +134,23 @@ export function registerIPCHandler() {
   })
 
   ipcMain.handle('check-for-upgrade', () => checkForUpgrade(true))
+
+  ipcMain.handle('get-ai-models', async () => {
+    const ai = store.get('ai')
+    if (!ai) return []
+    const res = await axios.get(`${ai.baseUrl}/models?type=text&sub_type=chat`, {
+      headers: {
+        Authorization: `Bearer ${ai.apiKey}`
+      }
+    })
+
+    return res.data.data.map(v => v.id)
+  })
+
+  ipcMain.handle('get-ai-settings', () => store.get('ai'))
+
+  ipcMain.handle('save-ai-settings', (_, data) => {
+    console.log('data: ', data)
+    store.set('ai', data)
+  })
 }

@@ -16,8 +16,10 @@ import {
 } from 'h3'
 import { readFiles } from 'h3-formidable'
 import { lookup } from 'mrmime'
-import { extractZodError, messageSchema, userSchema } from './schema'
-import { toGroupChatMessageStore, toUserStore, type StoreHandlers } from './store'
+import { aiChatSchema, extractZodError, messageSchema, userSchema } from './schema'
+import { toAiStore, toGroupChatMessageStore, toUserStore, type StoreHandlers } from './store'
+import type { Message, WebSocketServer } from './types'
+import type { ServerWithSocketIOType } from '.'
 
 export interface CreateServerOptions {
   uiDir: string
@@ -28,6 +30,7 @@ export interface CreateServerOptions {
 export function createHostServer(options: CreateServerOptions) {
   const userStore = toUserStore(options.storeHandlers)
   const groupChatStore = toGroupChatMessageStore(options.storeHandlers)
+  const aiStore = toAiStore(options.storeHandlers)
 
   const app = createApp()
   const router = createRouter()
@@ -173,5 +176,52 @@ export function createHostServer(options: CreateServerOptions) {
     })
   )
 
-  return createServer(toNodeListener(app))
+  router.get(
+    '/api/ai',
+    eventHandler(async () => {
+      return {
+        data: await aiStore.getConfig()
+      }
+    })
+  )
+
+  router.get(
+    '/api/ai/models',
+    eventHandler(async () => {
+      return {
+        data: await aiStore.getModels()
+      }
+    })
+  )
+
+  const server: ServerWithSocketIOType = createServer(toNodeListener(app))
+
+  router.post(
+    '/api/ai/chat',
+    eventHandler(async event => {
+      const { error, data } = await readValidatedBody(event, aiChatSchema.safeParseAsync)
+      if (error) throw createError({ statusCode: 400, message: extractZodError(error) })
+
+      const res = await aiStore.chat(data.prompt)
+
+      const { id, model, choices } = res
+      const msg: Message = {
+        cid: 'group',
+        mid: id,
+        type: 'text',
+        content: choices[0].message.content,
+        receiver: data.user,
+        sender: model,
+        time: Date.now()
+      }
+      await groupChatStore.create(msg)
+      server?.wss?.emit('$new-group-message', msg)
+
+      return {
+        data: msg
+      }
+    })
+  )
+
+  return server
 }

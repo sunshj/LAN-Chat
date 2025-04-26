@@ -27,7 +27,8 @@ export const useAppStore = defineStore('app', () => {
     uploadsDir: '',
     notificationAfterStartServer: false,
     autoCheckUpgrade: false,
-    autoLaunch: false
+    autoLaunch: false,
+    enableAI: false
   })
 
   async function syncSettings() {

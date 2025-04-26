@@ -35,7 +35,7 @@ function handleNewMessage(msg: Message) {
 
   // notification
   if (msg.receiver === appStore.userInfo.id && msg.sender !== appStore.currentChatUser.id) {
-    const senderName = appStore.users.find(user => user.id === msg.sender)?.username
+    const senderName = appStore.users.find(user => user.id === msg.sender)?.username ?? msg.sender
     const notification = ElNotification.success({
       title: 'You have a new message',
       message: `From ${senderName} (click to chat)`,
