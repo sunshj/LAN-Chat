@@ -1,5 +1,6 @@
 import type { Component } from 'vue'
 
+export declare const IconArrowDown: Component
 export declare const IconArrowLeft: Component
 export declare const IconBack: Component
 export declare const IconDelete: Component

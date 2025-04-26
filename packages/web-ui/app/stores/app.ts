@@ -177,12 +177,13 @@ export const useAppStore = defineStore(
       )
     })
 
-    async function createGroupMessage(msg: Message) {
+    async function createGroupMessage(msg: Message, onSent?: () => void) {
       const results: Record<string, any> = {}
       const { data } = await $fetch<{ data: Message }>('/api/group_chat/message', {
         method: 'POST',
         body: msg
       })
+      onSent?.()
       results[GROUP_CHAT_ID] = data
 
       const prefix = getStartingPrefix(msg.content, availableMentions, v => `/${v.value} `)

@@ -1,3 +1,4 @@
+export { default as IconArrowDown } from './components/ArrowDown.vue'
 export { default as IconArrowLeft } from './components/ArrowLeft.vue'
 export { default as IconBack } from './components/Back.vue'
 export { default as IconDelete } from './components/Delete.vue'

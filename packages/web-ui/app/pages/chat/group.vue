@@ -2,7 +2,10 @@
   <div class="h-full flex flex-col">
     <ChatHeader group :online="appStore.currentChatIsOnline" />
     <ChatMain>
-      <div ref="scrollerRef" class="h-full w-full flex-1 flex-1 overflow-y-auto bg-gray-2 p-10px">
+      <div
+        ref="scrollerRef"
+        class="relative h-full w-full flex-1 flex-1 overflow-y-auto bg-gray-2 p-10px"
+      >
         <ChatMessage
           v-for="item in appStore.currentChatMessages"
           :key="item.mid"
@@ -10,6 +13,15 @@
           @contextmenu="handleContextMenu"
         />
       </div>
+      <ElButton
+        v-show="!isNearBottom"
+        title="滚动到底部"
+        circle
+        class="absolute bottom-20 left-1/2 z-10 -translate-x-1/2"
+        @click="scrollToBottom"
+      >
+        <IconArrowDown />
+      </ElButton>
     </ChatMain>
 
     <ChatFooter>
@@ -52,7 +64,7 @@ const appStore = useAppStore()
 const scrollerRef = ref<HTMLDivElement | null>(null)
 const textFieldRef = ref<TextFieldExposed | null>(null)
 
-const { scrollToBottom } = useScrollBottom(scrollerRef)
+const { scrollToBottom, isNearBottom } = useScrollBottom(scrollerRef)
 
 const { message, sendMessage, handleContextMenu } = useChatMessage({
   isGroupChat: true,
@@ -63,8 +75,7 @@ const { message, sendMessage, handleContextMenu } = useChatMessage({
     return false
   },
   async onSendMessage(msg) {
-    await appStore.createGroupMessage(msg)
-    scrollToBottom()
+    await appStore.createGroupMessage(msg, scrollToBottom)
   },
   focusInput() {
     textFieldRef.value?.focus()
