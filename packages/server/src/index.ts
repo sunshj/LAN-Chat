@@ -1,6 +1,5 @@
 import { extractZodError, serverSchema } from './schema'
 import { createHostServer, type CreateServerOptions } from './server'
-import { createWSServer } from './ws'
 import type { WebSocketServer } from './types'
 import type { Server } from 'node:http'
 
