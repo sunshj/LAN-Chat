@@ -7,8 +7,6 @@ on:
 
 jobs:
   release:
-    runs-on: ${{ matrix.os }}
-
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
