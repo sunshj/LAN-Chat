@@ -29,7 +29,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "pnpm generate && tsup",
-    "generate": "node scripts/generate.cjs",
+    "generate": "tsx scripts/generate",
     "postinstall": "pnpm generate"
   }
 }

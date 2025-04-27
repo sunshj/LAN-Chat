@@ -1,2 +1,5 @@
 packages/web-ui/.nuxt
-src/renderer/types
+
+apps/cli/ui
+apps/vscode/res/ui
+apps/electron/src/renderer/types

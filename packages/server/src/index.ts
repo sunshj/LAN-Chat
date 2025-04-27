@@ -7,9 +7,8 @@ import type { Server } from 'node:http'
 export * from './store'
 export * from './types'
 
-export type ServerWithSocketIOType = Server & { wss?: WebSocketServer }
-
-let server: ServerWithSocketIOType | null = null
+let _server: Server | null = null
+let _wss: WebSocketServer | null = null
 
 interface StartServerOptions extends CreateServerOptions {
   host: string
@@ -18,8 +17,8 @@ interface StartServerOptions extends CreateServerOptions {
 }
 
 function cleanUp() {
-  server?.wss?.close()
-  server?.close()
+  _wss?.close()
+  _server?.close()
 }
 
 export async function startServer(options: StartServerOptions) {
@@ -29,13 +28,13 @@ export async function startServer(options: StartServerOptions) {
   if (error) throw new Error(extractZodError(error))
 
   cleanUp()
-
-  server = createHostServer({
+  const { server, wss } = createHostServer({
     uiDir,
     uploadsDir,
     storeHandlers
   })
-  server.wss = createWSServer(server)
+  _server = server
+  _wss = wss
 
   return await new Promise<boolean>(resolve => {
     server?.listen(data.port, data.host, async () => {
@@ -46,7 +45,7 @@ export async function startServer(options: StartServerOptions) {
 }
 
 export function stopServer() {
-  server?.wss?.emit('message', 'Server is shutting down')
+  _wss?.emit('message', 'Server is shutting down')
   cleanUp()
-  return server?.listening ?? false
+  return _server?.listening ?? false
 }

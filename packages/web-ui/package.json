@@ -18,8 +18,10 @@
     "seedrandom": "3.0.5",
     "socket.io-client": "4.7.5",
     "ua-parser-js": "1.0.38",
+    "vue": "3.5.12",
     "vue-aplayer-next": "1.0.1",
-    "vue-boring-avatars": "1.4.0"
+    "vue-boring-avatars": "1.4.0",
+    "vue-router": "4.3.3"
   },
   "devDependencies": {
     "@element-plus/nuxt": "1.0.9",
@@ -28,6 +30,7 @@
     "@types/ua-parser-js": "0.7.39",
     "@unocss/nuxt": "0.61.0",
     "@vueuse/nuxt": "11.3.0",
-    "lan-chat-icons": "workspace:*"
+    "lan-chat-icons": "workspace:*",
+    "vue-tsc": "2.1.10"
   }
 }

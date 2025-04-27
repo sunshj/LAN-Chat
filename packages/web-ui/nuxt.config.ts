@@ -88,9 +88,6 @@ export default defineNuxtConfig({
     experimental: {
       websocket: true
     },
-    output: {
-      publicDir: '../../resources/ui'
-    },
 
     devProxy: {
       '/api': {

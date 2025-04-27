@@ -18,8 +18,8 @@ import { readFiles } from 'h3-formidable'
 import { lookup } from 'mrmime'
 import { aiChatSchema, extractZodError, messageSchema, userSchema } from './schema'
 import { toAiStore, toGroupChatMessageStore, toUserStore, type StoreHandlers } from './store'
-import type { Message, WebSocketServer } from './types'
-import type { ServerWithSocketIOType } from '.'
+import { createWSServer } from './ws'
+import type { Message } from './types'
 
 export interface CreateServerOptions {
   uiDir: string
@@ -35,6 +35,8 @@ export function createHostServer(options: CreateServerOptions) {
   const app = createApp()
   const router = createRouter()
   app.use(router)
+  const server = createServer(toNodeListener(app))
+  const wss = createWSServer(server)
 
   const fileMap = new Map<string, Promise<string | undefined>>()
   const readCachedFile = (id: string) => {
@@ -194,8 +196,6 @@ export function createHostServer(options: CreateServerOptions) {
     })
   )
 
-  const server: ServerWithSocketIOType = createServer(toNodeListener(app))
-
   router.post(
     '/api/ai/chat',
     eventHandler(async event => {
@@ -215,7 +215,7 @@ export function createHostServer(options: CreateServerOptions) {
         time: Date.now()
       }
       await groupChatStore.create(msg)
-      server?.wss?.emit('$new-group-message', msg)
+      wss.emit('$new-group-message', msg)
 
       return {
         data: msg
@@ -223,5 +223,5 @@ export function createHostServer(options: CreateServerOptions) {
     })
   )
 
-  return server
+  return { server, wss }
 }

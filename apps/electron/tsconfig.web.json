@@ -4,14 +4,14 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@renderer/*": ["src/renderer/src/*"]
+      "@renderer/*": ["./src/renderer/src/*"]
     },
     "outDir": "./dist"
   },
   "include": [
-    "src/preload/index.d.ts",
-    "src/renderer/types/*.d.ts",
-    "src/renderer/src/**/*.vue",
-    "src/renderer/src/**/*.ts"
+    "./src/preload/index.d.ts",
+    "./src/renderer/types/*.d.ts",
+    "./src/renderer/src/**/*.vue",
+    "./src/renderer/src/**/*.ts"
   ]
 }

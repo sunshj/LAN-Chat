@@ -20,12 +20,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
 
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: pnpm
 
       - name: Install Dependencies
@@ -33,16 +33,14 @@ jobs:
 
       - name: build-win
         if: matrix.os == 'windows-latest'
-        run: pnpm run build:win
+        run: pnpm run build:electron-win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          files: dist/*.exe
+          files: apps/electron/dist/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}

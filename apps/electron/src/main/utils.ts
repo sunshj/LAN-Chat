@@ -1,8 +1,12 @@
 import crypto from 'node:crypto'
 import os from 'node:os'
 import path from 'node:path'
-import process from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { app, Notification, type NotificationConstructorOptions } from 'electron'
+
+const currentDirname = path.dirname(fileURLToPath(import.meta.url))
+
+export const currentScopeCwd = path.join(currentDirname, '../../')
 
 export function isEmptyObj(obj: object) {
   return Object.keys(obj).length === 0
@@ -50,7 +54,7 @@ export function $notify(
  * 获取resources目录
  */
 export function getResPath() {
-  const resourcesPathDev = path.join(process.cwd(), 'resources')
+  const resourcesPathDev = path.join(currentScopeCwd, 'resources')
   const resourcesPathProd = path
     .join(app.getAppPath(), 'resources')
     .replace('app.asar', 'app.asar.unpacked')

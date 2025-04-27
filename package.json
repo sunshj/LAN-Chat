@@ -1,79 +1,46 @@
 {
-  "name": "lan-chat",
-  "version": "1.4.6",
+  "name": "lan-chat-monorepo",
   "private": true,
   "description": "局域网聊天与传输工具",
   "type": "module",
   "author": "sunshj",
-  "main": "./out/main/index.js",
   "scripts": {
-    "dev": "chcp 65001 && electron-vite dev -w",
-    "start": "electron-vite preview",
-    "postinstall": "electron-builder install-app-deps",
-    "prebuild": "node scripts/clean && rimraf dist",
     "build:icons": "pnpm -F lan-chat-icons build",
-    "build:webui": "pnpm build:icons && pnpm -F web-ui build && node scripts/copy",
+    "build:webui": "pnpm build:icons && pnpm -F web-ui build && tsx scripts/copy",
     "build:server": "pnpm -F lan-chat-server build",
     "build:cli": "pnpm -F lan-chat-cli build",
     "build:vscode": "pnpm -F vscode-lan-chat build",
-    "build:packages": "pnpm build:server && pnpm build:webui && pnpm build:cli && pnpm build:vscode",
-    "build": "pnpm prebuild && pnpm build:server && pnpm build:webui && electron-vite build",
-    "build:unpack": "pnpm build && electron-builder --dir",
-    "build:win": "pnpm build && electron-builder --win",
-    "release": "bumpp && pnpm build:packages && pnpm -r publish",
+    "build:packages": "pnpm build:server && pnpm build:webui",
+    "build:apps": "pnpm build:cli && pnpm build:vscode",
+    "build:electron-vite": "pnpm -F lan-chat prebuild && pnpm build:packages && pnpm -F lan-chat build",
+    "build:electron-win": "pnpm build:electron-vite && pnpm -F lan-chat build:win",
+    "release": "bumpp && pnpm build:packages && pnpm build:apps && pnpm -r publish",
     "format": "prettier --write .",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --fix --cache",
     "commit": "git-cz",
-    "type-check:node": "tsc --noEmit -p tsconfig.node.json --composite false",
-    "type-check:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
+    "type-check:apps": "pnpm -r --filter=./apps/* --parallel run type-check",
     "type-check:packages": "pnpm -r --filter=./packages/* --parallel run type-check",
-    "type-check": "pnpm build:server && pnpm run /^type-check:.*/"
-  },
-  "dependencies": {
-    "@electron-toolkit/preload": "3.0.0",
-    "@electron-toolkit/utils": "3.0.0",
-    "@vueuse/core": "11.3.0",
-    "@vueuse/integrations": "11.3.0",
-    "axios": "1.7.2",
-    "electron-store": "9.0.0",
-    "electron-updater": "^6.3.9",
-    "element-plus": "2.8.3",
-    "pinia": "2.2.2",
-    "qrcode": "1.5.3"
+    "type-check": "pnpm -F lan-chat-server build && pnpm run /^type-check:.*/"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "18",
-    "@electron-toolkit/tsconfig": "1.0.1",
-    "@sunshj/eslint-config": "2.1.0",
+    "@sunshj/eslint-config": "2.2.2",
     "@sunshj/prettier-config": "1.0.1",
     "@types/node": "18.19.9",
-    "@vitejs/plugin-vue": "5.0.3",
-    "ajv": "8.16.0",
     "bumpp": "^9.5.2",
     "commitizen": "4.3.0",
     "commitlint": "^18.6.1",
     "cz-git": "1.9.2",
-    "electron": "28.2.0",
-    "electron-builder": "24.9.1",
-    "electron-vite": "2.3.0",
-    "eslint": "9.10.0",
-    "lan-chat-icons": "workspace:*",
-    "lan-chat-server": "workspace:*",
+    "eslint": "9.23.0",
     "lint-staged": "15",
     "prettier": "3.2.5",
     "rimraf": "5.0.7",
     "simple-git-hooks": "2.11.1",
     "tsup": "^8.3.0",
+    "tsx": "4.19.3",
     "typescript": "5.3.3",
-    "unocss": "0.63.6",
-    "unplugin-auto-import": "0.18.3",
-    "unplugin-vue-components": "0.27.4",
-    "unplugin-vue-router": "0.10.8",
-    "vite": "5.0.12",
-    "vue": "3.5.12",
-    "vue-router": "4.3.3",
-    "vue-tsc": "2.1.10"
+    "unocss": "0.63.6"
   },
   "config": {
     "commitizen": {
@@ -104,15 +71,15 @@
       "typedarray": "npm:@nolyfill/typedarray@^1"
     }
   },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged",
+    "commit-msg": "npx --no-install commitlint --config commitlint.config.js --edit $1"
+  },
   "lint-staged": {
-    "*.{vue,js,ts}": [
+    "*.{vue,js,ts,json,md,yaml}": [
       "eslint --fix",
       "prettier --write"
     ]
   },
-  "prettier": "@sunshj/prettier-config",
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged",
-    "commit-msg": "npx --no-install commitlint --config commitlint.config.js --edit $1"
-  }
+  "prettier": "@sunshj/prettier-config"
 }

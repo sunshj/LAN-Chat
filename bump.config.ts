@@ -2,9 +2,9 @@ import { defineConfig } from 'bumpp'
 
 export default defineConfig({
   files: [
-    'package.json',
-    './packages/cli/package.json',
-    './packages/server/package.json',
-    './packages/vscode/package.json'
+    './apps/electron/package.json',
+    './apps/cli/package.json',
+    './apps/vscode/package.json',
+    './packages/server/package.json'
   ]
 })

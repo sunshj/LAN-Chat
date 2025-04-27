@@ -1,16 +1,28 @@
 node_modules
 dist
-out
 .DS_Store
 *.log*
+.eslintcache
+.nuxt
+.nitro
+.env
+.env.*
+!.env.example
+!.gitkeep
 
-resources/ui/**
-resources/uploads/**
-resources/stores.json
-!resources/**/.gitkeep
+# apps-cli
+apps/cli/ui
 
-packages/cli/ui/**
+# apps-electron
+apps/electron/out
+apps/electron/resources/ui
+apps/electron/resources/uploads
 
-packages/vscode/res/ui/**
-packages/vscode/src/generated
-packages/vscode/**.vsix
+# apps-vscode
+apps/vscode/res/ui
+apps/vscode/src/generated
+
+
+# packages-webui
+packages/web-ui/.output
+packages/web-ui/.data

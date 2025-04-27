@@ -1,9 +1,9 @@
 import path from 'node:path'
-import process from 'node:process'
 import { is } from '@electron-toolkit/utils'
 import { dialog } from 'electron'
 import electronUpdater, { type AppUpdater } from 'electron-updater'
 import { store } from './store'
+import { currentScopeCwd } from './utils'
 import { getMainWindow } from './window'
 
 const autoUpdater: AppUpdater & { notifyWhenNotAvailable?: boolean } = electronUpdater.autoUpdater
@@ -13,7 +13,7 @@ export function registerAutoUpdater() {
   autoUpdater.autoInstallOnAppQuit = false
 
   if (is.dev) {
-    autoUpdater.updateConfigPath = path.join(process.cwd(), 'dev-app-update.yml')
+    autoUpdater.updateConfigPath = path.join(currentScopeCwd, 'dev-app-update.yml')
   }
 
   autoUpdater.on('update-available', info => {

@@ -19,7 +19,7 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@renderer': resolve('./src/renderer/src')
       }
     },
     plugins: [
@@ -32,7 +32,6 @@ export default defineConfig({
       autoImports({
         dts: './types/imports.d.ts',
         imports: ['vue', '@vueuse/core', VueRouterAutoImports, 'pinia'],
-        dirs: ['./src/stores'],
         resolvers: [ElementPlusResolver()]
       }),
       components({

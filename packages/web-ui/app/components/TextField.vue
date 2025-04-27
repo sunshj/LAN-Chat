@@ -8,7 +8,7 @@
       maxRows: 6
     }"
     resize="none"
-    placeholder="输入 / 启用 AI 命令， Ctrl + Enter 发送消息"
+    :placeholder="placeholder"
     :prefix="['/']"
     :options="mentionOptions"
     @search="handleSearch"
@@ -19,6 +19,12 @@
 
 <script setup lang="ts">
 import type { MentionInstance, MentionOption } from 'element-plus'
+
+const appStore = useAppStore()
+
+const placeholder = computed(() => {
+  return `${appStore.aiModelConfig.enable ? '/ 启用 AI 命令，' : ''}Ctrl + Enter 发送消息`
+})
 
 const mentionData: Record<string, MentionOption[]> = {
   '/': availableMentions

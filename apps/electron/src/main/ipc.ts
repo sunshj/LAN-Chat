@@ -149,8 +149,5 @@ export function registerIPCHandler() {
 
   ipcMain.handle('get-ai-settings', () => store.get('ai'))
 
-  ipcMain.handle('save-ai-settings', (_, data) => {
-    console.log('data: ', data)
-    store.set('ai', data)
-  })
+  ipcMain.handle('save-ai-settings', (_, data) => store.set('ai', data))
 }

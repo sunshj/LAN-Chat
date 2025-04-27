@@ -1,0 +1,47 @@
+{
+  "name": "lan-chat",
+  "version": "1.4.6",
+  "private": true,
+  "description": "局域网聊天与传输工具",
+  "type": "module",
+  "author": "sunshj",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "chcp 65001 && electron-vite dev -w",
+    "start": "electron-vite preview",
+    "postinstall": "electron-builder install-app-deps",
+    "prebuild": "node scripts/clean && rimraf dist",
+    "build": "electron-vite build",
+    "build:unpack": "electron-builder --dir",
+    "build:win": "electron-builder --win"
+  },
+  "dependencies": {
+    "@electron-toolkit/preload": "3.0.0",
+    "@electron-toolkit/utils": "3.0.0",
+    "@vueuse/core": "11.3.0",
+    "@vueuse/integrations": "11.3.0",
+    "axios": "1.7.2",
+    "electron-store": "9.0.0",
+    "electron-updater": "^6.3.9",
+    "element-plus": "2.8.3",
+    "pinia": "2.2.2",
+    "qrcode": "1.5.3"
+  },
+  "devDependencies": {
+    "@electron-toolkit/tsconfig": "1.0.1",
+    "@vitejs/plugin-vue": "5.0.3",
+    "ajv": "8.16.0",
+    "electron": "28.2.0",
+    "electron-builder": "24.9.1",
+    "electron-vite": "2.3.0",
+    "lan-chat-icons": "workspace:*",
+    "lan-chat-server": "workspace:*",
+    "unplugin-auto-import": "0.18.3",
+    "unplugin-vue-components": "0.27.4",
+    "unplugin-vue-router": "0.10.8",
+    "vite": "5.0.12",
+    "vue": "3.5.12",
+    "vue-router": "4.3.3",
+    "vue-tsc": "2.1.10"
+  }
+}

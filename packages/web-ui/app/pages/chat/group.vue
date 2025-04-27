@@ -20,7 +20,7 @@
         class="absolute bottom-20 left-1/2 z-10 -translate-x-1/2"
         @click="scrollToBottom"
       >
-        <IconArrowDown />
+        <IconArrowDown class="p-2" />
       </ElButton>
     </ChatMain>
 
@@ -106,6 +106,7 @@ watch(
 onBeforeMount(() => {
   appStore.clearGroupMessages()
   appStore.syncGroupMessages()
+  appStore.getAiModelConfig()
 })
 
 onMounted(() => {

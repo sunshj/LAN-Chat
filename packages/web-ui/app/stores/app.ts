@@ -186,6 +186,8 @@ export const useAppStore = defineStore(
       onSent?.()
       results[GROUP_CHAT_ID] = data
 
+      if (!aiModelConfig.value.enable) return results
+
       const prefix = getStartingPrefix(msg.content, availableMentions, v => `/${v.value} `)
       if (prefix?.matched) {
         const res = await $fetch<any>('/api/ai/chat', {
@@ -212,8 +214,14 @@ export const useAppStore = defineStore(
       messages.value[GROUP_CHAT_ID] = []
     }
 
+    const aiModelConfig = ref({
+      enable: false,
+      model: 'unknown'
+    })
+
     async function getAiModelConfig() {
       const { data } = await $fetch<{ data: any }>('/api/ai')
+      aiModelConfig.value = data
       return {
         enable: data.enable,
         model: data.model
@@ -254,6 +262,7 @@ export const useAppStore = defineStore(
       syncGroupMessages,
       clearGroupMessages,
 
+      aiModelConfig,
       getAiModelConfig
     }
   },
