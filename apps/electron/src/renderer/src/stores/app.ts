@@ -3,13 +3,8 @@ import { defineStore } from 'pinia'
 export const useAppStore = defineStore('app', () => {
   const isRunning = ref(false)
 
-  const server = ref({
-    host: '',
-    port: 3000
-  })
-
   async function startServer() {
-    isRunning.value = await window.api.startServer(toRaw(server.value))
+    isRunning.value = await window.api.startServer(toRaw(settings.value.server))
   }
 
   async function stopServer() {
@@ -20,10 +15,14 @@ export const useAppStore = defineStore('app', () => {
 
   async function getIPAddresses() {
     ipAddresses.value = await window.api.getIPAddresses()
-    server.value.host = ipAddresses.value[0]
+    settings.value.server.host = ipAddresses.value[0]
   }
 
   const settings = ref({
+    server: {
+      host: '127.0.0.1',
+      port: 3000
+    },
     uploadsDir: '',
     notificationAfterStartServer: false,
     autoCheckUpgrade: false,
@@ -61,7 +60,6 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     isRunning,
-    server,
     startServer,
     stopServer,
 

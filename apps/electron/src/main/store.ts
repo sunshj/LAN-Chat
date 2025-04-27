@@ -14,6 +14,10 @@ interface AppStore extends Store {
 
   /** exposed app settings */
   settings: {
+    server: {
+      host: string
+      port: number
+    }
     uploadsDir: string
     notificationAfterStartServer: boolean
     autoCheckUpgrade: boolean
@@ -39,6 +43,10 @@ export const store = new ElectronStore<AppStore>({
       quitAppForUpdate: false
     },
     settings: {
+      server: {
+        host: '127.0.0.1',
+        port: 3000
+      },
       uploadsDir: '',
       notificationAfterStartServer: true,
       autoCheckUpgrade: false,

@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col gap-2 p-2">
     <ElCard shadow="never">
-      <ElForm :model="appStore.server" label-width="auto" class="max-w-full w-full">
+      <ElForm :model="appStore.settings.server" label-width="auto" class="max-w-full w-full">
         <div class="w-full flex justify-between">
           <ElFormItem label="PORT">
             <ElInput
-              v-model.number="appStore.server.port"
+              v-model.number="appStore.settings.server.port"
               :disabled="appStore.isRunning"
               type="number"
               :formatter="value => Math.min(Math.max(value, 1), 65535)"
@@ -21,7 +21,7 @@
         </div>
         <ElFormItem label="IP">
           <ElSelect
-            v-model="appStore.server.host"
+            v-model="appStore.settings.server.host"
             :disabled="appStore.isRunning"
             remote
             :remote-method="appStore.getIPAddresses"
@@ -68,7 +68,9 @@ import { useAppStore } from '../stores/app'
 const appStore = useAppStore()
 const { copied, copy } = useClipboard()
 
-const url = computed(() => `http://${appStore.server.host}:${appStore.server.port}`)
+const url = computed(
+  () => `http://${appStore.settings.server.host}:${appStore.settings.server.port}`
+)
 const qrcode = useQRCode(url)
 
 async function open(url: string) {
@@ -79,6 +81,7 @@ const startServer = useThrottleFn(appStore.startServer, 1000)
 const stopServer = useThrottleFn(appStore.stopServer, 1000)
 
 onBeforeMount(() => {
+  appStore.syncSettings()
   appStore.getIPAddresses()
 })
 </script>
