@@ -44,7 +44,7 @@ const profileDrawerVisible = ref(false)
 
 function gotoChat(user: User) {
   appStore.setCurrentChatUser(user)
-  navigateTo(`/chat?uid=${user.id}`)
+  navigateTo(`/chat/${user.id}`)
 }
 
 function gotoGroupChat() {

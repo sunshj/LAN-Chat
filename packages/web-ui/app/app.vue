@@ -47,10 +47,7 @@ function handleNewMessage(msg: Message) {
       position: 'top-right',
       duration: 3000,
       onClick() {
-        router.push({
-          path: '/chat',
-          query: { uid: msg.sender }
-        })
+        router.push(`/chat/${msg.sender}`)
         notification.close()
       }
     })

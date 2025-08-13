@@ -44,12 +44,7 @@ const senderName = computed(() => {
 })
 
 function gotoPrivateChat() {
-  router.push({
-    path: '/chat',
-    query: {
-      uid: props.msg.sender
-    }
-  })
+  router.push(`/chat/${props.msg.sender}`)
 }
 </script>
 

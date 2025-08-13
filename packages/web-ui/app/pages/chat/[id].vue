@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import type { TextFieldExposed } from '@/components/TextField.vue'
 
-const route = useRoute()
+const route = useRoute('chat-id')
 const router = useRouter()
 const appStore = useAppStore()
 
@@ -93,7 +93,7 @@ const { percentage, remainPercent, onUploadProgress, onUploadSuccess } = useFile
 })
 
 onMounted(() => {
-  const uid = route.query.uid as string
+  const uid = route.params.id as string
   if (!uid || !appStore.validateUid(uid)) {
     appStore.clearCurrentChatUser()
     router.push('/')
