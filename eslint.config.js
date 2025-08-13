@@ -8,8 +8,14 @@ export default defineConfig(
       }
     },
     {
+      files: ['apps/electron/src/main/ipc.ts'],
+      rules: {
+        'require-await': 'off'
+      }
+    },
+    {
       ignores: ['apps/electron/src/renderer/types']
     }
   ],
-  { vue: true, unocss: true }
+  { vue: true, unocss: true, react: false }
 )

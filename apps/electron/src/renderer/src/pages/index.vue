@@ -62,9 +62,9 @@
 
 <script setup lang="ts">
 import { useQRCode } from '@vueuse/integrations/useQRCode'
+import { client } from '../client'
 import { vOverlay } from '../directives/overlay'
 import { useAppStore } from '../stores/app'
-import { client } from '../client'
 
 const appStore = useAppStore()
 const { copied, copy } = useClipboard()

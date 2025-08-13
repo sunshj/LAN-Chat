@@ -7,6 +7,12 @@ on:
 
 jobs:
   release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3

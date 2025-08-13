@@ -1,10 +1,10 @@
 import process from 'node:process'
+import { registerIpcMain } from '@egoist/tipc/main'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app } from 'electron'
+import { router } from './ipc'
 import { registerAutoUpdater } from './updater'
 import { createMainWindow } from './window'
-import { registerIpcMain } from '@egoist/tipc/main'
-import { router } from './ipc'
 
 if (!app.isPackaged) {
   Object.defineProperty(app, 'isPackaged', { get: () => true })

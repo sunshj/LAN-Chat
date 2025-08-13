@@ -2,7 +2,7 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { is } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, shell, Tray, Menu } from 'electron'
+import { app, BrowserWindow, dialog, Menu, shell, Tray } from 'electron'
 import { getSettings, store } from './store'
 import { checkForUpgrade } from './updater'
 
