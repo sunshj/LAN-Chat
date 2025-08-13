@@ -9,6 +9,10 @@ export default defineNuxtConfig({
     compatibilityVersion: 4
   },
 
+  experimental: {
+    typedPages: true
+  },
+
   app: {
     head: {
       title: 'LAN Chat'
@@ -23,6 +27,9 @@ export default defineNuxtConfig({
 
   modules: [
     '@sunshj/mdc',
+    '@nuxt/icon',
+    '@nuxt/image',
+    '@nuxtjs/mdc',
     '@unocss/nuxt',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
@@ -80,7 +87,21 @@ export default defineNuxtConfig({
     },
 
     optimizeDeps: {
-      include: ['debug']
+      include: [
+        'debug',
+        'element-plus/es/**',
+        'seedrandom',
+        'vue-boring-avatars',
+        'axios',
+        'music-metadata',
+        'vue-aplayer-next',
+        'shiki/core',
+        'shiki/wasm',
+        '@shikijs/transformers',
+        'shiki/engine/oniguruma',
+        'shiki/langs/**',
+        'shiki/themes/**'
+      ]
     }
   },
 
