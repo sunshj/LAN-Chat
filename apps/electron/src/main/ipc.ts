@@ -3,55 +3,80 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import axios from 'axios'
-import { app, dialog, ipcMain, shell } from 'electron'
+import { app, dialog, shell } from 'electron'
 import { startServer, stopServer } from 'lan-chat-server'
-import { getSettings, networkStore, store, storeHandlers } from './store'
+import { AppStore, getSettings, networkStore, store, storeHandlers } from './store'
 import { checkForUpgrade } from './updater'
 import { $notify, getResPath } from './utils'
+import { tipc } from '@egoist/tipc/main'
+import { destroyMainWindow, getMainWindow } from './window'
 
-export function registerIPCHandler() {
-  ipcMain.handle('start-server', (_, { host, port }) => {
-    const { notificationAfterStartServer, uploadsDir } = getSettings()
-    return startServer({
-      host,
-      port,
-      uiDir: path.join(getResPath(), 'ui'),
-      uploadsDir,
-      storeHandlers,
-      onListening(host) {
-        networkStore.increment(host)
+const t = tipc.create()
 
-        if (notificationAfterStartServer) {
-          const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)
-          notify.addListener('click', () => {
-            shell.openExternal(`http://${host}:${port}`)
-          })
+export const router = {
+  // start server
+  startServer: t.procedure
+    .input<{
+      host: string
+      port: number
+    }>()
+    .action(async ({ input }) => {
+      const { host, port } = input
+      const { notificationAfterStartServer, uploadsDir } = getSettings()
+      return await startServer({
+        host,
+        port,
+        uiDir: path.join(getResPath(), 'ui'),
+        uploadsDir,
+        storeHandlers,
+        onListening(host) {
+          networkStore.increment(host)
+
+          if (notificationAfterStartServer) {
+            const notify = $notify('LAN Chat Notice', `Server started on port ${port}`)
+            notify.addListener('click', () => {
+              shell.openExternal(`http://${host}:${port}`)
+            })
+          }
         }
-      }
-    }).catch((error: any) => {
-      dialog.showErrorBox('Start Server Failed', error.message)
-      return false
-    })
-  })
+      }).catch((error: any) => {
+        dialog.showErrorBox('Start Server Failed', error.message)
+        return false
+      })
+    }),
 
-  ipcMain.handle('stop-server', () => stopServer())
+  // stop server
+  stopServer: t.procedure.action(async () => {
+    return stopServer()
+  }),
 
-  ipcMain.handle('get-ip-addresses', () => networkStore.addresses)
+  // get ip address list
+  getIpAddressList: t.procedure.action(async () => {
+    return networkStore.addresses
+  }),
 
-  ipcMain.handle('open-url', (_, url) => shell.openExternal(url))
+  // open external url
+  openExternalUrl: t.procedure.input<string>().action(async ({ input }) => {
+    shell.openExternal(input)
+  }),
 
-  ipcMain.handle('get-version', () => app.getVersion())
+  // get app version
+  getAppVersion: t.procedure.action(async () => {
+    return app.getVersion()
+  }),
 
-  ipcMain.handle('open-uploads-dir', async () => {
+  // open uploads directory
+  openUploadsDirectory: t.procedure.action(async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ['openDirectory'],
       defaultPath: getSettings().uploadsDir
     })
     if (canceled) return null
     return filePaths[0]
-  })
+  }),
 
-  ipcMain.handle('clean-uploads-dir', () => {
+  // clean uploads directory
+  cleanUploadsDirectory: t.procedure.action(async () => {
     const { uploadsDir } = getSettings()
 
     const files = fs.readdirSync(uploadsDir)
@@ -75,46 +100,48 @@ export function registerIPCHandler() {
       type: 'info',
       message: `清理完成，共删除${safeFiles.length}个文件`
     })
-  })
+  }),
 
-  ipcMain.handle('clean-stores', () => {
+  // clear store state
+  clearStore: t.procedure.action(async () => {
     store.clear()
-  })
+  }),
 
-  ipcMain.handle('clean-app-data', () => {
+  // clear local app data(users & messages)
+  clearAppData: t.procedure.action(async () => {
     store.reset('users')
     store.reset('messages')
-  })
+  }),
 
-  ipcMain.handle('get-settings', () => getSettings())
+  getSettings: t.procedure.action(async () => {
+    return getSettings()
+  }),
 
-  ipcMain.handle('save-settings', (_, settings) => {
-    store.set('settings', settings)
-
-    // Update auto launch settings when changed
+  saveSettings: t.procedure.input<AppStore['settings']>().action(async ({ input }) => {
+    store.set('settings', input)
     if (app.isPackaged) {
       app.setLoginItemSettings({
-        openAtLogin: settings.autoLaunch,
+        openAtLogin: input.autoLaunch,
         path: app.getPath('exe'),
         args: ['--hidden']
       })
     }
-  })
+  }),
 
-  ipcMain.handle('reset-settings', () => {
+  resetSettings: t.procedure.action(async () => {
     store.reset('settings')
     return getSettings()
-  })
+  }),
 
-  ipcMain.handle('open-stores-data', () => {
+  openStoresData: t.procedure.action(async () => {
     if (import.meta.env.DEV) {
       store.openInEditor()
     } else {
-      shell.openPath(store.path)
+      await shell.openPath(store.path)
     }
-  })
+  }),
 
-  ipcMain.handle('show-version-data', () => {
+  showVersionData: t.procedure.action(async () => {
     const isPortable = process.env.PORTABLE_EXECUTABLE_DIR !== undefined
     const info = {
       版本: app.getVersion() + (isPortable ? ' (portable)' : ' (setup)'),
@@ -123,7 +150,7 @@ export function registerIPCHandler() {
       'Node.js': process.versions.node,
       OS: `${os.type()} ${os.arch()} ${os.release()}`
     }
-    dialog.showMessageBox({
+    await dialog.showMessageBox({
       title: '关于 LAN Chat',
       type: 'info',
       message: 'LAN Chat',
@@ -131,23 +158,40 @@ export function registerIPCHandler() {
         .map(([k, v]) => `${k}: ${v}`)
         .join('\n')
     })
-  })
+  }),
 
-  ipcMain.handle('check-for-upgrade', () => checkForUpgrade(true))
+  checkForUpgrade: t.procedure.action(async () => {
+    return checkForUpgrade(true)
+  }),
 
-  ipcMain.handle('get-ai-models', async () => {
+  getAiModels: t.procedure.action(async () => {
     const ai = store.get('ai')
     if (!ai) return []
     const res = await axios.get(`${ai.baseUrl}/models?type=text&sub_type=chat`, {
-      headers: {
-        Authorization: `Bearer ${ai.apiKey}`
-      }
+      headers: { Authorization: `Bearer ${ai.apiKey}` }
     })
+    return res.data.data.map((v: any) => v.id)
+  }),
 
-    return res.data.data.map(v => v.id)
+  getAiSettings: t.procedure.action(async () => {
+    return store.get('ai')
+  }),
+
+  saveAiSettings: t.procedure
+    .input<{ baseUrl: string; apiKey: string; model: string }>()
+    .action(async ({ input }) => {
+      store.set('ai', input)
+    }),
+
+  // open devtools
+  openDevtools: t.procedure.action(async () => {
+    getMainWindow()?.webContents.openDevTools()
+  }),
+
+  // exit app
+  exit: t.procedure.action(async () => {
+    destroyMainWindow()
   })
-
-  ipcMain.handle('get-ai-settings', () => store.get('ai'))
-
-  ipcMain.handle('save-ai-settings', (_, data) => store.set('ai', data))
 }
+
+export type Router = typeof router

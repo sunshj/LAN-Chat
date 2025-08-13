@@ -26,6 +26,8 @@
 </template>
 
 <script setup lang="ts">
+import { client } from './client'
+
 const route = useRoute()
 const title = useTitle(`LAN Chat`)
 
@@ -33,7 +35,7 @@ const tip = computed(() => (route.path === '/' ? '设置' : '返回'))
 const targetPath = computed(() => (route.path === '/' ? '/setting' : '/'))
 
 onBeforeMount(async () => {
-  const version = await window.api.getVersion()
+  const version = await client.getAppVersion()
   title.value = `LAN Chat v${version}`
 })
 </script>

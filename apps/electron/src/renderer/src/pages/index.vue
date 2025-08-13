@@ -64,6 +64,7 @@
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { vOverlay } from '../directives/overlay'
 import { useAppStore } from '../stores/app'
+import { client } from '../client'
 
 const appStore = useAppStore()
 const { copied, copy } = useClipboard()
@@ -74,7 +75,7 @@ const url = computed(
 const qrcode = useQRCode(url)
 
 async function open(url: string) {
-  await window.api.open(url)
+  await client.openExternalUrl(url)
 }
 
 const startServer = useThrottleFn(appStore.startServer, 1000)

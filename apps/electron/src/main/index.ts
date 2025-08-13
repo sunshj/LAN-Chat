@@ -1,9 +1,10 @@
 import process from 'node:process'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { app, ipcMain } from 'electron'
-import { registerIPCHandler } from './ipc'
+import { app } from 'electron'
 import { registerAutoUpdater } from './updater'
-import { createMainWindow, destroyMainWindow } from './window'
+import { createMainWindow } from './window'
+import { registerIpcMain } from '@egoist/tipc/main'
+import { router } from './ipc'
 
 if (!app.isPackaged) {
   Object.defineProperty(app, 'isPackaged', { get: () => true })
@@ -17,14 +18,12 @@ app.whenReady().then(() => {
   })
 
   // IPC
-  registerIPCHandler()
+  registerIpcMain(router)
 
-  const mainWindow = createMainWindow()
+  createMainWindow()
 
+  // updater
   registerAutoUpdater()
-
-  ipcMain.handle('open-devtools', () => mainWindow.webContents.openDevTools())
-  ipcMain.handle('exit-app', destroyMainWindow)
 })
 
 app.on('window-all-closed', () => {

@@ -3,7 +3,7 @@ import ElectronStore from 'electron-store'
 import { getNetworkAddresses, getResPath, isEmptyObj } from './utils'
 import type { Store, StoreHandlers } from 'lan-chat-server'
 
-interface AppStore extends Store {
+export interface AppStore extends Store {
   /** internal app settings */
   internalSettings: {
     networks: Record<string, number>

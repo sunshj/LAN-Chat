@@ -9,6 +9,7 @@
     "outDir": "./dist"
   },
   "include": [
+    "./src/main/ipc.ts",
     "./src/preload/index.d.ts",
     "./src/renderer/types/*.d.ts",
     "./src/renderer/src/**/*.vue",

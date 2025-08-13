@@ -1,20 +1,21 @@
 import { defineStore } from 'pinia'
+import { client } from '../client'
 
 export const useAppStore = defineStore('app', () => {
   const isRunning = ref(false)
 
   async function startServer() {
-    isRunning.value = await window.api.startServer(toRaw(settings.value.server))
+    isRunning.value = await client.startServer(toRaw(settings.value.server))
   }
 
   async function stopServer() {
-    isRunning.value = await window.api.stopServer()
+    isRunning.value = await client.stopServer()
   }
 
   const ipAddresses = ref<string[]>([])
 
   async function getIPAddresses() {
-    ipAddresses.value = await window.api.getIPAddresses()
+    ipAddresses.value = await client.getIpAddressList()
     settings.value.server.host = ipAddresses.value[0]
   }
 
@@ -31,12 +32,12 @@ export const useAppStore = defineStore('app', () => {
   })
 
   async function syncSettings() {
-    const data = await window.api.getSettings()
+    const data = await client.getSettings()
     settings.value = data
   }
 
   async function selectUploadsDir() {
-    const dir = await window.api.openUploadsDir()
+    const dir = await client.openUploadsDirectory()
     if (dir) {
       settings.value.uploadsDir = dir
       saveSettings()
@@ -44,7 +45,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function resetSettings() {
-    settings.value = await window.api.resetSettings()
+    settings.value = await client.resetSettings()
     ElMessage.success('Settings reset')
   }
 
@@ -54,7 +55,7 @@ export const useAppStore = defineStore('app', () => {
       await syncSettings()
       return
     }
-    await window.api.saveSettings(toRaw(settings.value))
+    await client.saveSettings(toRaw(settings.value))
     ElMessage.success('Settings saved')
   }
 

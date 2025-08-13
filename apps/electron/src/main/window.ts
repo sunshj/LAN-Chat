@@ -2,16 +2,13 @@ import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { is } from '@electron-toolkit/utils'
-import { app, BrowserWindow, dialog, shell, Tray } from 'electron'
-import { createTrayMenu } from './menu'
+import { app, BrowserWindow, dialog, shell, Tray, Menu } from 'electron'
 import { getSettings, store } from './store'
 import { checkForUpgrade } from './updater'
 
 const windows = {
   mainWindow: null as BrowserWindow | null
 }
-
-globalThis.windows = windows
 
 const currentDirname = dirname(fileURLToPath(import.meta.url))
 
@@ -22,6 +19,30 @@ export function getMainWindow() {
 export function destroyMainWindow() {
   windows.mainWindow?.destroy()
   windows.mainWindow = null
+}
+
+function createTrayMenu(mainWindow: BrowserWindow) {
+  return Menu.buildFromTemplate([
+    {
+      label: '显示',
+      click: () => {
+        mainWindow.show()
+      }
+    },
+    {
+      label: '设置',
+      click: () => {
+        mainWindow.show()
+        mainWindow.webContents.send('navigate', '/setting')
+      }
+    },
+    {
+      label: '退出',
+      click: () => {
+        mainWindow.destroy()
+      }
+    }
+  ])
 }
 
 export function createMainWindow() {
@@ -40,6 +61,8 @@ export function createMainWindow() {
       sandbox: false
     }
   })
+
+  windows.mainWindow = mainWindow
 
   mainWindow.on('ready-to-show', () => {
     if (!process.argv.includes('--hidden')) {
@@ -130,8 +153,6 @@ export function createMainWindow() {
     mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
     mainWindow.isVisible() ? mainWindow.setSkipTaskbar(false) : mainWindow.setSkipTaskbar(true)
   })
-
-  windows.mainWindow = mainWindow
 
   return mainWindow
 }

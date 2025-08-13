@@ -139,6 +139,7 @@
 
 <script setup lang="ts">
 import { useAppStore } from '../stores/app'
+import { client } from '../client'
 
 const appStore = useAppStore()
 
@@ -149,7 +150,7 @@ function cleanUploads() {
     type: 'warning'
   })
     .then(async () => {
-      await window.api.cleanUploads()
+      await client.cleanUploadsDirectory()
       ElMessage.success('Clean uploads success')
     })
     .catch(() => {
@@ -163,7 +164,7 @@ function cleanStores() {
     cancelButtonText: 'Cancel',
     type: 'warning'
   }).then(async () => {
-    await window.api.cleanStores()
+    await client.clearStore()
     appStore.syncSettings()
     ElMessage.success('Clean stores success')
   })
@@ -175,7 +176,7 @@ function cleanAppData() {
     cancelButtonText: 'Cancel',
     type: 'warning'
   }).then(async () => {
-    await window.api.cleanAppData()
+    await client.clearAppData()
     appStore.syncSettings()
     ElMessage.success('Clean app data success')
   })
@@ -198,25 +199,25 @@ async function querySearchAIModels(queryString: string, cb: any) {
 }
 
 async function getAISettings() {
-  aiSettings.value = await window.api.getAISettings()
+  aiSettings.value = await client.getAiSettings()
 }
 
 async function getAIModels() {
-  const data: string[] = await window.api.getAIModels()
+  const data: string[] = await client.getAiModels()
   return data.map(item => ({ value: item }))
 }
 
 const saveAISettings = useDebounceFn(async () => {
   console.log('saveAISettings', aiSettings.value)
-  await window.api.saveAISettings({ ...aiSettings.value })
+  await client.saveAiSettings({ ...aiSettings.value })
 }, 500)
 
 const saveSettings = useDebounceFn(appStore.saveSettings, 500)
-const openDevtools = useThrottleFn(window.api.openDevtools, 2000)
-const openStoresData = useThrottleFn(window.api.openStoresData, 2000)
-const checkForUpgrade = useThrottleFn(window.api.checkForUpgrade, 2000)
-const showVersionData = useThrottleFn(window.api.showVersionData, 2000)
-const exitApp = useThrottleFn(window.api.exitApp, 2000)
+const openDevtools = useThrottleFn(client.openDevtools, 2000)
+const openStoresData = useThrottleFn(client.openStoresData, 2000)
+const checkForUpgrade = useThrottleFn(client.checkForUpgrade, 2000)
+const showVersionData = useThrottleFn(client.showVersionData, 2000)
+const exitApp = useThrottleFn(client.exit, 2000)
 
 onBeforeMount(() => {
   appStore.syncSettings()
