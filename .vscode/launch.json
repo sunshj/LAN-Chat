@@ -20,7 +20,7 @@
       "port": 9222,
       "request": "attach",
       "type": "chrome",
-      "webRoot": "${workspaceFolder}/src/renderer",
+      "webRoot": "${workspaceFolder}/apps/electron/src/renderer",
       "timeout": 60000,
       "presentation": {
         "hidden": true
@@ -30,13 +30,15 @@
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"],
-      "outFiles": ["${workspaceFolder}/packages/vscode/dist/**/*.js"]
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/apps/vscode"],
+      "outFiles": ["${workspaceFolder}/apps/vscode/dist/**/*.js"],
+      "preLaunchTask": "npm: dev - apps/vscode"
     }
   ],
   "compounds": [
     {
-      "name": "Debug All",
+      "name": "Debug Electron",
       "configurations": ["Debug Main Process", "Debug Renderer Process"],
       "presentation": {
         "order": 1
