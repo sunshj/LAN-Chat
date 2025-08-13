@@ -44,6 +44,7 @@
         <TextField
           ref="textFieldRef"
           v-model="message"
+          :show-ai-tools="appStore.aiModelConfig.enable"
           :on-upload-progress="onUploadProgress"
           :on-upload-success="onUploadSuccess"
           @enter="sendMessage()"
@@ -68,7 +69,11 @@ const { scrollToBottom, isNearBottom } = useScrollBottom(scrollerRef)
 
 const { message, sendMessage, handleContextMenu } = useChatMessage({
   isGroupChat: true,
-  onNewMessage: scrollToBottom,
+  onNewMessage: () => {
+    setTimeout(() => {
+      scrollToBottom()
+    }, 0)
+  },
   onBeforeSendMessage() {
     if (appStore.users.length !== 0) return true
     ElMessage.error('当前群聊无在线用户，无法发送消息')

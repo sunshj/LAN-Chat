@@ -33,6 +33,7 @@ const mentionData: Record<string, MentionOption[]> = {
 const mentionOptions = ref<MentionOption[]>([])
 
 function handleSearch(_: string, prefix: string) {
+  if (!props.showAiTools) return
   mentionOptions.value = (mentionData[prefix] || []).map(({ label, value }) => ({
     label,
     value
@@ -62,6 +63,7 @@ defineExpose<TextFieldExposed>({
 const message = defineModel<string>({ required: true })
 
 const props = defineProps<{
+  showAiTools?: boolean
   onUploadProgress?: (event: any) => void
   onUploadSuccess?: (res: UploadFileResult, ...args: any[]) => void
 }>()

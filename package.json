@@ -5,6 +5,7 @@
   "type": "module",
   "author": "sunshj",
   "scripts": {
+    "postinstall": "pnpm build:packages",
     "build:icons": "pnpm -F lan-chat-icons build",
     "build:webui": "pnpm build:icons && pnpm -F web-ui build && tsx scripts/copy",
     "build:server": "pnpm -F lan-chat-server build",
